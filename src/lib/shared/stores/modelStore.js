@@ -110,22 +110,6 @@ export const _inputs = derived(
   }
 )
 
-// export const _inputs = derived(
-// 	[selectedFuels, requiredSiteInputs],
-// 	([$selectedFuels, $requiredSiteInputs]) => {
-// 		const inputs = {
-// 			...{ 'surface.primary.fuel.model.catalogKey': $selectedFuels },
-// 			...$requiredSiteInputs
-// 		}
-// 		return inputs
-// 	}
-// )
-
-// export const _output = derived(, ($_inputs) => {
-// 	const output = fireSim.run($_inputs)
-// 	return output
-// })
-
 export const _output = derived([_inputs], ([$_inputs]) => {
   const output = {}
   Object.keys($_inputs).forEach((fuel) => {
@@ -136,18 +120,17 @@ export const _output = derived([_inputs], ([$_inputs]) => {
   return output
 })
 
-export const displayDataset = derived([selectedFuels, selectedInput, selectedOutput, _output],
-  ([$selectedFuels, $selectedInput, $selectedOutput, $_output]) => {
+export const displayDataset = derived([selectedInput, selectedOutput, _output],
+  ([$selectedInput, $selectedOutput, $_output]) => {
     const resArray = [];
-    $selectedFuels.forEach((fuel) => {
-      const inputKey = $selectedInput
-      const outputKey = $selectedOutput
+    Object.keys($_output).forEach((fuel) => {
       const inputs = $_output[fuel].get($selectedInput);
       const outputs = $_output[fuel].get($selectedOutput);
+      const combined = inputs.map((input, index) => ({ [$selectedInput]: input, [$selectedOutput]: outputs[index], fuel }));
+
       resArray.push({
-        name: fuel,
-        [$selectedInput]: inputs,
-        [$selectedOutput]: outputs,
+        fuel,
+        values: combined
       });
     })
     return resArray;
