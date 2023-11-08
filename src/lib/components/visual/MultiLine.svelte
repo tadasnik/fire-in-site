@@ -3,26 +3,36 @@
   Generates an SVG multi-series line chart. It expects your data to be an array of objects, each with a `values` key that is an array of data objects.
  -->
 <script>
-  import { getContext } from 'svelte';
+  import { getContext } from "svelte";
 
-  const { data, xGet, yGet, zGet } = getContext('LayerCake');
+  const { data, xDomain, yDomain, xGet, yGet, zGet, flatData } =
+    getContext("LayerCake");
 
-  $: path = values => {
-    return 'M' + values
-      .map(d => {
-        return $xGet(d) + ',' + $yGet(d);
-      })
-      .join('L');
+  $: path = (values) => {
+    console.log("path values", $xGet(values[0]));
+
+    return (
+      "M" +
+      values
+        .map((d) => {
+          return $xGet(d) + "," + $yGet(d);
+        })
+        .join("L")
+    );
   };
+  $: console.log(
+    "data line plot",
+    $data[0].values,
+    path($data[0].values),
+    $flatData,
+    $xDomain,
+    $yDomain
+  );
 </script>
 
 <g class="line-group">
   {#each $data as group}
-    <path
-      class='path-line'
-      d='{path(group.values)}'
-      stroke="{$zGet(group)}"
-    ></path>
+    <path class="path-line" d={path(group.values)} stroke={$zGet(group)} />
   {/each}
 </g>
 
@@ -34,3 +44,4 @@
     stroke-width: 3px;
   }
 </style>
+

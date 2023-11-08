@@ -21,27 +21,33 @@
   /* --------------------------------------------
    * Set what is our x key to separate it from the other series
    */
-  const seriesNames = Object.keys(data[0]).filter((d) => d !== xKey);
+  // const xKey = "month";
+  // const yKey = "value";
+  // const zKey = "fruit";
+
+  // const xKeyCast = timeParse("%Y-%m-%d");
+
+  // const seriesNames = Object.keys(data[0]).filter((d) => d !== xKey);
   const seriesColors = ["#ffe4b8", "#ffb3c0", "#ff7ac7", "#ff00cc"];
 
   /* --------------------------------------------
    * Cast values
    */
-  data.forEach((d) => {
-    d[xKey] = typeof d[xKey] === "string" ? xKeyCast(d[xKey]) : d[xKey];
+  // data.forEach((d) => {
+  //   d[xKey] = typeof d[xKey] === "string" ? xKeyCast(d[xKey]) : d[xKey];
+  //
+  //   seriesNames.forEach((name) => {
+  //     d[name] = +d[name];
+  //   });
+  // });
 
-    seriesNames.forEach((name) => {
-      d[name] = +d[name];
-    });
-  });
+  // const formatTickX = timeFormat("%b. %e");
+  // const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
 
-  const formatTickX = timeFormat("%b. %e");
-  const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
-
-  const groupedData = groupLonger(data, seriesNames, {
-    groupTo: zKey,
-    valueTo: yKey,
-  });
+  // const groupedData = groupLonger(data, seriesNames, {
+  //   groupTo: zKey,
+  //   valueTo: yKey,
+  // });
 </script>
 
 <div class="chart-container">
@@ -53,24 +59,18 @@
     yDomain={[0, null]}
     zScale={scaleOrdinal()}
     zRange={seriesColors}
-    flatData={flatten(groupedData, "values")}
-    data={groupedData}
+    flatData={flatten(data, "values")}
+    {data}
   >
     <Svg>
-      <AxisX
-        gridlines={false}
-        ticks={data.map((d) => d[xKey]).sort((a, b) => a - b)}
-        formatTick={formatTickX}
-        snapTicks={true}
-        tickMarks={true}
-      />
-      <AxisY ticks={4} formatTick={formatTickY} />
+      <AxisX gridlines={false} ticks={4} snapTicks={true} tickMarks={true} />
+      <AxisY ticks={4} />
       <MultiLine />
     </Svg>
 
     <Html>
       <Labels />
-      <SharedTooltip formatTitle={formatTickX} dataset={data} />
+      <!-- <SharedTooltip formatTitle={formatTickX} dataset={data} /> -->
     </Html>
   </LayerCake>
 </div>
