@@ -38,10 +38,10 @@
       $fuelInputs[fuel][key] = [fuelNodes[key].min, fuelNodes[key].max];
     }
   };
-  $: console.log("fuel inputs for ", fuel);
 </script>
 
 <div class="flex flex-col p-4">
+  <h3 class="h3 font-bold">Required inputs for: {fuel}</h3>
   <Accordion multiple>
     {#each Object.keys($requiredFuelInputs[fuel]) as key}
       <AccordionItem id={key}>
