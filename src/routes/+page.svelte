@@ -3,7 +3,7 @@
 
   import UKFuels from "$lib/data/UKFuels.json";
   import {
-    selectedOutputs,
+    selectedOutput,
     modelConfigValues,
     requiredConfig,
     config,
@@ -21,6 +21,7 @@
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import MultiLine from "$lib/components/visual/MultiLine.svelte";
+  import SiteInputs from "$lib/components/SiteInputs.svelte";
 
   const selectOptions = [];
   for (const [key, value] of Object.entries(UKFuels)) {
@@ -35,17 +36,12 @@
     return options;
   }
 
-  $: console.log($selectedOutputs);
-  // $: console.log('fuelInputs', $fuelInputs['gs3']);
-  // $: console.log("requiredeFuelInputs", $requiredFuelInputs);
-
   $: console.log(
     "outputs",
     $_output
-    // $_output[$selectedFuels[0]].get("Surface Weighted Fire Spread Rate")
+    // $_output[$selectedFuels[0]].get($selectedOutputs[0])
   );
-
-  $: console.log("modelConfigValues", $modelConfigValues);
+  $: console.log("displayDataset", $displayDataset);
 </script>
 
 <section class="pb-5">
@@ -70,6 +66,15 @@
   </div>
 </section>
 <div />
+<section class="space-y-1">
+  <MultiLinePage
+    data={$displayDataset}
+    xKey={$selectedInput}
+    yKey={$selectedOutput}
+    zKey="fuel"
+  />
+  <!-- <MultiLinePage /> -->
+</section>
 <section class="space-y-1">
   <h3 class="h3 font-bold">Required config options:</h3>
   {#each $requiredConfig as configKey}

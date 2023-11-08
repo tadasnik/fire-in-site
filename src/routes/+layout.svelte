@@ -38,7 +38,6 @@
 
   let hidden1 = true;
   const toggleDrawer = () => {
-    console.log("hidden");
     hidden1 = false;
   };
 </script>
