@@ -42,12 +42,11 @@ export default class FireSim {
     for (const [key, values] of Object.entries(nodeProps)) {
       this.dag.get(key)._variant.setDisplayUnits(values.units)
     }
-    console.log(this.dag.get('surface.weighted.fire.primaryCover'))
+    // console.log(this.dag.get('surface.weighted.fire.primaryCover'))
   }
 
   selectOutputs(outputs) {
     this.selected = outputs
-    console.log('Outputs', outputs)
     this.dag.select(this.selected)
     this.requiredConfig = this.dag.requiredConfigNodes().map((node) => `${node.key()}`)
     return this.requiredConfig
@@ -56,14 +55,12 @@ export default class FireSim {
   updateConfig(config) {
     // Step 2 - configure input choices and computational options
     this.dag.configure(config)
-    console.log('Configuring', config)
     return this.dag.requiredInputNodes().map((node) => node.key())
   }
   // Set display units
   run(inputs) {
     this.dag.setRunLimit(1000000)
     const inputsArray = []
-    console.log("inputs", inputs)
     for (const [key, values] of Object.entries(inputs)) {
       let valuesMod = [];
       if (values.length === 2) {
@@ -75,18 +72,17 @@ export default class FireSim {
     }
     this.dag.input(inputsArray)
     this.dag.run()
-    let elapsed = Date.now() // start the elapsed timer
-    const results = this.dag.run()
-    elapsed = Date.now() - elapsed
+    // let elapsed = Date.now() // start the elapsed timer
+    // const results = this.dag.run()
+    // elapsed = Date.now() - elapsed
+    //
+    // const runs = results.runs
+    // const rps = (runs / (0.001 * elapsed)).toFixed(0)
+    // console.log(
+    //   header(`Optimized: ${runs} runs required ${elapsed} ms (${rps} runs/s): ${results.message}`)
+    // )
 
-    const runs = results.runs
-    const rps = (runs / (0.001 * elapsed)).toFixed(0)
-    console.log(
-      header(`Optimized: ${runs} runs required ${elapsed} ms (${rps} runs/s): ${results.message}`)
-    )
-    const node = this.dag.get('surface.primary.fuel.model.behave.parms.dead.heatOfCombustion')
-    console.log('heatOfCombustion', node.displayValue() / 1000)
-    return this.store._valueMap
+    return this.store._resultsArray
   };
 
   arrayToNative(key, values) {

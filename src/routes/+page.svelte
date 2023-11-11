@@ -1,6 +1,6 @@
 <script>
-  import { Select, Label, MultiSelect, Badge } from "flowbite-svelte";
-
+  import { Select, Label, Badge } from "flowbite-svelte";
+  import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
   import UKFuels from "$lib/data/UKFuels.json";
   import {
     selectedOutput,
@@ -16,13 +16,12 @@
     fuelInputs,
     _inputs,
     _output,
-    displayDataset,
+    // displayDataset,
   } from "$lib/shared/stores/modelStore.js";
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
-  import { outputNodes } from "$lib/data/outputNodes.js";
-  import MultiLine from "$lib/components/visual/MultiLine.svelte";
-  import SiteInputs from "$lib/components/SiteInputs.svelte";
+  import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
 
+  let w;
   const selectOptions = [];
   for (const [key, value] of Object.entries(UKFuels)) {
     selectOptions.push({ name: key + ": " + value.label, value: key });
@@ -37,11 +36,11 @@
   }
 
   $: console.log(
-    "outputs",
+    "output",
     $_output
     // $_output[$selectedFuels[0]].get($selectedOutputs[0])
   );
-  $: console.log("displayDataset", $displayDataset);
+  $: console.log("fuel inputs", $fuelInputs);
 </script>
 
 <section class="pb-5">
@@ -66,15 +65,15 @@
   </div>
 </section>
 <div />
-<section class="space-y-1">
-  <MultiLinePage
-    data={$displayDataset}
-    xKey={$selectedInput}
-    yKey={$selectedOutput}
-    zKey="fuel"
+<div class="w-full aspect-square container" bind:clientWidth={w}>
+  <FireCharacteristics
+    parentWidth={w}
+    data={$_output}
+    xKey="surface.weighted.fire.heatPerUnitArea"
+    yKey="surface.weighted.fire.spreadRate"
+    zKey="surface.weighted.fire.flameLength"
   />
-  <!-- <MultiLinePage /> -->
-</section>
+</div>
 <section class="space-y-1">
   <h3 class="h3 font-bold">Required config options:</h3>
   {#each $requiredConfig as configKey}
@@ -91,3 +90,6 @@
     </Select>
   {/each}
 </section>
+
+<style>
+</style>

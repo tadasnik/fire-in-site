@@ -10,9 +10,9 @@ export const modelConfigOptions = {
     'palmettoGallberry': palmetto-gallberry dynamic fuel parameters
     'westernAspen': western aspen dynamic fuel parameters
     `,
-    },
-   'configure.fuel.secondary': {
-     options: [
+  },
+  'configure.fuel.secondary': {
+    options: [
       'none',
       'catalog',
       'behave',
@@ -82,9 +82,9 @@ export const modelConfigOptions = {
     'atMidflame': midflame height`
   },
   'configure.fire.effectiveWindSpeedLimit': {
-     options: ['applied', 'ignored'],
-     value: 'applied',
-     description: `The fire spread rate effective wind speed limit (see Rothermel 1972) is
+    options: ['applied', 'ignored'],
+    value: 'applied',
+    description: `The fire spread rate effective wind speed limit (see Rothermel 1972) is
 
     'applied'
     'ignored'

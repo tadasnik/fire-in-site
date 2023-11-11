@@ -6,11 +6,13 @@ import { modelConfigOptions } from '$lib/data/configuration.js'
 import UKFuels from '$lib/data/UKFuels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
 
+import { browser } from '$app/environment';
+
 export const fireSim = new FireSim({ ...inputNodes, ...fuelNodes, ...outputNodes })
 export const siteInputs = writable(inputNodes)
-export const selectedOutputs = writable(['surface.weighted.fire.spreadRate', 'surface.primary.fuel.bed.dead.mineralDamping', 'surface.primary.fuel.bed.dead.moistureDamping', 'surface.primary.fuel.bed.live.mineralDamping', 'surface.primary.fuel.bed.live.extinction.moistureContent'])
+export const selectedOutputs = writable(['surface.weighted.fire.spreadRate', 'surface.weighted.fire.heatPerUnitArea', 'surface.weighted.fire.firelineIntensity', 'surface.weighted.fire.flameLength'])
 export const selectedInput = writable('site.moisture.dead.category')
-export const selectedOutput = writable('surface.weighted.fire.spreadRate')
+export const selectedOutput = writable('surface.weighted.fire.firelineIntensity')
 export const selectedFuels = writable(['sh6', 'sh4'])
 export const secondaryFuel = writable(['gr6'])
 
@@ -23,7 +25,6 @@ for (const [f_key, f_values] of Object.entries(UKFuels)) {
 }
 
 export const fuelInputs = writable(fuelProps)
-console.log("fuelInputs", fuelInputs)
 export const modelConfigValues = writable(modelConfigOptions)
 
 export const requiredConfig = derived(selectedOutputs, ($selectedOutputs) => {
@@ -74,7 +75,6 @@ export const requiredFuelInputs = derived(
     $selectedFuels.forEach((fuel) => {
       requiredFuelI[fuel] = {}
       $requiredInputs.forEach((input) => {
-        console.log(fuel, input)
         const splitKey = input.split('.')
         if (
           splitKey[0] === 'surface' &&
@@ -109,29 +109,30 @@ export const _inputs = derived(
     return inputs
   }
 )
-
 export const _output = derived([_inputs], ([$_inputs]) => {
-  const output = {}
+  const output = []
   Object.keys($_inputs).forEach((fuel) => {
-    console.log("run fuel: ", fuel)
-    console.log("inputs", $_inputs)
-    output[fuel] = fireSim.run($_inputs[fuel])
+    const result = fireSim.run($_inputs[fuel])
+    output.push({
+      "surface.primary.fuel.model.catalogKey": fuel,
+      values: result
+    });
   })
   return output
 })
 
-export const displayDataset = derived([selectedInput, selectedOutput, _output],
-  ([$selectedInput, $selectedOutput, $_output]) => {
-    const resArray = [];
-    Object.keys($_output).forEach((fuel) => {
-      const inputs = $_output[fuel].get($selectedInput);
-      const outputs = $_output[fuel].get($selectedOutput);
-      const combined = inputs.map((input, index) => ({ [$selectedInput]: input, [$selectedOutput]: outputs[index], fuel }));
-
-      resArray.push({
-        fuel,
-        values: combined
-      });
-    })
-    return resArray;
-  })
+// export const displayDataset = derived([selectedInput, selectedOutput, _output],
+//   ([$selectedInput, $selectedOutput, $_output]) => {
+//     const resArray = [];
+//     Object.keys($_output).forEach((fuel) => {
+//       const inputs = $_output[fuel].get($selectedInput);
+//       const outputs = $_output[fuel].get($selectedOutput);
+//       const combined = inputs.map((input, index) => ({ [$selectedInput]: input, [$selectedOutput]: outputs[index], fuel }));
+//
+//       resArray.push({
+//         fuel,
+//         values: combined
+//       });
+//     })
+//     return resArray;
+//   })

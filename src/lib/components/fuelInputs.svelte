@@ -12,18 +12,23 @@
 
   let timer: ReturnType<typeof setTimeout>;
 
+  function just_set(e: Object, key: String) {
+    $fuelInputs[fuel][key] = e.detail.values;
+  }
+
   function debounce_set(e: Object, key: String) {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      $fuelInputs[key] = e.detail.values;
-    }, 100);
+      $fuelInputs[fuel][key] = e.detail.values;
+      console.log("after changing", $fuelInputs[fuel][key]);
+    }, 0);
   }
 
   function valuesDisplay(key) {
-    if ($fuelInputs[fuel][key].value.length > 1) {
-      return $fuelInputs[fuel][key].value.join("-");
+    if ($fuelInputs[fuel][key].length > 1) {
+      return $fuelInputs[fuel][key].join("-");
     } else {
-      return $fuelInputs[fuel][key].value;
+      return $fuelInputs[fuel][key];
     }
   }
 
@@ -54,7 +59,7 @@
           </div>
 
           <div class="text-left align-middle">
-            <span class="align-middle"><b>{$fuelInputs[fuel][key]}</b></span>
+            <span class="align-middle"><b>{valuesDisplay(key)}</b></span>
             <span class="text-xs align-middle">({fuelNodes[key].units}) </span>
           </div>
         </span>
@@ -74,7 +79,7 @@
               step={fuelNodes[key].step}
               values={$fuelInputs[fuel][key]}
               on:stop={(e, key) => {
-                debounce_set(e, key);
+                just_set(e, key);
               }}
             />
           </div>
