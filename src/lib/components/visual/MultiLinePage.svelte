@@ -9,6 +9,7 @@
   import AxisX from "$lib/components/visual/AxisX.svelte";
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import Labels from "$lib/components/visual/GroupLabels.html.svelte";
+  import ScatterSvg from "./ScatterSvg.svelte";
   import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
 
   // This example loads csv data as json using @rollup/plugin-dsv
@@ -41,13 +42,14 @@
   //   });
   // });
 
-  // const formatTickX = timeFormat("%b. %e");
+  const formatTickX = timeFormat("%b. %e");
   // const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
 
   // const groupedData = groupLonger(data, seriesNames, {
   //   groupTo: zKey,
   //   valueTo: yKey,
   // });
+  console.log("data ", data);
 </script>
 
 <div class="chart-container">
@@ -56,7 +58,6 @@
     x={xKey}
     y={yKey}
     z={zKey}
-    yDomain={[0, null]}
     zScale={scaleOrdinal()}
     zRange={seriesColors}
     flatData={flatten(data, "values")}
@@ -66,12 +67,13 @@
       <AxisX gridlines={false} ticks={4} snapTicks={true} tickMarks={true} />
       <AxisY ticks={4} />
       <MultiLine />
+      <!-- <ScatterSvg /> -->
     </Svg>
 
-    <Html>
-      <Labels />
-      <!-- <SharedTooltip formatTitle={formatTickX} dataset={data} /> -->
-    </Html>
+    <!-- <Html> -->
+    <!--   <Labels /> -->
+    <!--   <SharedTooltip formatTitle={formatTickX} dataset={data} /> -->
+    <!-- </Html> -->
   </LayerCake>
 </div>
 

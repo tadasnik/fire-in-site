@@ -16,6 +16,7 @@
   import AxisX from "$lib/components/visual/AxisX.svelte";
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import FireCharAnotations from "$lib/components/visual/FireCharAnotations.svelte";
+  import DensityContours from "./DensityContours.svelte";
 
   export let parentWidth;
   export let data;
@@ -47,9 +48,10 @@
     </Html>
 
     <Svg>
-      <AxisX gridlines={false} ticks={4} snapTicks={true} tickMarks={true} />
+      <AxisX gridlines={true} ticks={4} snapTicks={true} tickMarks={true} />
       <AxisY ticks={4} />
-      <ScatterSvg data={flatData} />
+      <!-- <ScatterSvg data={flatData} /> -->
+      <DensityContours data={flatData} />
     </Svg>
 
     <Html>

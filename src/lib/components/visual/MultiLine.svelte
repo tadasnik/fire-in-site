@@ -20,14 +20,6 @@
         .join("L")
     );
   };
-  $: console.log(
-    "data line plot",
-    $data[0].values,
-    path($data[0].values),
-    $flatData,
-    $xDomain,
-    $yDomain
-  );
 </script>
 
 <g class="line-group">

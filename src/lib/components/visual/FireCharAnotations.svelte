@@ -14,7 +14,7 @@
 
   $: console.log($xDomain, yCoord);
   $: tickParms = [
-    { label: "1.2m", ros: 1.3, hpa: yCoord },
+    { label: "1.2m", ros: 1.5, hpa: yCoord },
     { label: "2.4m", ros: 4.2, hpa: yCoord },
     { label: "3.5m", ros: 9, hpa: yCoord },
     { label: "Flame\nlength\n5m", ros: 18.3, hpa: yCoord },
@@ -35,7 +35,7 @@
 
 {#each tickParms as tick}
   <div
-    class="label text-lg"
+    class="label text-xs text-right"
     style="
       top:{top(tick.ros) * 100}%;
       left:{left(tick.hpa) * 100}%;
@@ -50,6 +50,5 @@
   .label {
     position: absolute;
     transform: translate(-100%, -100%) translateY(1px);
-    font-size: 13px;
   }
 </style>
