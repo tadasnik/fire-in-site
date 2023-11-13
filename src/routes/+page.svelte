@@ -71,7 +71,7 @@
     data={$_output}
     xKey="surface.weighted.fire.heatPerUnitArea"
     yKey="surface.weighted.fire.spreadRate"
-    zKey="surface.weighted.fire.flameLength"
+    zKey="surface.primary.fuel.model.catalogKey"
   />
 </div>
 <section class="space-y-1">

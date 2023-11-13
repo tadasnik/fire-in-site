@@ -24,7 +24,8 @@
   export let yKey;
   export let zKey;
 
-  $: flatData = flatten(data, "values");
+  // $: flatData = flatten(data, "values");
+  $: console.log("data charChar:", data);
 </script>
 
 <div
@@ -41,7 +42,8 @@
     yDomain={[0, 60]}
     yRange={[parentWidth - 35, 0]}
     zScale={scaleSequential(interpolateReds)}
-    data={flatData}
+    {data}
+    flatdata={flatten(data, "values")}
   >
     <Html>
       <img alt="The project logo" src={fireCharBackg} />
@@ -51,7 +53,7 @@
       <AxisX gridlines={true} ticks={4} snapTicks={true} tickMarks={true} />
       <AxisY ticks={4} />
       <!-- <ScatterSvg data={flatData} /> -->
-      <DensityContours data={flatData} />
+      <DensityContours {data} />
     </Svg>
 
     <Html>
