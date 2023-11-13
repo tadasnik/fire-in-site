@@ -52,11 +52,6 @@
     }
     return "middle";
   }
-  $: console.log("ticks", ticks);
-  $: console.log("format 3000000", format(".2s")(3000000));
-  // $: formatTick = (d) => {
-  //   format(".2s")(d);
-  // };
 </script>
 
 <g class="axis x-axis" class:snapTicks>
@@ -95,6 +90,11 @@
       x2={$width}
     />
   {/if}
+  <g class="tick">
+    <text text-anchor="middle" x={$width / 2} y={$height + 20}
+      >Heat per Unit Area (J/m2)
+    </text>
+  </g>
 </g>
 
 <style>
