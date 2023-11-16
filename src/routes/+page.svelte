@@ -1,6 +1,8 @@
 <script>
+  import { randomInt } from "d3-random";
   import { Select, Label, Badge } from "flowbite-svelte";
   import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
+  import Auth from "$lib/components/Auth.svelte";
   import UKFuels from "$lib/data/UKFuels.json";
   import {
     selectedOutput,
@@ -35,12 +37,13 @@
     return options;
   }
 
-  $: console.log(
-    "output",
-    $_output
-    // $_output[$selectedFuels[0]].get($selectedOutputs[0])
-  );
-  $: console.log("fuel inputs", $fuelInputs);
+  $: console.log("output", $_output);
+  // $_output[$selectedFuels[0]].get($selectedOutputs[0])
+  // );
+  // $: console.log("fuel inputs", $fuelInputs);
+  //
+  const generator = randomInt(50, 100);
+  $: console.log("rand into, ", generator(100));
 </script>
 
 <section class="pb-5">
@@ -70,6 +73,12 @@
     parentWidth={w}
     data={$_output}
     xKey="surface.weighted.fire.heatPerUnitArea"
+    yKey="surface.weighted.fire.spreadRate"
+    zKey="surface.primary.fuel.model.catalogKey"
+  />
+  <MultiLinePage
+    data={$_output}
+    xKey="site.moisture.dead.category"
     yKey="surface.weighted.fire.spreadRate"
     zKey="surface.primary.fuel.model.catalogKey"
   />
