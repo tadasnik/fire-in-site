@@ -20,15 +20,15 @@ const firebaseConfig = {
 
   authDomain: import.meta.env.VITEAUTHDOMAIN,
 
-  projectId: "uk-behaveplus",
+  projectId: import.meta.env.VITEPROJECTID,
 
-  storageBucket: "uk-behaveplus.appspot.com",
+  storageBucket: import.meta.env.VITESTORAGEBUCKET,
 
-  messagingSenderId: "408912685094",
+  messagingSenderId: import.meta.env.VITEMESSAGINGSENDERID,
 
-  appId: "1:408912685094:web:4ba75bbfc7bfdb69cf1ee7",
+  appId: import.meta.env.VITEAPPID,
 
-  measurementId: "G-BPSBFFNVNN"
+  measurementId: import.meta.env.VITEMEASUREMENTID
 
 };
 
