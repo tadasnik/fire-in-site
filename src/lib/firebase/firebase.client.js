@@ -4,6 +4,7 @@ import { getApp, getApps, deleteApp, initializeApp } from "firebase/app";
 
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, setPersistence, inMemoryPersistence } from "firebase/auth"
+import { getFirestore } from "firebase/firestore"
 
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -18,17 +19,17 @@ const firebaseConfig = {
 
   apiKey: import.meta.env.VITE_APIKEY,
 
-  authDomain: import.meta.env.VITEAUTHDOMAIN,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
 
-  projectId: import.meta.env.VITEPROJECTID,
+  projectId: import.meta.env.VITE_PROJECT_ID,
 
-  storageBucket: import.meta.env.VITESTORAGEBUCKET,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
 
-  messagingSenderId: import.meta.env.VITEMESSAGINGSENDERID,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
 
-  appId: import.meta.env.VITEAPPID,
+  appId: import.meta.env.VITE_APP_ID,
 
-  measurementId: import.meta.env.VITEMEASUREMENTID
+  measurementId: import.meta.env.VITE_MEASUREMENT_ID
 
 };
 
@@ -45,3 +46,4 @@ if (!getApps.length) {
 }
 
 export const auth = getAuth(firebaseApp)
+export const db = getFirestore(firebaseApp)
