@@ -2,9 +2,10 @@
   import "../app.postcss";
 
   import { onMount } from "svelte";
-  import { auth } from "$lib/firebase/firebase.client";
+  import { auth, db } from "$lib/firebase/firebase.client";
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
+  import { doc, getDoc, setDoc } from "firebase/firestore";
   import {
     Sidebar,
     Navbar,
@@ -26,7 +27,7 @@
   import AuthReset from "$lib/components/AuthReset.svelte";
 
   onMount(() => {
-    const unsuscribe = auth.onAuthStateChanged((user) => {
+    const unsuscribe = auth.onAuthStateChanged(async (user) => {
       console.log("user changed ", user);
       authStore.update((curr) => {
         return { ...curr, isLoading: false, currentUser: user };
@@ -39,6 +40,23 @@
       ) {
         // window.location.href = "/";
         console.log($authStore.currentUser, $authStore.isLaoding);
+      }
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocContent = await getDoc(userDocRef);
+      if (!userDocContent.exists()) {
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(
+          userRef,
+          {
+            email: user.email,
+            displayName: user.displayName,
+            fuels: {},
+            scenarios: {},
+          },
+          { merge: true }
+        );
+      } else {
+        const userData = userDocContent.data();
       }
     });
     return unsuscribe;
