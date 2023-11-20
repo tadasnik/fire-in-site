@@ -94,8 +94,8 @@ export default class FireSim {
     return resultsArray
   }
 
-  testRun(inputs) {
-    this.dag.setRunLimit(100000)
+  runWithRandom(inputs) {
+    this.dag.setRunLimit(1000)
     // this.dag.run()
     // dag.run can be replaced by the below:
     this.dag._sortedNodes.forEach(node => {
@@ -105,9 +105,16 @@ export default class FireSim {
         }
       }
     })
-    this.dag._updateClass.update(inputs)
-
-
+    // let elapsed = Date.now() // start the elapsed timer
+    const results = this.dag._updateClass.update(inputs)
+    // elapsed = Date.now() - elapsed
+    //
+    // const calls = results.calls
+    // const runs = results.runs
+    // const rps = (runs / (0.001 * elapsed)).toFixed(0)
+    // console.log(
+    //   header(`Optimized: ${runs} runs and ${calls} calls required ${elapsed} ms (${rps} runs/s): ${results.message}`)
+    // )
     return this.store._resultsArray
   }
 
@@ -119,23 +126,25 @@ export default class FireSim {
     for (const [key, values] of Object.entries(inputs)) {
       let valuesMod = [];
       if (values.length === 2) {
-        valuesMod = makeRange(values, 5)
+        valuesMod = makeRange(values, 100)
       } else if (values.length === 1) {
         valuesMod = values
       }
       inputsArray.push([key, this.arrayToNative(key, valuesMod)])
     }
+    console.log("run ", inputs)
     this.dag.input(inputsArray)
-    this.dag.run(inputsArray)
-    // let elapsed = Date.now() // start the elapsed timer
-    // const results = this.dag.run()
-    // elapsed = Date.now() - elapsed
-    //
-    // const runs = results.runs
-    // const rps = (runs / (0.001 * elapsed)).toFixed(0)
-    // console.log(
-    //   header(`Optimized: ${runs} runs required ${elapsed} ms (${rps} runs/s): ${results.message}`)
-    // )
+    //this.dag.run(inputsArray)
+    let elapsed = Date.now() // start the elapsed timer
+    const results = this.dag.run()
+    elapsed = Date.now() - elapsed
+
+    const calls = results.calls
+    const runs = results.runs
+    const rps = (runs / (0.001 * elapsed)).toFixed(0)
+    console.log(
+      header(`Optimized: ${runs} runs and ${calls} calls required ${elapsed} ms (${rps} runs/s): ${results.message}`)
+    )
     return this.store._resultsArray
   };
 
