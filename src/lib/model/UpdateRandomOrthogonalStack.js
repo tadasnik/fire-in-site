@@ -13,10 +13,11 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
   constructor(dag) {
     super(dag)
   }
-  makeRangeRand(origArray, noElements) {
+  makeRangeRand(origArray, noRangeInputs) {
     const vMin = Math.min(origArray[0], origArray[1])
     const vMax = Math.max(origArray[0], origArray[1])
     const generator = randomUniform(vMin, vMax + 1);
+    const noElements = Math.floor(this._dag._runLimit / noRangeInputs)
     let valueArray = []
     for (let i = 0; i < noElements; i++) {
       valueArray.push(generator())
@@ -42,11 +43,17 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
   }
 
   prepareInputs(inputs) {
+    let noRangeInputs = 0
+    for (const values of Object.values(inputs)) {
+      if (values.length === 2) {
+        noRangeInputs = ++noRangeInputs
+      }
+    }
     const inputsObject = {}
     for (const [key, values] of Object.entries(inputs)) {
       let valuesMod = [];
       if (values.length === 2) {
-        valuesMod = this.makeRangeRand(values, 500)
+        valuesMod = this.makeRangeRand(values, noRangeInputs)
       } else if (values.length === 1) {
         valuesMod = values
       }
@@ -60,7 +67,6 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
    */
   update(inputs) {
     const inputsObject = this.prepareInputs(inputs)
-    console.log("got inputs :", inputsObject)
     const result = { runs: 0, calls: 0, ok: true, message: '' }
     const ptrMap = new Map() // map of input DagNode value indices
     this._dag.requiredInputNodes().forEach(node => ptrMap.set(node, 0))
@@ -111,6 +117,7 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
       } // while
     } // if (stack.length > 0)
     this._dag._storageClass.end()
+    console.log("run result : ", result)
     return result
   }
 }
