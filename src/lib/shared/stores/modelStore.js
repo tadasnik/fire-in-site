@@ -5,6 +5,8 @@ import { outputNodes } from '$lib/data/outputNodes.js'
 import { modelConfigOptions } from '$lib/data/configuration.js'
 import UKFuels from '$lib/data/UKFuels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
+import { db, auth } from "$lib/firebase/firebase.client";
+import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
 
 import { browser } from '$app/environment';
 
@@ -13,6 +15,8 @@ export const siteInputs = writable(inputNodes)
 export const selectedOutputs = writable(['surface.weighted.fire.spreadRate', 'surface.weighted.fire.heatPerUnitArea', 'surface.weighted.fire.firelineIntensity', 'surface.weighted.fire.flameLength'])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.firelineIntensity')
+export const scenarios = writable([])
+export const selectedScenarios = writable(['Dry windy'])
 export const selectedFuels = writable(['sh6', 'sh4'])
 export const secondaryFuel = writable(['gr6'])
 
@@ -20,7 +24,11 @@ const fuelProps = {}
 for (const [f_key, f_values] of Object.entries(UKFuels)) {
   fuelProps[f_key] = {}
   for (const [key, values] of Object.entries(fuelNodes)) {
-    fuelProps[f_key][key] = [f_values[values.catalogParam]]
+    if (Number(f_values[values.catalogParam])) {
+      fuelProps[f_key][key] = [f_values[values.catalogParam].toFixed(values.decimals)]
+    } else {
+      fuelProps[f_key][key] = [f_values[values.catalogParam]]
+    }
   }
 }
 
@@ -114,8 +122,10 @@ export const _output = derived([_inputs], ([$_inputs]) => {
   const output = []
   Object.keys($_inputs).forEach((fuel) => {
     // const result = fireSim.doRuns($_inputs[fuel], 100)
-    console.log($_inputs[fuel])
-    const result = fireSim.testRun($_inputs[fuel])
+    //console.log($_inputs[fuel])
+
+    const result = fireSim.runWithRandom($_inputs[fuel])
+    // const result = fireSim.run($_inputs[fuel])
     // console.log("result store ", result)
     output.push({
       "surface.primary.fuel.model.catalogKey": fuel,
