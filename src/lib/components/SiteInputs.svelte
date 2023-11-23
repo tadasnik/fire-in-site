@@ -1,13 +1,66 @@
 <script lang="ts">
-  import { Toggle } from "flowbite-svelte";
+  import { Button, Modal, Toggle } from "flowbite-svelte";
+  import { Input, Label, Helper } from "flowbite-svelte";
   import RangeSlider from "svelte-range-slider-pips";
   import { AccordionItem, Accordion } from "flowbite-svelte";
+  import { db, auth } from "$lib/firebase/firebase.client";
+  import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     siteInputs,
     requiredSiteInputs,
+    scenarios,
   } from "$lib/shared/stores/modelStore.js";
+  import { authStore } from "$lib/shared/stores/authStore";
+  import type { fromJSON } from "postcss";
 
   let timer: ReturnType<typeof setTimeout>;
+  let defaultModal = false;
+
+  let currScenario = {
+    label: "",
+    description: "",
+  };
+
+  async function readUserScenarios(user) {
+    const scenariosQuerry = await getDocs(
+      collection(db, "users", user.uid, "scenarios")
+    );
+    let userScenarios = [];
+    scenariosQuerry.forEach((doc) => {
+      userScenarios.push(doc.data());
+    });
+    return userScenarios;
+  }
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      //do your logged in user stuff here
+      const userScenarios = await readUserScenarios(user);
+      userScenarios.forEach((element) => {
+        $scenarios.push(element);
+      });
+      $scenarios = $scenarios;
+    } else {
+      // TODO remove user content from store!?
+    }
+  });
+
+  async function addScenario(currScenario) {
+    try {
+      const userRef = doc(
+        db,
+        "users",
+        $authStore.currentUser.uid,
+        "scenarios",
+        currScenario.label
+      );
+      await setDoc(userRef, {
+        ...currScenario,
+      });
+    } catch (error) {
+      console.log("There was an error saving your information", error);
+    }
+  }
 
   function debounce_set(e: Object, key: String) {
     clearTimeout(timer);
@@ -24,6 +77,17 @@
     }
   }
 
+  function prepareScenario() {
+    Object.keys($requiredSiteInputs).forEach((key) => {
+      currScenario[key] = $siteInputs[key].value;
+    });
+    console.log("currScenario ", currScenario);
+  }
+
+  function activateScenarioModal() {
+    prepareScenario();
+  }
+
   $: isRange = (key) => {
     return $siteInputs[key].value.length > 1;
   };
@@ -35,6 +99,9 @@
       $siteInputs[key].value = [$siteInputs[key].min, $siteInputs[key].max];
     }
   };
+  $: console.log("scenarios ", $scenarios);
+  // $: console.log("siteInputs ", $siteInputs);
+  // $: console.log("defaultModal ", defaultModal);
 </script>
 
 <div class="flex flex-col p-4">
@@ -94,4 +161,114 @@
       </AccordionItem>
     {/each}
   </Accordion>
+
+  <Button
+    on:click={() => {
+      prepareScenario();
+      defaultModal = true;
+    }}>Save this scenario</Button
+  >
+  <Modal class="mt-20" title="Save Scenario" bind:open={defaultModal} autoclose>
+    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+      Save current site fuel moisture, slope and wind speed settings as a
+      scenario in the database.
+    </p>
+
+    <form>
+      <div class="grid gap-6 mb-6 md:grid-cols-1">
+        <div>
+          <Label for="scenario_label" class="mb-2">Unique label</Label>
+          <Input
+            type="text"
+            bind:value={currScenario.label}
+            id="scenario_label"
+            placeholder="label"
+            required
+          />
+        </div>
+        <div>
+          <Label for="scenario_description" class="mb-2">Description</Label>
+          <Input
+            type="text"
+            bind:value={currScenario.description}
+            id="scenario_description"
+            placeholder="description"
+            required
+          />
+        </div>
+
+        <!-- {#each Object.keys(currScenario) as key} -->
+        {#each Object.keys($requiredSiteInputs) as key}
+          <div>
+            {#if currScenario[key].length === 1}
+              <Label class="mb-2"
+                >{$siteInputs[key].label}({$siteInputs[key].units})</Label
+              >
+              <Input
+                type="number"
+                id={$siteInputs[key].label}
+                bind:value={currScenario[key][0]}
+                placeholder=""
+                required
+              />
+            {:else}
+              <Label for={$siteInputs[key].label} class="mb-2"
+                >{$siteInputs[key].label}({$siteInputs[key].units})</Label
+              >
+              <div class="grid gap-6 md:grid-cols-2">
+                {#each $siteInputs[key].value as value, indx}
+                  <div>
+                    <Input
+                      type="number"
+                      id={$siteInputs[key].label + indx}
+                      bind:value={currScenario[key][indx]}
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {/each}
+        <!-- {#each Object.keys($requiredSiteInputs) as key} -->
+        <!--   <div> -->
+        <!--     {#if $siteInputs[key].value.length === 1} -->
+        <!--       <Label for={$siteInputs[key].label} class="mb-2" -->
+        <!--         >{$siteInputs[key].label}({$siteInputs[key].units})</Label -->
+        <!--       > -->
+        <!--       <Input -->
+        <!--         type="number" -->
+        <!--         id={$siteInputs[key].label} -->
+        <!--         bind:value={currScenario[key].value[0]} -->
+        <!--         placeholder="" -->
+        <!--         required -->
+        <!--       /> -->
+        <!--     {:else} -->
+        <!--       <Label for={$siteInputs[key].label} class="mb-2" -->
+        <!--         >{$siteInputs[key].label}({$siteInputs[key].units})</Label -->
+        <!--       > -->
+        <!--       <div class="grid gap-6 md:grid-cols-2"> -->
+        <!--         {#each $siteInputs[key].value as value} -->
+        <!--           <div> -->
+        <!--             <Input -->
+        <!--               type="number" -->
+        <!--               id={$siteInputs[key].label} -->
+        <!--               {value} -->
+        <!--               placeholder="" -->
+        <!--               required -->
+        <!--             /> -->
+        <!--           </div> -->
+        <!--         {/each} -->
+        <!--       </div> -->
+        <!--     {/if} -->
+        <!--   </div> -->
+        <!-- {/each} -->
+      </div>
+    </form>
+    <svelte:fragment slot="footer">
+      <Button on:click={() => addScenario(currScenario)}>Save</Button>
+      <Button color="alternative">Cancel</Button>
+    </svelte:fragment>
+  </Modal>
 </div>
