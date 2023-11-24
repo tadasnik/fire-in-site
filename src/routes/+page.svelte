@@ -16,13 +16,14 @@
     requiredFuelInputs,
     requiredInputs,
     fuelInputs,
+    scenarios,
     _inputs,
     _output,
-    // displayDataset,
   } from "$lib/shared/stores/modelStore.js";
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
 
+  export let data;
   let w;
   const selectOptions = [];
   for (const [key, value] of Object.entries(UKFuels)) {
@@ -37,13 +38,13 @@
     return options;
   }
 
-  $: console.log("output", $_output);
+  $scenarios = data.scenarios;
+  $: console.log("scenarios", $scenarios);
+  // $: console.log("output", $_output);
   // $_output[$selectedFuels[0]].get($selectedOutputs[0])
   // );
   // $: console.log("fuel inputs", $fuelInputs);
   //
-  const generator = randomInt(50, 100);
-  $: console.log("rand into, ", generator(100));
 </script>
 
 <section class="pb-5">
@@ -76,12 +77,12 @@
     yKey="surface.weighted.fire.spreadRate"
     zKey="surface.primary.fuel.model.catalogKey"
   />
-  <MultiLinePage
-    data={$_output}
-    xKey="site.moisture.dead.category"
-    yKey="surface.weighted.fire.spreadRate"
-    zKey="surface.primary.fuel.model.catalogKey"
-  />
+  <!-- <MultiLinePage -->
+  <!--   data={$_output} -->
+  <!--   xKey="site.moisture.dead.category" -->
+  <!--   yKey="surface.weighted.fire.spreadRate" -->
+  <!--   zKey="surface.primary.fuel.model.catalogKey" -->
+  <!-- /> -->
 </div>
 <section class="space-y-1">
   <h3 class="h3 font-bold">Required config options:</h3>
