@@ -10,7 +10,7 @@
   import { scaleOrdinal } from "d3-scale";
   import { timeParse, timeFormat } from "d3-time-format";
   import { format, precisionFixed } from "d3-format";
-  import fireCharBackg from "$lib/assets/fire_char_backg.png";
+  import fireCharBackg from "$lib/assets/fire_char_backg.svg";
 
   import ScatterSvg from "$lib/components/visual/ScatterSvg.svelte";
   import AxisX from "$lib/components/visual/AxisX.svelte";
@@ -24,7 +24,7 @@
   export let yKey;
   export let zKey;
 
-  // $: flatData = flatten(data, "values");
+  $: flatData = flatten(data, "values");
   $: console.log("data charChar:", data);
 </script>
 
@@ -76,5 +76,9 @@
   .chart-container {
     width: 100%;
     height: 100%;
+  }
+  img {
+    width: 100%;
+    height: auto;
   }
 </style>
