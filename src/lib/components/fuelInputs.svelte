@@ -20,7 +20,6 @@
     clearTimeout(timer);
     timer = setTimeout(() => {
       $fuelInputs[fuel][key] = e.detail.values;
-      console.log("after changing", $fuelInputs[fuel][key]);
     }, 0);
   }
 
@@ -43,6 +42,7 @@
       $fuelInputs[fuel][key] = [fuelNodes[key].min, fuelNodes[key].max];
     }
   };
+  $: console.log("fuel inputs : ", $fuelInputs);
 </script>
 
 <div class="flex flex-col p-4">
@@ -79,7 +79,7 @@
               step={fuelNodes[key].step}
               values={$fuelInputs[fuel][key]}
               on:stop={(e, key) => {
-                just_set(e, key);
+                debounce_set(e, key);
               }}
             />
           </div>

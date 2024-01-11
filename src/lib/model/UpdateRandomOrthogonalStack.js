@@ -13,11 +13,10 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
   constructor(dag) {
     super(dag)
   }
-  makeRangeRand(origArray, noRangeInputs) {
+  makeRangeRand(origArray, noElements) {
     const vMin = Math.min(origArray[0], origArray[1])
     const vMax = Math.max(origArray[0], origArray[1])
     const generator = randomUniform(vMin, vMax + 1);
-    const noElements = Math.floor(this._dag._runLimit / noRangeInputs)
     let valueArray = []
     for (let i = 0; i < noElements; i++) {
       valueArray.push(generator())
@@ -49,11 +48,12 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
         noRangeInputs = ++noRangeInputs
       }
     }
+    const noElements = Math.floor(this._dag._runLimit / noRangeInputs / 2)
     const inputsObject = {}
     for (const [key, values] of Object.entries(inputs)) {
       let valuesMod = [];
       if (values.length === 2) {
-        valuesMod = this.makeRangeRand(values, noRangeInputs)
+        valuesMod = this.makeRangeRand(values, noElements)
       } else if (values.length === 1) {
         valuesMod = values
       }
@@ -82,7 +82,8 @@ export class UpdateRandomOrthogonalStack extends UpdateAbstract {
         if (ptrMap.has(node)) { // this is a required, non-Config input dagNode
           if (delta > 0) { // moving down the stack, so start with the first input value
             ptrMap.set(node, 0)
-            if (inputValues.length === 1 && Number(inputValues[0])) {
+            if (inputValues.length === 1 && Number(inputValues[0]) && node.key().startsWith('site')
+            ) {
               node._value = node._variant.displayValueToNativeValue(inputValues[0] + randGenerator())
             } else {
               node._value = node._variant.displayValueToNativeValue(inputValues[0])

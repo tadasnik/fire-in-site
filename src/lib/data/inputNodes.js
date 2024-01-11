@@ -61,7 +61,7 @@ export const inputNodes = {
     units: '%',
     selected: true,
     defValue: 15,
-    value: [15, 30],
+    value: [10, 20],
     decimals: 0,
     max: 50,
     min: 0,

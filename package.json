@@ -16,6 +16,7 @@
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/kit": "^1.20.4",
     "autoprefixer": "^10.4.14",
+    "firebase": "^10.6.0",
     "flowbite": "^2.0.0",
     "flowbite-svelte": "^0.44.19",
     "flowbite-svelte-icons": "^0.4.5",

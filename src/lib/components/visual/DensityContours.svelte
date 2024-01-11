@@ -22,7 +22,7 @@
     height,
   } = getContext("LayerCake");
 
-  const fuelCats = { sh4: "#e377c2", sh6: "#bcbd22" };
+  const fuelCats = { sh4: "#e377c2", sh6: "#bcbd22", gr6: "#ff7f0e" };
   const cat10colors = [
     "1f77b4",
     "ff7f0e",
@@ -60,10 +60,14 @@
       .x($xGet)
       .y($yGet)
       .size([$width, $height])
-      .bandwidth(10)
-      .thresholds(5)(fuelData);
+      .bandwidth(3)
+      .thresholds(20)(fuelData);
     return contours;
   };
+  // $: console.log(
+  //   "data density",
+  //   data[0].values.map((d) => $x(d))
+  // );
 
   $: contours = contourDensity()
     .x($xGet)
@@ -71,9 +75,6 @@
     .size([$width, $height])
     .bandwidth(10)
     .thresholds(5)(data);
-
-  $: console.log(myColor($z(data[0])));
-  $: console.log(myColor($z(data[1])));
 </script>
 
 <g class="">

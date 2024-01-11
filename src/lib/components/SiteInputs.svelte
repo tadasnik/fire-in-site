@@ -21,6 +21,15 @@
     description: "",
   };
 
+  async function readGlobalScenarios() {
+    const scenariosQuerry = await getDocs(collection(db, "scenarios"));
+    let globalScenarios = [];
+    scenariosQuerry.forEach((doc) => {
+      globalScenarios.push(doc.data());
+    });
+    return globalScenarios;
+  }
+
   async function readUserScenarios(user) {
     const scenariosQuerry = await getDocs(
       collection(db, "users", user.uid, "scenarios")
@@ -35,25 +44,20 @@
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       //do your logged in user stuff here
-      const userScenarios = await readUserScenarios(user);
-      userScenarios.forEach((element) => {
-        $scenarios.push(element);
-      });
-      $scenarios = $scenarios;
+      // const userScenarios = await readUserScenarios(user);
+      // userScenarios.forEach((element) => {
+      //   $scenarios.push(element);
+      // });
+      // $scenarios = $scenarios;
     } else {
       // TODO remove user content from store!?
     }
   });
 
-  async function addScenario(currScenario) {
+  async function addScenario(currScenario, dbCollectionPath) {
     try {
-      const userRef = doc(
-        db,
-        "users",
-        $authStore.currentUser.uid,
-        "scenarios",
-        currScenario.label
-      );
+      console.log("adding to path ", ...dbCollectionPath);
+      const userRef = doc(...dbCollectionPath);
       await setDoc(userRef, {
         ...currScenario,
       });
@@ -99,7 +103,7 @@
       $siteInputs[key].value = [$siteInputs[key].min, $siteInputs[key].max];
     }
   };
-  $: console.log("scenarios ", $scenarios);
+  // $: console.log("authStore ", $authStore)
   // $: console.log("siteInputs ", $siteInputs);
   // $: console.log("defaultModal ", defaultModal);
 </script>
@@ -162,12 +166,15 @@
     {/each}
   </Accordion>
 
-  <Button
-    on:click={() => {
-      prepareScenario();
-      defaultModal = true;
-    }}>Save this scenario</Button
-  >
+  {#if $authStore.currentUser}
+    <Button
+      on:click={() => {
+        prepareScenario();
+        defaultModal = true;
+      }}>Save this scenario</Button
+    >
+  {/if}
+
   <Modal class="mt-20" title="Save Scenario" bind:open={defaultModal} autoclose>
     <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
       Save current site fuel moisture, slope and wind speed settings as a
@@ -231,44 +238,27 @@
             {/if}
           </div>
         {/each}
-        <!-- {#each Object.keys($requiredSiteInputs) as key} -->
-        <!--   <div> -->
-        <!--     {#if $siteInputs[key].value.length === 1} -->
-        <!--       <Label for={$siteInputs[key].label} class="mb-2" -->
-        <!--         >{$siteInputs[key].label}({$siteInputs[key].units})</Label -->
-        <!--       > -->
-        <!--       <Input -->
-        <!--         type="number" -->
-        <!--         id={$siteInputs[key].label} -->
-        <!--         bind:value={currScenario[key].value[0]} -->
-        <!--         placeholder="" -->
-        <!--         required -->
-        <!--       /> -->
-        <!--     {:else} -->
-        <!--       <Label for={$siteInputs[key].label} class="mb-2" -->
-        <!--         >{$siteInputs[key].label}({$siteInputs[key].units})</Label -->
-        <!--       > -->
-        <!--       <div class="grid gap-6 md:grid-cols-2"> -->
-        <!--         {#each $siteInputs[key].value as value} -->
-        <!--           <div> -->
-        <!--             <Input -->
-        <!--               type="number" -->
-        <!--               id={$siteInputs[key].label} -->
-        <!--               {value} -->
-        <!--               placeholder="" -->
-        <!--               required -->
-        <!--             /> -->
-        <!--           </div> -->
-        <!--         {/each} -->
-        <!--       </div> -->
-        <!--     {/if} -->
-        <!--   </div> -->
-        <!-- {/each} -->
       </div>
     </form>
     <svelte:fragment slot="footer">
-      <Button on:click={() => addScenario(currScenario)}>Save</Button>
+      <Button
+        on:click={() =>
+          addScenario(currScenario, [
+            db,
+            "users",
+            $authStore.currentUser.uid,
+            "scenarios",
+            currScenario.label,
+          ])}>Save</Button
+      >
       <Button color="alternative">Cancel</Button>
+      {#if $authStore.currentUser.uid === "SgbOOJpWvYVps3JY31UnfSgqKLX2"}
+        <Button
+          on:click={() => {
+            addScenario(currScenario, [db, "scenarios", currScenario.label]);
+          }}>Save to global</Button
+        >
+      {/if}
     </svelte:fragment>
   </Modal>
 </div>

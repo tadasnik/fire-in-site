@@ -12,13 +12,13 @@
 
   $: yCoord = max($xDomain) - 400000;
 
-  $: console.log($xDomain, yCoord);
+  $: console.log("xDomain, yCoord", $xDomain, yCoord);
   $: tickParms = [
-    { label: "1.2m", ros: 1.5, hpa: yCoord },
-    { label: "2.4m", ros: 4.2, hpa: yCoord },
-    { label: "3.5m", ros: 9, hpa: yCoord },
-    { label: "Flame\nlength\n5m", ros: 18.3, hpa: yCoord },
-    { label: "8m", ros: 51, hpa: yCoord },
+    { label: "0.5m", ros: 0.8, hpa: yCoord, rotate: 0 },
+    { label: "1.5m", ros: 2.1, hpa: yCoord, rotate: 0 },
+    { label: "Flame length 3.5m", ros: 8.2, hpa: yCoord - 200000, rotate: 10 },
+    { label: "5m", ros: 18, hpa: yCoord - 200000, rotate: 20 },
+    { label: "8m", ros: 48.8, hpa: yCoord - 400000, rotate: 40 },
   ];
   $: console.log(tickParms);
   /* --------------------------------------------
@@ -35,11 +35,13 @@
 
 {#each tickParms as tick}
   <div
-    class="label text-xs text-right"
+    class="label text-xs"
     style="
       top:{top(tick.ros) * 100}%;
       left:{left(tick.hpa) * 100}%;
       text-align: right;
+      rotate:{tick.rotate}deg;
+    white-space: nowrap;
     "
   >
     {cap(tick.label)}

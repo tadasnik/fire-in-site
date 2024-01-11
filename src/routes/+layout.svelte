@@ -5,7 +5,7 @@
   import { auth, db } from "$lib/firebase/firebase.client";
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
-  import { doc, getDoc, setDoc } from "firebase/firestore";
+  import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     Sidebar,
     Navbar,
@@ -26,20 +26,27 @@
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
   import AuthReset from "$lib/components/AuthReset.svelte";
 
+  let userScenarios;
   onMount(() => {
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
-      console.log("user changed ", user);
+      // console.log("user changed ", user);
       authStore.update((curr) => {
         return { ...curr, isLoading: false, currentUser: user };
       });
       if (
+        // if browser and no user
         browser &&
         !$authStore.currentUser &&
-        !$authStore.isLoading &&
-        window.location.pathname !== "/"
+        !$authStore.isLoading
+        // window.location.pathname !== "/"
       ) {
         // window.location.href = "/";
-        console.log($authStore.currentUser, $authStore.isLaoding);
+        console.log(
+          "current User ",
+          $authStore.currentUser,
+          $authStore.isLoading
+        );
+        return;
       }
       const userDocRef = doc(db, "users", user.uid);
       const userDocContent = await getDoc(userDocRef);
@@ -50,19 +57,17 @@
           {
             email: user.email,
             displayName: user.displayName,
-            fuels: {},
-            scenarios: {},
           },
           { merge: true }
         );
       } else {
-        const userData = userDocContent.data();
+        userScenarios = userDocContent.data();
       }
     });
     return unsuscribe;
   });
 
-  $: console.log("authStore ", $authStore.currentUser, $authStore.isLaoding);
+  $: console.log("user data ", userScenarios);
   let spanClass = "flex-1 ml-3 whitespace-nowrap";
 
   $: activeUrl = $page.url.pathname;

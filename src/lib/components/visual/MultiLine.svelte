@@ -8,9 +8,9 @@
   const { data, xDomain, yDomain, xGet, yGet, zGet, flatData } =
     getContext("LayerCake");
 
+  $: console.log("Multiline data", $data);
   $: path = (values) => {
     console.log("path values", $xGet(values[0]));
-
     return (
       "M" +
       values
@@ -36,4 +36,3 @@
     stroke-width: 3px;
   }
 </style>
-

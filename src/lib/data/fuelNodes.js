@@ -46,9 +46,9 @@ export const fuelNodes = {
     value: [0.2],
     defValue: 0.2,
     decimals: 2,
-    max: 2,
+    max: 1,
     min: 0,
-    step: 0.1
+    step: 0.01
   },
 
   'surface.primary.fuel.model.behave.parms.dead.tl10h.ovendryLoad': {
@@ -61,7 +61,7 @@ export const fuelNodes = {
     decimals: 2,
     max: 2,
     min: 0,
-    step: 0.1
+    step: 0.01
   },
 
   'surface.primary.fuel.model.behave.parms.dead.tl100h.ovendryLoad': {
@@ -74,7 +74,7 @@ export const fuelNodes = {
     decimals: 2,
     max: 2,
     min: 0,
-    step: 0.1
+    step: 0.01
   },
 
   'surface.primary.fuel.model.behave.parms.dead.tl1h.surfaceAreaToVolumeRatio': {
@@ -84,7 +84,7 @@ export const fuelNodes = {
     selected: true,
     value: [0.2],
     defValue: 0.2,
-    decimals: 2,
+    decimals: 0,
     max: 200,
     min: 1,
     step: 1
@@ -110,7 +110,7 @@ export const fuelNodes = {
     selected: true,
     value: [15],
     defValue: 15,
-    decimals: 2,
+    decimals: 0,
     max: 200,
     min: 1,
     step: 1
@@ -123,7 +123,7 @@ export const fuelNodes = {
     selected: true,
     value: [15],
     defValue: 15,
-    decimals: 2,
+    decimals: 0,
     max: 200,
     min: 1,
     step: 1

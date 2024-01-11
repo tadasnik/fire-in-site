@@ -1,21 +1,30 @@
 <script>
   import { Input, Label, Helper, Button } from "flowbite-svelte";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
-  let register = true;
+
+  let register = false;
+  let displayName = "";
   let email = "";
   let password = "";
   let confirmPassword = "";
 
   async function handleSubmit() {
-    if (!email || (!password && register && !confirmPassword)) {
+    if (
+      !email ||
+      !password ||
+      (!register && !displayName && !password && !confirmPassword)
+    ) {
       return;
     }
     if (register && password === confirmPassword) {
       try {
         console.log("confirm password");
-        await authHandlers.signup(email, password);
+        await authHandlers.signup(email, password, displayName);
       } catch (err) {
-        console.log(err);
+        console.log("cought err", err.code);
+        if (err.code == "auth/email-already-in-use") {
+          alert("Email already in use, please log in");
+        }
       }
     } else {
       try {
@@ -25,15 +34,30 @@
       }
     }
     if ($authStore.currentUser) {
-      window.location.href = "/privatepage";
+      window.location.href = "/";
     }
   }
 </script>
 
-<h1>{register ? "Register" : "Sign Up"}</h1>
 <form>
-  <div class="grid gap-6 mb-6 md:grid-cols-2">
+  <div class="flex flex-col gap-6 mb-6">
+    <div class="">
+      <h3>{register ? "Register" : "Log in"}</h3>
+    </div>
     <div>
+      {#if register}
+        <Label class="block space-y-2">
+          <span>User name</span>
+          <Input
+            label="Username"
+            id="name"
+            name="name"
+            bind:value={displayName}
+            required
+            placeholder="User name"
+          />
+        </Label>
+      {/if}
       <Label class="block space-y-2">
         <span>Your email</span>
         <Input

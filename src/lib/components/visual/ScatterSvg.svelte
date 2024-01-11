@@ -23,7 +23,7 @@
   export let data;
 
   /** @type {Number} [r=5] – The circle's radius. */
-  export let r = 5;
+  export let r = 1;
 
   /** @type {String} [fill='#0cf'] – The circle's fill color. */
   export let fill = "#0cf";
@@ -41,7 +41,7 @@
       cx={$xGet(d) + ($xScale.bandwidth ? $xScale.bandwidth() / 2 : 0)}
       cy={$yGet(d) + ($yScale.bandwidth ? $yScale.bandwidth() / 2 : 0)}
       {r}
-      fill={$zGet(d)}
+      fill="gray"
       {stroke}
       stroke-width={strokeWidth}
     />

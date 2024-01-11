@@ -38,6 +38,7 @@
     return options;
   }
 
+  $: console.log("fetch scenarios  ", data.scenarios);
   $scenarios = data.scenarios;
   $: console.log("scenarios", $scenarios);
   // $: console.log("output", $_output);
