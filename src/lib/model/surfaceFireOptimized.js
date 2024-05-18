@@ -15,7 +15,7 @@
  * On my old laptop, 240,000 runs requires from 735 to 1300 millseconds,
  * or 180,000 to 326,000 runs per second.
  */
-import { Sim } from '@cbevins/fire-behavior-simulator'
+import { Sim, UpdateOrthogonalStack } from '@cbevins/fire-behavior-simulator'
 import StorageNeat from '$lib/model/ResultsStore.js'
 import { UpdateRandomOrthogonalStack } from '$lib/model/UpdateRandomOrthogonalStack.js'
 import { randomInt, randomUniform, randomNormal } from "d3-random"
@@ -94,10 +94,26 @@ export default class FireSim {
     return resultsArray
   }
 
+  runBasic(inputs) {
+    this.dag.setRunLimit(1000)
+    this.dag.setUpdateClass(new UpdateOrthogonalStack(this.dag))
+    const inputsArray = []
+
+    for (const [key, values] of Object.entries(inputs)) {
+      inputsArray.push([key, this.arrayToNative(key, values)])
+    }
+    console.log(" inputs in run ", inputs)
+    this.dag.input(inputsArray)
+    this.dag.run()
+    return this.store._resultsArray
+  };
+
   runWithRandom(inputs) {
     this.dag.setRunLimit(1000)
+    this.dag.setUpdateClass(new UpdateRandomOrthogonalStack(this.dag))
     // this.dag.run()
     // dag.run can be replaced by the below:
+    console.log('inputs during run: ', inputs)
     this.dag._sortedNodes.forEach(node => {
       if (node._is._required && node._is._input) {
         if ((!this.dag._input.has(node)) || this.dag._input.get(node) === []) {
@@ -106,7 +122,7 @@ export default class FireSim {
       }
     })
     // let elapsed = Date.now() // start the elapsed timer
-    const results = this.dag._updateClass.update(inputs)
+    this.dag._updateClass.update(inputs)
     // elapsed = Date.now() - elapsed
     //
     // const calls = results.calls
@@ -121,6 +137,7 @@ export default class FireSim {
   // Set display units
   run(inputs) {
     this.dag.setRunLimit(100000)
+
     const inputsArray = []
 
     for (const [key, values] of Object.entries(inputs)) {
@@ -132,7 +149,7 @@ export default class FireSim {
       }
       inputsArray.push([key, this.arrayToNative(key, valuesMod)])
     }
-    console.log("run ", inputs)
+    console.log(" inputs in run ", inputs)
     this.dag.input(inputsArray)
     //this.dag.run(inputsArray)
     let elapsed = Date.now() // start the elapsed timer
