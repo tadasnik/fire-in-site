@@ -12,13 +12,36 @@ import { browser } from '$app/environment';
 
 export const fireSim = new FireSim({ ...inputNodes, ...fuelNodes, ...outputNodes })
 export const siteInputs = writable(inputNodes)
-export const selectedOutputs = writable(['surface.weighted.fire.spreadRate', 'surface.weighted.fire.heatPerUnitArea', 'surface.weighted.fire.firelineIntensity', 'surface.weighted.fire.flameLength'])
+export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
+  'surface.weighted.fire.heatPerUnitArea',
+  'surface.weighted.fire.firelineIntensity',
+  'surface.weighted.fire.flameLength',
+  'ignition.firebrand.probability'])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.firelineIntensity')
 export const scenarios = writable([])
-export const selectedScenarios = writable(['Dry windy'])
+export const selectedScenario = writable({
+  "site.moisture.dead.category": [
+    5,
+    8
+  ],
+  "site.slope.steepness.degrees": [
+    22
+  ],
+  "description": "Wet live fuels, steep terrain",
+  "site.wind.speed.atMidflame": [
+    5
+  ],
+  "label": "Wet live",
+  "site.moisture.live.category": [
+    116
+  ],
+  "site.temperature.air": [45],
+  "site.canopy.fuel.shading": [0],
+})
 export const selectedFuels = writable(['sh6', 'sh4'])
 export const secondaryFuel = writable(['gr6'])
+export const advancedMode = writable(false)
 
 const fuelProps = {}
 for (const [f_key, f_values] of Object.entries(UKFuels)) {
@@ -56,15 +79,19 @@ export const requiredInputs = derived(config, ($config) => {
   return requiredI
 })
 
+
 export const requiredSiteInputs = derived(
-  [requiredInputs, siteInputs],
-  ([$requiredInputs, $siteInputs]) => {
+  [requiredInputs, siteInputs, selectedScenario],
+  ([$requiredInputs, $siteInputs, $selectedScenario]) => {
+    console.log("from model store selected scenario", $selectedScenario)
     const requiredSiteI = {}
     $requiredInputs.forEach((input) => {
       console.log("input ", input)
       const splitKey = input.split('.')
       if (splitKey[0] === 'site') {
-        requiredSiteI[input] = $siteInputs[input].value
+        console.log("READING ", input)
+        requiredSiteI[input] = $selectedScenario[input]
+        console.log("SET value ", requiredSiteI[input])
       } else if (
         splitKey[0] === 'surface' &&
         splitKey[1] === 'weighted' &&
@@ -118,15 +145,18 @@ export const _inputs = derived(
     return inputs
   }
 )
-export const _output = derived([_inputs], ([$_inputs]) => {
+export const _output = derived([_inputs, advancedMode], ([$_inputs, $advancedMode]) => {
   const output = []
   Object.keys($_inputs).forEach((fuel) => {
-    // const result = fireSim.doRuns($_inputs[fuel], 100)
-    //console.log($_inputs[fuel])
-
-    const result = fireSim.runWithRandom($_inputs[fuel])
-    // const result = fireSim.run($_inputs[fuel])
-    // console.log("result store ", result)
+    let result = {};
+    if ($advancedMode) {
+      result = fireSim.runWithRandom($_inputs[fuel])
+    } else {
+      result = fireSim.runBasic($_inputs[fuel])
+      console.log('if NOT advanced : ', $advancedMode)
+    }
+    console.log("result store ", result)
+    console.log("result store ", result)
     output.push({
       "surface.primary.fuel.model.catalogKey": fuel,
       values: result
