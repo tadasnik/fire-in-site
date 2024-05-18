@@ -13,6 +13,7 @@
     NavLi,
     NavUl,
     NavHamburger,
+    Toggle,
     Button,
     CloseButton,
   } from "flowbite-svelte";
@@ -22,12 +23,27 @@
   import {
     selectedFuels,
     requiredFuelInputs,
+    advancedMode,
   } from "$lib/shared/stores/modelStore";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
   import AuthReset from "$lib/components/AuthReset.svelte";
 
+  const successCallback = (pos) => {
+    const crd = pos.coords;
+
+    console.log("Your current position is:");
+    console.log(`Latitude : ${crd.latitude}`);
+    console.log(`Longitude: ${crd.longitude}`);
+    console.log(`More or less ${crd.accuracy} meters.`);
+  };
+
+  const errorCallback = (error) => {
+    console.log("there was ", error);
+  };
   let userScenarios;
   onMount(() => {
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
       // console.log("user changed ", user);
       authStore.update((curr) => {
@@ -61,9 +77,10 @@
           { merge: true }
         );
       } else {
-        userScenarios = userDocContent.data();
+        userScenarios = userDocContent;
       }
     });
+
     return unsuscribe;
   });
 
@@ -77,6 +94,8 @@
   const toggleDrawer = () => {
     hidden1 = false;
   };
+
+  $: console.log("advanced mode : ", $advancedMode);
 </script>
 
 <header
@@ -115,9 +134,11 @@
         class="inline-block dark:hover:text-white hover:text-gray-900"
       />
     </div>
+    <div class="flex items-center ml-auto">
+      <Toggle size="small" bind:checked={$advancedMode}>Advanced mode</Toggle>
+    </div>
   </Navbar>
 </header>
-
 {#if activeUrl === "/"}
   <Sidebar
     {activeUrl}
@@ -129,10 +150,10 @@
     {#each $selectedFuels as fuel}
       {@const key = Object.keys($requiredFuelInputs[fuel])}
       <section class="space-y-1">
-        <div class="pl-4 flex flex-wrap">
+        <div class="pl-4 pt-2 flex flex-wrap">
           <!-- {#if key === "surface.primary.fuel.model.catalogKey" || key === "surface.secondary.fuel.model.catalogKey"} -->
           {#if key.length === 1}
-            <p>Fuel model: {fuel}</p>
+            <p>{fuel}</p>
           {:else}
             <FuelInputs {fuel} />
           {/if}
@@ -142,15 +163,15 @@
   </Sidebar>
 {/if}
 
-<main class="p-4 md:ml-96 h-auto pt-20">
-  {#if $authStore.currentUser}
-    <heading class="p-8" tag="h1" customSize="text-3xl"
-      >Private page user: {$authStore.currentUser.displayName}
-    </heading>
-    <AuthReset />
-  {:else}
-    <h1>Loading....</h1>
-  {/if}
+<main class="md:ml-96 h-auto max-w-xl p-10">
+  <!-- {#if $authStore.currentUser} -->
+  <!--   <heading class="p-8" tag="h1" customSize="text-3xl" -->
+  <!--     >Private page user: {$authStore.currentUser.displayName} -->
+  <!--   </heading> -->
+  <!--   <AuthReset /> -->
+  <!-- {:else} -->
+  <!--   <h1>Loading....</h1> -->
+  <!-- {/if} -->
 
   <slot />
 </main>

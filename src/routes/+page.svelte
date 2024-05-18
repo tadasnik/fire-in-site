@@ -1,5 +1,4 @@
 <script>
-  import { randomInt } from "d3-random";
   import { Select, Label, Badge } from "flowbite-svelte";
   import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
   import Auth from "$lib/components/Auth.svelte";
@@ -17,8 +16,10 @@
     requiredInputs,
     fuelInputs,
     scenarios,
+    selectedScenario,
     _inputs,
     _output,
+    advancedMode,
   } from "$lib/shared/stores/modelStore.js";
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
@@ -38,9 +39,11 @@
     return options;
   }
 
-  $: console.log("fetch scenarios  ", data.scenarios);
+  //  $: console.log("fetch scenarios  ", data.scenarios);
   $scenarios = data.scenarios;
-  $: console.log("scenarios", $scenarios);
+  // $: console.log("scenarios", $scenarios);
+  // $: console.log("selectedScenario", $selectedScenario);
+
   // $: console.log("output", $_output);
   // $_output[$selectedFuels[0]].get($selectedOutputs[0])
   // );
@@ -49,6 +52,13 @@
 </script>
 
 <section class="pb-5">
+  <Label for="select-sm" class="mb-2">Select site scenario</Label>
+  <Select id="select-sm" size="sm" class="mb-6" bind:value={$selectedScenario}>
+    {#each $scenarios as scenario}
+      <option value={scenario}>{scenario.label}</option>
+    {/each}
+  </Select>
+
   <heading class="p-8" tag="h1" customSize="text-3xl"
     >Select fuel models</heading
   >
@@ -71,13 +81,23 @@
 </section>
 <div />
 <div class="w-full aspect-square container" bind:clientWidth={w}>
-  <FireCharacteristics
-    parentWidth={w}
-    data={$_output}
-    xKey="surface.weighted.fire.heatPerUnitArea"
-    yKey="surface.weighted.fire.spreadRate"
-    zKey="surface.primary.fuel.model.catalogKey"
-  />
+  {#if $advancedMode}
+    <FireCharacteristics
+      parentWidth={w}
+      data={$_output}
+      xKey="surface.weighted.fire.heatPerUnitArea"
+      yKey="surface.weighted.fire.spreadRate"
+      zKey="surface.primary.fuel.model.catalogKey"
+    />
+  {:else}
+    <MultiLinePage
+      data={$_output}
+      xKey="site.moisture.dead.category"
+      yKey="surface.weighted.fire.spreadRate"
+      zKey="surface.primary.fuel.model.catalogKey"
+    />
+  {/if}
+
   <!-- <MultiLinePage -->
   <!--   data={$_output} -->
   <!--   xKey="site.moisture.dead.category" -->
@@ -85,7 +105,7 @@
   <!--   zKey="surface.primary.fuel.model.catalogKey" -->
   <!-- /> -->
 </div>
-<section class="space-y-1">
+<section class="pt-20 space-y-2">
   <h3 class="h3 font-bold">Required config options:</h3>
   {#each $requiredConfig as configKey}
     <Label for="select-sm" class="mb-2">{configKey}</Label>
