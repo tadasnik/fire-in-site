@@ -1,4 +1,9 @@
 export const outputNodes = {
+
+  'surface.primary.fuel.model.catalogKey': {
+    label: 'Fuel model'
+  },
+
   'surface.weighted.fire.spreadRate': {
     code: 'fireSpreadRate',
     group: 'primary',
