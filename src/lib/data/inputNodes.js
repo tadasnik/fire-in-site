@@ -175,12 +175,26 @@ export const inputNodes = {
     units: 'oC',
     selected: true,
     defValue: 20,
-    value: [20],
+    value: [50],
     decimals: 0,
     max: 45,
     min: 0,
     step: 1,
     description: 'Air temeperature in degrees Celsius'
+  },
+
+  'site.canopy.fuel.shading': {
+    label: 'Canopy shading ',
+    code: 'FuelCoverFraction',
+    units: '%',
+    selected: true,
+    defValue: 0,
+    value: [0],
+    decimals: 1,
+    max: 100,
+    min: 0,
+    step: 1,
+    description: 'Fuel % covered by canopy'
   },
 
   'site.canopy.tree.dbh': {
