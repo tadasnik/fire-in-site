@@ -2,17 +2,9 @@
   import { LayerCake, Svg, Html, groupLonger, flatten } from "layercake";
 
   import { scaleSequential } from "d3-scale";
-  import {
-    interpolateYlOrRd,
-    interpolateReds,
-    interpolateInferno,
-  } from "d3-scale-chromatic";
-  import { scaleOrdinal } from "d3-scale";
-  import { timeParse, timeFormat } from "d3-time-format";
-  import { format, precisionFixed } from "d3-format";
+  import { interpolateReds } from "d3-scale-chromatic";
   import fireCharBackg from "$lib/assets/fire_char_backg.svg";
 
-  import ScatterSvg from "$lib/components/visual/ScatterSvg.svelte";
   import AxisX from "$lib/components/visual/AxisX.svelte";
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import FireCharAnotations from "$lib/components/visual/FireCharAnotations.svelte";
@@ -23,9 +15,6 @@
   export let xKey;
   export let yKey;
   export let zKey;
-
-  $: flatData = flatten(data, "values");
-  $: console.log("data charChar:", data);
 </script>
 
 <div
@@ -46,13 +35,15 @@
     flatdata={flatten(data, "values")}
   >
     <Html>
-      <img alt="The project logo" src={fireCharBackg} />
+      <img
+        alt="Background witn countour lines fire characteristics figure"
+        src={fireCharBackg}
+      />
     </Html>
 
     <Svg>
       <AxisX gridlines={true} ticks={4} snapTicks={true} tickMarks={true} />
       <AxisY ticks={4} />
-      <!-- <ScatterSvg data={flatData} /> -->
       <DensityContours {data} />
     </Svg>
 
