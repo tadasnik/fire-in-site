@@ -1,8 +1,8 @@
 import { writable, derived, get } from 'svelte/store'
 import { inputNodes } from '$lib/data/inputNodes.js'
 import { fuelNodes } from '$lib/data/fuelNodes.js'
-import { outputNodes } from '$lib/data/outputNodes.js'
-import { modelConfigOptions } from '$lib/data/configuration.js'
+import { outputNodes } from "$lib/data/outputNodes.js";
+import { modelConfigOptions } from '$lib/data/configuration';
 import UKFuels from '$lib/data/UKFuels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
 import { db, auth } from "$lib/firebase/firebase.client";
@@ -18,11 +18,10 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'surface.weighted.fire.flameLength',
   'ignition.firebrand.probability'])
 export const selectedInput = writable('site.moisture.dead.category')
-export const selectedOutput = writable('surface.weighted.fire.firelineIntensity')
+export const selectedOutput = writable('surface.weighted.fire.spreadRate')
 export const scenarios = writable([])
 export const selectedScenario = writable({
   "site.moisture.dead.category": [
-    5,
     8
   ],
   "site.slope.steepness.degrees": [
@@ -42,6 +41,8 @@ export const selectedScenario = writable({
 export const selectedFuels = writable(['sh6', 'sh4'])
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
+export const coordinates = writable({ 'latitude': 51.6, 'longitude': -4 })
+export const forecast = writable({})
 
 const fuelProps = {}
 for (const [f_key, f_values] of Object.entries(UKFuels)) {
