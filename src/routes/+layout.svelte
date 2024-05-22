@@ -24,25 +24,44 @@
     selectedFuels,
     requiredFuelInputs,
     advancedMode,
+    coordinates,
+    forecast,
   } from "$lib/shared/stores/modelStore";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
+  import fetchForecastJSON from "$lib/weather/metoffice";
   import AuthReset from "$lib/components/AuthReset.svelte";
 
   const successCallback = (pos) => {
-    const crd = pos.coords;
-
-    console.log("Your current position is:");
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude: ${crd.longitude}`);
-    console.log(`More or less ${crd.accuracy} meters.`);
+    return pos;
+    // $coordinates.latitude = pos.coords.latitude;
+    // $coordinates.longitude = pos.coords.longitude;
   };
 
   const errorCallback = (error) => {
     console.log("there was ", error);
   };
   let userScenarios;
+  let cwd = 0;
   onMount(() => {
-    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    var promise1 = new Promise(function (resolve, reject) {
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        $coordinates.latitude = pos.coords.latitude;
+        $coordinates.longitude = pos.coords.longitude;
+        resolve(pos);
+      });
+    });
+    promise1.then(function () {
+      var promise2 = fetchForecastJSON(
+        $coordinates.latitude,
+        $coordinates.longitude
+      );
+      promise2.then(function (result) {
+        $forecast = result;
+      });
+    });
+
+    // .then(fetchForecastJSON($coordinates.latitude, $coordinates.longitude))
+    // .then((result) => ($forecast = result));
 
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
       // console.log("user changed ", user);
@@ -79,12 +98,18 @@
       } else {
         userScenarios = userDocContent;
       }
+      //   const forecast = fetchForecastJSON(crd.latitude, crd.longitude).then(
+      //     (forecast) => {
+      //         console.log("!!!!!!!! forecast ", forecast.features[0].properties);
+      //     }
+      // );
+      //
+      //   console.log("!!!!!!!! forecast ", forecast.features[0].properties);
     });
 
     return unsuscribe;
   });
 
-  $: console.log("user data ", userScenarios);
   let spanClass = "flex-1 ml-3 whitespace-nowrap";
 
   $: activeUrl = $page.url.pathname;
@@ -96,6 +121,9 @@
   };
 
   $: console.log("advanced mode : ", $advancedMode);
+  $: console.log(" $$$$$$$ cordinates:", $coordinates);
+  $: console.log(" $$$$$$$ cwd:", cwd);
+  $: console.log(" $$$$$$$ forecast:", $forecast);
 </script>
 
 <header
