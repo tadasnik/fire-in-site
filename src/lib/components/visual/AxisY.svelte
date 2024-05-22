@@ -34,6 +34,9 @@
   /** @type {String} [textAnchor='start'] The CSS `text-anchor` passed to the label. This is automatically set to "end" if the scale has a bandwidth method, like in ordinal scales. */
   export let textAnchor = "start";
 
+  /** @type {String} [axisLabel='My label'] - Axis label */
+  export let axisLabel = "My label";
+
   $: isBandwidth = typeof $yScale.bandwidth === "function";
 
   $: tickVals = Array.isArray(ticks)
@@ -85,9 +88,8 @@
       y={-10}
       x={-$height / 2}
       dy=".75em"
-      transform="rotate(-90)"
-      >ROS (m/min)
-    </text>
+      transform="rotate(-90)">{axisLabel}</text
+    >
   </g>
 </g>
 
@@ -112,4 +114,3 @@
     stroke-dasharray: 0;
   }
 </style>
-

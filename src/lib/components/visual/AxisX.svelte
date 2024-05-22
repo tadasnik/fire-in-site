@@ -31,6 +31,9 @@
   /** @type {Number} [yTick=16] - The distance from the baseline to place each tick value. */
   export let yTick = 16;
 
+  /** @type {String} [axisLabel='My label'] - Axis label */
+  export let axisLabel = "My label";
+
   $: isBandwidth = typeof $xScale.bandwidth === "function";
 
   $: tickVals = Array.isArray(ticks)
@@ -91,8 +94,8 @@
     />
   {/if}
   <g class="tick">
-    <text text-anchor="middle" x={$width / 2} y={$height + 20}
-      >Heat per Unit Area (J/m2)
+    <text text-anchor="middle" x={$width / 2} y={$height + 30}
+      >{axisLabel}
     </text>
   </g>
 </g>
