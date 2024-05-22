@@ -9,6 +9,7 @@
     siteInputs,
     requiredSiteInputs,
     scenarios,
+    selectedScenario,
   } from "$lib/shared/stores/modelStore.js";
   import { authStore } from "$lib/shared/stores/authStore";
   import type { fromJSON } from "postcss";
@@ -44,11 +45,11 @@
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       //do your logged in user stuff here
-      // const userScenarios = await readUserScenarios(user);
-      // userScenarios.forEach((element) => {
-      //   $scenarios.push(element);
-      // });
-      // $scenarios = $scenarios;
+      const userScenarios = await readUserScenarios(user);
+      userScenarios.forEach((element) => {
+        $scenarios.push(element);
+      });
+      $scenarios = $scenarios;
     } else {
       // TODO remove user content from store!?
     }
@@ -74,10 +75,10 @@
   }
 
   function valuesDisplay(key) {
-    if ($siteInputs[key].value.length > 1) {
-      return $siteInputs[key].value.join("-");
+    if ($selectedScenario[key].length > 1) {
+      return $selectedScenario[key].join("-");
     } else {
-      return $siteInputs[key].value;
+      return $selectedScenario[key];
     }
   }
 
@@ -109,7 +110,7 @@
 </script>
 
 <div class="flex flex-col p-4">
-  <h3 class="h3 font-bold">Required site inputs:</h3>
+  <h3 class="h3 font-bold">Site inputs:</h3>
   <Accordion multiple>
     {#each Object.keys($requiredSiteInputs) as key}
       <AccordionItem id={key}>
@@ -167,12 +168,14 @@
   </Accordion>
 
   {#if $authStore.currentUser}
-    <Button
-      on:click={() => {
-        prepareScenario();
-        defaultModal = true;
-      }}>Save this scenario</Button
-    >
+    <div class="pt-4">
+      <Button
+        on:click={() => {
+          prepareScenario();
+          defaultModal = true;
+        }}>Save this scenario</Button
+      >
+    </div>
   {/if}
 
   <Modal class="mt-20" title="Save Scenario" bind:open={defaultModal} autoclose>
