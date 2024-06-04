@@ -11,9 +11,9 @@ export const modelConfigOptions = {
     'palmettoGallberry': palmetto-gallberry dynamic fuel parameters
     'westernAspen': western aspen dynamic fuel parameters
     `,
-    },
-   'configure.fuel.secondary': {
-     options: [
+  },
+  'configure.fuel.secondary': {
+    options: [
       'none',
       'catalog',
       'behave',
@@ -44,14 +44,13 @@ export const modelConfigOptions = {
     `,
   },
   'configure.fuel.moisture': {
-    options: ['individual', 'liveCategory', 'category'],
-    value: 'category',
+    options: ['individual', 'liveCategory', 'fosberg', 'category'],
+    value: 'fosberg',
     active: false,
     description: `When required as input, fuel moisture is entered for
-
     'individual': the 3 dead and 2 live fuel moisture classes
     'liveCategory': the 3 dead moisture classes and a singe live category moisture
-    'fosberg': calculated from temperature, humidity, slope, aspect, month, time
+    'fosberg': calculated from temperature, humidity, slope, aspect, month and hour of the day
     'category': the dead and live category moistures only
     `,
   },
@@ -79,7 +78,7 @@ export const modelConfigOptions = {
   },
   'configure.wind.speed': {
     options: ['at10m', 'at20ft', 'atMidflame'],
-    value: 'atMidflame',
+    value: 'at10m',
     active: false,
     description: `When required as an input, wind speed is entered for
 
@@ -88,10 +87,10 @@ export const modelConfigOptions = {
     'atMidflame': midflame height`
   },
   'configure.fire.effectiveWindSpeedLimit': {
-     options: ['applied', 'ignored'],
-     value: 'applied',
+    options: ['applied', 'ignored'],
+    value: 'applied',
     active: false,
-     description: `The fire spread rate effective wind speed limit (see Rothermel 1972) is
+    description: `The fire spread rate effective wind speed limit (see Rothermel 1972) is
 
     'applied'
     'ignored'
@@ -150,10 +149,10 @@ export const modelConfigOptions = {
     `,
   },
   'configure.fuel.chaparralTotalLoad': {
-  options: ['input', 'estimated'],
-  value: 'input',
-  active: false,
-  description: `When required as input, chaparral total fuel load is
+    options: ['input', 'estimated'],
+    value: 'input',
+    active: false,
+    description: `When required as input, chaparral total fuel load is
 
     'input': entered directly
     'estimated': estimated from chaparral depth
