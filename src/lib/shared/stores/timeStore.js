@@ -8,18 +8,32 @@ export function getRoundedDate() {
   return new Date(3600000 * (Math.round(Date.now() / 3600000)))
 };
 
-export const dateTime = writable(getRoundedDate())
+export function getMonth(date) {
+  return date.getMonth() + 1
+}
+
+export function getHour(date) {
+  return date.getHours() + 1
+}
+export const currentDateTime = writable(
+  new Date()
+)
+
+export const dateTime = derived(
+  currentDateTime, ($currentDateTime) => {
+    return 3600000 * (Math.round($currentDateTime / 3600000))
+  }
+)
 
 export const month = derived(
-  [dateTime],
-  ([$dateTime]) => {
-    console.log('$dateTime ', $dateTime)
-    return $dateTime.getMonth() + 1;
+  [currentDateTime],
+  ([$currentDateTime]) => {
+    return $currentDateTime.getMonth() + 1;
   })
 
 export const hour = derived(
-  [dateTime],
-  ([$dateTime]) => {
-    return $dateTime.getHours() + 1;
+  [currentDateTime],
+  ([$currentDateTime]) => {
+    return $currentDateTime.getHours() + 1;
 
   })
