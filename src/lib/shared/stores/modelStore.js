@@ -3,15 +3,15 @@ import { inputNodes } from '$lib/data/inputNodes.js'
 import { fuelNodes } from '$lib/data/fuelNodes.js'
 import { outputNodes } from "$lib/data/outputNodes.js";
 import { modelConfigOptions } from '$lib/data/configuration';
+import { dateTime, getMonth, getHour } from "$lib/shared/stores/timeStore";
+import { currentWeather } from "$lib/shared/stores/forecastStore";
 import UKFuels from '$lib/data/UKFuels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
 import { db, auth } from "$lib/firebase/firebase.client";
 import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
 
-import { browser } from '$app/environment';
-
+export const inputNodesStore = writable(inputNodes)
 export const fireSim = new FireSim({ ...inputNodes, ...fuelNodes, ...outputNodes })
-export const siteInputs = writable(inputNodes)
 export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'surface.weighted.fire.heatPerUnitArea',
   'surface.weighted.fire.firelineIntensity',
@@ -38,11 +38,19 @@ export const selectedScenario = writable({
   "site.temperature.air": [45],
   "site.canopy.fuel.shading": [0],
 })
-export const selectedFuels = writable(['sh6', 'sh4'])
+export const selectedFuels = writable(['sh6', 'sh4', 'gr6'])
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
-export const coordinates = writable({ 'latitude': 51.6, 'longitude': -4 })
-export const forecast = writable({})
+
+export const siteInputs = writable(inputNodes)//, forecast], ([$inputNodesStore, $forecast]) => {
+
+// export const testInputs = derived([siteInputs], ([$siteInputs, $forecast]) => {
+//   inputNodesStore['site.temperature.air'] = $forecast.currentWeather.screenTemperature
+//   console.log('model store forecast :', $forecast.currentWeather)
+//   console.log(Object.hasOwn($forecast, 'currentWeather'))
+//   console.log('model store forecast :', $forecast.location)
+//   return $inputNodesStore
+// })
 
 const fuelProps = {}
 for (const [f_key, f_values] of Object.entries(UKFuels)) {
@@ -80,19 +88,21 @@ export const requiredInputs = derived(config, ($config) => {
   return requiredI
 })
 
+// export const siteInputs = derived(
+//   [inputNodeStore, month, hour],
+//   ([$inputNodeStore, $month, $hour]) => {
+//     $inputNodeStore['site.date.month'].value = $month
+//     $inputNodeStore['site.time.hour'].value = $hour
+//   })
 
-export const requiredSiteInputs = derived(
+export const requiredSiteInputsScenario = derived(
   [requiredInputs, siteInputs, selectedScenario],
   ([$requiredInputs, $siteInputs, $selectedScenario]) => {
-    console.log("from model store selected scenario", $selectedScenario)
     const requiredSiteI = {}
     $requiredInputs.forEach((input) => {
-      console.log("input ", input)
       const splitKey = input.split('.')
       if (splitKey[0] === 'site') {
-        console.log("READING ", input)
         requiredSiteI[input] = $selectedScenario[input]
-        console.log("SET value ", requiredSiteI[input])
       } else if (
         splitKey[0] === 'surface' &&
         splitKey[1] === 'weighted' &&
@@ -104,6 +114,61 @@ export const requiredSiteInputs = derived(
     return requiredSiteI
   }
 )
+export const requiredSiteInputsForecast = derived(
+  [requiredInputs, siteInputs, currentWeather, dateTime],
+  ([$requiredInputs, $siteInputs, $currentWeather, $dateTime]) => {
+    const requiredSiteI = {}
+    const forecastInputs = {
+      "site.temperature.air": "screenTemperature",
+      "site.temperature.relativeHumidity": "screenRelativeHumidity",
+      "site.wind.speed.at10m": "windSpeed10m"
+    }
+    const timeInputs = { "site.date.month": getMonth(new Date($dateTime)), "site.time.hour": getHour(new Date($dateTime)) }
+    $requiredInputs.forEach((input) => {
+      const splitKey = input.split('.')
+      if (Object.keys(forecastInputs).includes(input)) {
+        console.log('required inputs forecast :', input, $currentWeather[forecastInputs[input]])
+        requiredSiteI[input] = [$currentWeather[forecastInputs[input]]]
+      } else if (Object.keys(timeInputs).includes(input)) {
+        requiredSiteI[input] = [timeInputs[input]]
+      }
+      else {
+        console.log('required inputs non - forecast :', input)
+        if (splitKey[0] === 'site') {
+          requiredSiteI[input] = $siteInputs[input].value
+        } else if (
+          splitKey[0] === 'surface' &&
+          splitKey[1] === 'weighted' &&
+          splitKey.at(-1) === 'primaryCover'
+        ) {
+          requiredSiteI[input] = $siteInputs[input].value
+        }
+      }
+    })
+    return requiredSiteI
+  }
+)
+
+// export const requiredSiteInputs = derived(
+//   [requiredInputs, siteInputs],
+//   ([$requiredInputs, $siteInputs]) => {
+//     const requiredSiteI = {}
+//     $requiredInputs.forEach((input) => {
+//       console.log('required inputs :', input)
+//       const splitKey = input.split('.')
+//       if (splitKey[0] === 'site') {
+//         requiredSiteI[input] = $siteInputs[input].value
+//       } else if (
+//         splitKey[0] === 'surface' &&
+//         splitKey[1] === 'weighted' &&
+//         splitKey.at(-1) === 'primaryCover'
+//       ) {
+//         requiredSiteI[input] = $siteInputs[input].value
+//       }
+//     })
+//     return requiredSiteI
+//   }
+// )
 
 export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs],
@@ -137,11 +202,11 @@ export const requiredFuelInputs = derived(
   }
 )
 export const _inputs = derived(
-  [selectedFuels, requiredFuelInputs, requiredSiteInputs],
-  ([$selectedFuels, $requiredFuelInputs, $requiredSiteInputs]) => {
+  [selectedFuels, requiredFuelInputs, requiredSiteInputsForecast],
+  ([$selectedFuels, $requiredFuelInputs, $requiredSiteInputsForecast]) => {
     const inputs = {}
     $selectedFuels.forEach((fuel) => {
-      inputs[fuel] = { ...$requiredFuelInputs[fuel], ...$requiredSiteInputs }
+      inputs[fuel] = { ...$requiredFuelInputs[fuel], ...$requiredSiteInputsForecast }
     })
     return inputs
   }
@@ -153,11 +218,10 @@ export const _output = derived([_inputs, advancedMode], ([$_inputs, $advancedMod
     if ($advancedMode) {
       result = fireSim.runWithRandom($_inputs[fuel])
     } else {
+      console.log($_inputs[fuel])
       result = fireSim.runBasic($_inputs[fuel])
-      console.log('if NOT advanced : ', $advancedMode)
+      // console.log(" $$$$$$$ node :", fireSim.dag.get('site.temperature.shading'))
     }
-    console.log("result store ", result)
-    console.log("result store ", result)
     output.push({
       "surface.primary.fuel.model.catalogKey": fuel,
       values: result
