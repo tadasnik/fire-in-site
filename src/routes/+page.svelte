@@ -1,6 +1,7 @@
 <script>
   import { Select, Label, Badge } from "flowbite-svelte";
   import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
+  import Map from "$lib/components/ui/Map.svelte";
   import Auth from "$lib/components/Auth.svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import SveltyPicker from "svelty-picker";
@@ -105,6 +106,11 @@
   <!--   yKey="surface.weighted.fire.spreadRate" -->
   <!--   zKey="surface.primary.fuel.model.catalogKey" -->
   <!-- /> -->
+</div>
+<div class="w-full aspect-video container" bind:clientWidth={w}>
+  <section>
+    <Map />
+  </section>
 </div>
 <section class="pt-2 space-y-2">
   <heading class="p-2" tag="h1" customSize="text-3xl"
