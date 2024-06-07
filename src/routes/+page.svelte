@@ -2,13 +2,13 @@
   import { Select, Label, Badge } from "flowbite-svelte";
   import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
   import Auth from "$lib/components/Auth.svelte";
-  import UKFuels from "$lib/data/UKFuels.json";
+  import UKFuelModels from "$lib/data/UKFuelModels.json";
+  import SveltyPicker from "svelty-picker";
   import {
     selectedOutput,
     modelConfigValues,
     requiredConfig,
     config,
-    requiredSiteInputs,
     siteInputs,
     selectedFuels,
     selectedInput,
@@ -21,6 +21,8 @@
     _output,
     advancedMode,
   } from "$lib/shared/stores/modelStore.js";
+  import { forecastLocation } from "$lib/shared/stores/forecastStore.js";
+  import { dateTime } from "$lib/shared/stores/timeStore.js";
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import BarFigure from "$lib/components/visual/BarFigure.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
@@ -28,7 +30,7 @@
   export let data;
   let w;
   const selectOptions = [];
-  for (const [key, value] of Object.entries(UKFuels)) {
+  for (const [key, value] of Object.entries(UKFuelModels)) {
     selectOptions.push({ name: key + ": " + value.label, value: key });
   }
 
@@ -40,9 +42,14 @@
     return options;
   }
 
-  //  $: console.log("fetch scenarios  ", data.scenarios);
-  $scenarios = data.scenarios;
-  $: console.log("selected Output", $selectedOutput);
+  let currentDateTime = new Date($dateTime).toString();
+
+  $: console.log("CurrentDateTime :", currentDateTime);
+
+  // $: console.log("inputs  ", $_inputs);
+  // $: console.log("required inputs  ", $requiredSiteInputs);
+  // $scenarios = data.scenarios;
+  // $: console.log("selected Output", $selectedOutput);
   // $: console.log("selectedScenario", $selectedScenario);
 
   // $: console.log("output", $_output);
@@ -51,35 +58,30 @@
   //
 </script>
 
-<section class="pb-5">
-  <Label for="select-sm" class="mb-2">Select site scenario</Label>
-  <Select id="select-sm" size="sm" class="mb-6" bind:value={$selectedScenario}>
-    {#each $scenarios as scenario}
-      <option value={scenario}>{scenario.label}</option>
-    {/each}
-  </Select>
-
-  <heading class="p-8" tag="h1" customSize="text-3xl"
-    >Select fuel models</heading
-  >
-  <div>
-    <MultiSelect
-      items={selectOptions}
-      bind:value={$selectedFuels}
-      let:item
-      let:clear
+<section class="p-2">
+  <h1>
+    Current fire behaviour prediction for: <strong
+      >{$forecastLocation.name}</strong
     >
-      <Badge
-        dismissable={$selectedFuels.length > 1}
-        params={{ duration: 100 }}
-        on:close={clear}
-      >
-        {item.name}
-      </Badge>
-    </MultiSelect>
-  </div>
+    <br />
+    <p>
+      lon: {$forecastLocation.coordinates[0]}, lat: {$forecastLocation
+        .coordinates[1]} elev.: {$forecastLocation.coordinates[2]}m
+
+      <br />
+      {new Date($dateTime)}
+    </p>
+  </h1>
 </section>
-<div />
+<!-- <section class="pb-2"> -->
+<!-- <Label for="select-sm" class="mb-2">Select site scenario</Label> -->
+<!-- <Select id="select-sm" size="sm" class="mb-6" bind:value={$selectedScenario}> -->
+<!--   {#each $scenarios as scenario} -->
+<!--     <option value={scenario}>{scenario.label}</option> -->
+<!--   {/each} -->
+<!-- </Select> -->
+<!-- </section> -->
+<!-- <div /> -->
 <div class="w-full aspect-square container" bind:clientWidth={w}>
   {#if $advancedMode}
     <FireCharacteristics
@@ -104,6 +106,36 @@
   <!--   zKey="surface.primary.fuel.model.catalogKey" -->
   <!-- /> -->
 </div>
+<section class="pt-2 space-y-2">
+  <heading class="p-2" tag="h1" customSize="text-3xl"
+    >Select fuel models</heading
+  >
+  <div>
+    <MultiSelect
+      items={selectOptions}
+      bind:value={$selectedFuels}
+      let:item
+      let:clear
+    >
+      <Badge
+        dismissable={$selectedFuels.length > 1}
+        params={{ duration: 100 }}
+        on:close={clear}
+      >
+        {item.name}
+      </Badge>
+    </MultiSelect>
+  </div>
+</section>
+<section>
+  <SveltyPicker
+    bind:value={currentDateTime}
+    mode="datetime"
+    format="mm-dd hh"
+    displayFormat="mm-dd HH P"
+    placeholder="Set date and time"
+  />
+</section>
 <section class="pt-20 space-y-2">
   <h3 class="h3 font-bold">Required config options:</h3>
   {#each $requiredConfig as configKey}
