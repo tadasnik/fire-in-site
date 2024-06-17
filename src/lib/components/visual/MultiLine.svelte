@@ -10,7 +10,6 @@
 
   $: console.log("Multiline data", $data);
   $: path = (values) => {
-    console.log("path values", $xGet(values[0]));
     return (
       "M" +
       values
