@@ -2,6 +2,7 @@ import { writable, derived } from 'svelte/store'
 import { inputNodes } from '$lib/data/inputNodes.js'
 import { fuelNodes } from '$lib/data/fuelNodes.js'
 import { outputNodes } from "$lib/data/outputNodes.js";
+import { fuelMoisture } from "$lib/data/fuelMoisture";
 import { modelConfigOptions } from '$lib/data/configuration';
 import { dateTime, getMonth, getHour, month } from "$lib/shared/stores/timeStore";
 import { currentWeather, elevationDiff, forecastTimeIndex } from "$lib/shared/stores/forecastStore";
@@ -68,6 +69,17 @@ for (const [f_key, f_values] of Object.entries(UKFuelModels)) {
     }
   }
 }
+
+function fuelShadingMetoffice(forecast) {
+  let shading = 0
+  if (forecast.significantWeatherCode == 1) {
+    shading = 1
+  } else if (forecast.significantWeatherCode == 3 && forecast.uvIndex > 3) {
+    shading = 1
+  }
+  return shading
+}
+
 
 export const fuelInputs = writable(fuelProps)
 
@@ -171,13 +183,16 @@ export const requiredSiteInputsForecast = derived(
       "site.temperature.air": "screenTemperature",
       "site.temperature.relativeHumidity": "screenRelativeHumidity",
       "site.wind.speed.at10m": "windSpeed10m",
-      "site.wind.direction.source.fromNorth": "windDirectionFrom10m"
+      "site.wind.direction.source.fromNorth": "windDirectionFrom10m",
     }
     const locationInputs = {
       "site.slope.direction.aspect": $currentLocation.aspect,
       "site.slope.steepness.degrees": $currentLocation.slope,
       "site.location.elevation.diff": $elevationDiff,
     }
+    const liveMoistureInputs = [
+      "site.moisture.live.stem", "site.moisture.live.herb"
+    ]
     $forecastTimeIndex.forEach((forecast, time) => {
       let requiredSiteI = {}
       let timeInputs = { "site.date.month": getMonth(new Date(time)), "site.time.hour": getHour(new Date(time)) }
@@ -186,14 +201,22 @@ export const requiredSiteInputsForecast = derived(
         const splitKey = input.split('.')
         if (Object.keys(forecastInputs).includes(input)) {
           requiredSiteI[input] = [forecast[forecastInputs[input]]]
+        } else if (input == "site.temperature.shading") {
+          requiredSiteI[input] = [fuelShadingMetoffice(forecast)]
+          // console.log(time, requiredSiteI[input], forecast["uvIndex"], forecast["significantWeatherCode"], inputNodes[input])
         } else if (Object.keys(timeInputs).includes(input)) {
           requiredSiteI[input] = [timeInputs[input]]
         } else if (Object.keys(locationInputs).includes(input)) {
           requiredSiteI[input] = [locationInputs[input]]
-        }
-        else {
+          // } else if (liveMoistureInputs.includes(input)) {
+          //   requiredSiteI[input] = fuelMoisture[fuel][input][getMonth(new Date(time))]
+          // } else if (
+          //   splitKey[0] === 'site' &&
+          //   splitKey[1] === 'moisture'
+          // ) {
+        } else {
           // console.log('required inputs non - forecast :', input)
-          if (splitKey[0] === 'site') {
+          if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
             requiredSiteI[input] = $siteInputs[input].value
           } else if (
             splitKey[0] === 'surface' &&
@@ -214,6 +237,7 @@ export const requiredSiteInputsForecast = derived(
 export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
   ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
+    console.log("requiredInputs from fuel inputs :", $requiredInputs)
     console.log("updating requiredFuelInputs no 1")
 
     const requiredFuelI = {}
@@ -227,6 +251,12 @@ export const requiredFuelInputs = derived(
           splitKey.at(-1) === 'catalogKey'
         ) {
           requiredFuelI[fuel][input] = [fuel]
+        } else if (
+          splitKey[0] === 'site' &&
+          splitKey[1] === 'moisture'
+        ) {
+          console.log("fuel input moisture : ", fuelMoisture[fuel][input][$month])
+          requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
         } else if (
           splitKey[0] === 'surface' &&
           splitKey[1] === 'secondary' &&
@@ -247,6 +277,7 @@ export const requiredFuelInputs = derived(
         }
       })
     })
+    console.log("requiredFuelI", requiredFuelI)
     return requiredFuelI
   }
 )
@@ -298,7 +329,7 @@ export const _inputsForecast = derived(
 // })
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
-  console.log("updating _outputForecast no 3, : ")
+  console.log("updating _outputForecast no 3, : ", $_inputsForecast)
   const resultForecast = new Map()
   $_inputsForecast.forEach((forecast, time) => {
     const output = []
