@@ -1,4 +1,5 @@
 <script>
+  import { derived } from "svelte/store";
   import {
     LayerCake,
     Svg,
@@ -15,9 +16,12 @@
   import MultiLine from "$lib/components/visual/MultiLine.svelte";
   import AxisX from "$lib/components/visual/AxisX.svelte";
   import AxisY from "$lib/components/visual/AxisY.svelte";
+  import { outputNodes } from "$lib/data/outputNodes.js";
+  import { selectedOutput } from "$lib/shared/stores/modelStore";
   import Labels from "$lib/components/visual/GroupLabels.html.svelte";
   import ScatterSvg from "./ScatterSvg.svelte";
   import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
+  import { _outputForecastArray } from "$lib/shared/stores/modelStore";
 
   // This example loads csv data as json using @rollup/plugin-dsv
   // import data from "./fruit.csv";
@@ -39,25 +43,30 @@
 
   const seriesColors = ["#ffe4b8", "#ffb3c0", "#ff7ac7", "#ff00cc"];
 
-  /* --------------------------------------------
-   * Cast values
-   */
-  // data.forEach((d) => {
-  //   d[xKey] = typeof d[xKey] === "string" ? xKeyCast(d[xKey]) : d[xKey];
-  //
-  //   seriesNames.forEach((name) => {
-  //     d[name] = +d[name];
+  const formatTickX = timeFormat("%H");
+  const formatXtip = timeFormat("%b %d, %H:00");
+  $: console.log("data :", data);
+  $: seriesNames = Object.keys(data[0]).filter((d) => d !== xKey);
+  // const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
+  // const groupedData = [];
+
+  $: groupedData = groupLonger(data, seriesNames, {
+    groupTo: zKey,
+    valueTo: yKey,
+  });
+
+  // $: $_outputForecastArray,
+  // const groupedData = derived(_outputForecastArray, ($_outputForecastArray) => {
+  //   const seriesNames = Object.keys($_outputForecastArray[0]).filter(
+  //     (d) => d !== xKey
+  //   );
+  //   return groupLonger($_outputForecastArray, seriesNames, {
+  //     groupTo: zKey,
+  //     valueTo: yKey,
   //   });
   // });
-
-  const formatTickX = timeFormat("%H");
-  console.log(data[0].values.map((d) => formatTickX(d.time)));
-  // const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
-
-  // const groupedData = groupLonger(data, seriesNames, {
-  //   groupTo: zKey,
-  //   valueTo: yKey,
-  // });
+  // $: console.log("_outputForecastArray ", $_outputForecastArray);
+  $: console.log("groupedData ", groupedData);
   // const times = (data[0].values) => {
   //   values.map((d) => {
   //     return $xGet(d)
@@ -115,8 +124,8 @@
     zScale={scaleOrdinal()}
     xScale={scaleTime()}
     zRange={seriesColors}
-    flatData={flatten(data, "values")}
-    {data}
+    flatData={flatten(groupedData, "values")}
+    data={groupedData}
   >
     <Svg>
       <AxisX
@@ -126,15 +135,22 @@
         baseline
         formatTick={formatTickX}
       />
-      <AxisY ticks={4} />
+      <AxisY
+        ticks={4}
+        axisLabel={outputNodes[$selectedOutput].label +
+          " (" +
+          outputNodes[$selectedOutput].units +
+          ")"}
+      />
+
       <MultiLine />
       <!-- <ScatterSvg /> -->
     </Svg>
 
-    <!-- <Html> -->
-    <!--   <Labels /> -->
-    <!--   <SharedTooltip formatTitle={formatTickX} dataset={data} /> -->
-    <!-- </Html> -->
+    <Html>
+      <Labels />
+      <SharedTooltip formatTitle={formatXtip} dataset={$_outputForecastArray} />
+    </Html>
   </LayerCake>
 </div>
 
