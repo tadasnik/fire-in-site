@@ -2,8 +2,9 @@
   import { onMount, onDestroy } from "svelte";
   import { Map, Marker } from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
-  import { locations } from "$lib/shared/stores/locationStore";
+  import { currentLocation } from "$lib/shared/stores/locationStore";
   import "$lib/styles/mapbox-gl.css";
+  import Layout from "../../../routes/+layout.svelte";
 
   let locMarker;
   let map;
@@ -14,52 +15,42 @@
   lat = 52;
   zoom = 9;
 
-  function slopeAspect(points) {
-    const p1 = new LatLon(
-      points["N"].coordinates._lat,
-      points["N"].coordinates._lon
+  function setCurrentLocation(coordinates) {
+    const prevLoc = new LatLon(
+      $currentLocation.latitude,
+      $currentLocation.longitude
     );
-    const p2 = new LatLon(
-      points["S"].coordinates._lat,
-      points["S"].coordinates._lon
+    $currentLocation.longitude = coordinates.lng;
+    $currentLocation.latitude = coordinates.lat;
+    const newLoc = new LatLon(
+      $currentLocation.latitude,
+      $currentLocation.longitude
     );
-    const dy = p1.distanceTo(p2);
+    $currentLocation.distanceFromPrevious = prevLoc.distanceTo(newLoc);
+  }
 
-    const p3 = new LatLon(
-      points["E"].coordinates._lat,
-      points["E"].coordinates._lon
-    );
-    const p4 = new LatLon(
-      points["W"].coordinates._lat,
-      points["W"].coordinates._lon
-    );
-    const dx = p3.distanceTo(p4);
-
-    var dzdx = (points["E"].elevation - points["W"].elevation) / dx,
-      dzdy = (points["N"].elevation - points["S"].elevation) / dy;
-
-    //With those values, slope and aspect are calculated like this:
+  // Slope and aspect
+  function slopeAspect(points, distance) {
+    var dzdx = (points["W"].elevation - points["E"].elevation) / (distance * 2),
+      dzdy = (points["S"].elevation - points["N"].elevation) / (distance * 2);
 
     const slope = Math.atan(Math.sqrt(dzdx ** 2 + dzdy ** 2)) * (180 / Math.PI);
-    const aspect =
-      dx !== 0 // counterclockwise from east
-        ? (Math.atan2(dzdy, dzdx) * (180 / Math.PI) + 180) % 360
-        : (90 * (dy > 0 ? 1 : -1) + 180) % 360;
-    console.log("another aspect :", 57.29578 * Math.atan2(dzdy, -dzdx));
-    return [slope, aspect];
+    const aspectInit = 57.29578 * Math.atan2(dzdy, dzdx);
+
+    return [slope, (450 - aspectInit) % 360];
   }
 
-  function processPoint(map) {
+  function processPointSlopeAspect(map, distance) {
     const points = pointsCardinalDirections(
-      $locations.currentLocation.longitude,
-      $locations.currentLocation.latitude,
-      100
+      $currentLocation.longitude,
+      $currentLocation.latitude,
+      distance
     );
     pointsElevation(points, map);
-    console.log("slopeAspect", slopeAspect(points));
+    return slopeAspect(points, distance);
   }
 
-  function pointsCardinalDirections(longitude, latitude, dist) {
+  function pointsCardinalDirections(longitude, latitude, distance) {
     const points = {
       N: { bearing: 0, coordinates: [], elevation: null },
       E: { bearing: 90, coordinates: [], elevation: null },
@@ -68,7 +59,10 @@
     };
     const p1 = new LatLon(latitude, longitude);
     Object.keys(points).forEach((key) => {
-      points[key].coordinates = p1.destinationPoint(dist, points[key].bearing);
+      points[key].coordinates = p1.destinationPoint(
+        distance,
+        points[key].bearing
+      );
     });
     return points;
   }
@@ -80,7 +74,18 @@
         points[key].coordinates._lat,
       ]);
     });
-    console.log(points);
+  }
+
+  function setMarkerLocation() {
+    console.log("setMarkerLocation");
+    if (map) {
+      console.log("setMarkerLocation map available");
+      map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+      locMarker.setLngLat([
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ]);
+    }
   }
 
   onMount(() => {
@@ -91,10 +96,7 @@
       accessToken: import.meta.env.VITE_MAPBOX_GL_TOKEN,
 
       style: `mapbox://styles/mapbox/outdoors-v11`,
-      center: [
-        $locations.currentLocation.longitude,
-        $locations.currentLocation.latitude,
-      ],
+      center: [$currentLocation.longitude, $currentLocation.latitude],
       zoom: initialState.zoom,
     });
     map.on("style.load", () => {
@@ -107,42 +109,41 @@
       });
       map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
     });
+    map.on("sourcedata", (e) => {
+      if (
+        e.source.type === "raster-dem" &&
+        $currentLocation.userLocation === false
+      ) {
+        locMarker.setLngLat([
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+        ]);
+        map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+        const [slope, aspect] = processPointSlopeAspect(map, 50);
+        $currentLocation.slope = slope;
+        $currentLocation.aspect = aspect;
+        $currentLocation.userLocation = true;
+      }
+    });
+
     map.on("click", function (e) {
       var coordinates = e.lngLat;
-      console.log(coordinates);
-      $locations.currentLocation.longitude = coordinates.lng;
-      $locations.currentLocation.latitude = coordinates.lat;
+      setCurrentLocation(coordinates);
       locMarker.setLngLat([
-        $locations.currentLocation.longitude,
-        $locations.currentLocation.latitude,
+        $currentLocation.longitude,
+        $currentLocation.latitude,
       ]);
-      const elevation = map.queryTerrainElevation([
+      $currentLocation.elevation = map.queryTerrainElevation([
         coordinates.lng,
         coordinates.lat,
       ]);
-      processPoint(map);
-
-      console.log("elevation : ", elevation);
+      const [slope, aspect] = processPointSlopeAspect(map, 50);
+      $currentLocation.slope = slope;
+      $currentLocation.aspect = aspect;
     });
-    map.setCenter([
-      $locations.currentLocation.longitude,
-      $locations.currentLocation.latitude,
-    ]);
     locMarker = new Marker()
-      .setLngLat([
-        $locations.currentLocation.longitude,
-        $locations.currentLocation.latitude,
-      ])
+      .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
       .addTo(map);
-
-    // console.log(
-    //   "pointsCardinalDirections",
-    //   pointsCardinalDirections(
-    //     $locations.currentLocation.longitude,
-    //     $locations.currentLocation.latitude,
-    //     100
-    //   )
-    // );
   });
 
   onDestroy(async () => {
@@ -151,11 +152,11 @@
     }
   });
 
-  $: console.log("MAP locations ", $locations);
+  // $: $currentLocation, setMarkerLocation(); // promise.then(fetchForecast());
 </script>
 
 <div class="sidebar">
-  Longitude: {$locations.currentLocation.longitude.toFixed(3)} | Latitude: {$locations.currentLocation.latitude.toFixed(
+  Longitude: {$currentLocation.longitude.toFixed(3)} | Latitude: {$currentLocation.latitude.toFixed(
     3
   )} | Zoom:
   {zoom.toFixed(2)}
@@ -171,7 +172,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: #e5e9ec;
     overflow: hidden;
   }
   .sidebar {
