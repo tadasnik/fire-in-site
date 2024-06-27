@@ -44,9 +44,10 @@ export const selectedScenario = writable({
 })
 
 export const modelConfigValues = writable(modelConfigOptions)
-export const selectedFuels = writable(['cl1', 'cl2', 'mxh1', 'mxh2', 'gr1', 'gr3'])
+export const selectedFuels = writable(['cl1', 'cl3', 'mxh1', 'mxh2', 'gr3', 'eg1', 'eg3', 'lnl'])
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
+// export const _outputForecast = writable(new Map())
 
 export const siteInputs = writable(inputNodes)//, forecast], ([$inputNodesStore, $forecast]) => {
 
@@ -69,6 +70,25 @@ for (const [f_key, f_values] of Object.entries(UKFuelModels)) {
     }
   }
 }
+
+export function getOutputsForecast(inputsForecast) {
+  console.log("_outputForecast start")
+  const resultForecast = new Map()
+  inputsForecast.forEach((forecast, time) => {
+    const output = []
+    Object.keys(forecast).forEach((fuel) => {
+      const result = fireSim.runBasic(forecast[fuel])
+      result[0]["surface.primary.fuel.model.catalogKey"] = fuel
+      output.push({
+        "surface.primary.fuel.model.catalogKey": fuel,
+        values: result
+      });
+    })
+    _outputForecast.set(time, output)
+  })
+  return resultForecast
+}
+
 
 function fuelShadingMetoffice(forecast) {
   let shading = 0
@@ -133,6 +153,7 @@ export const requiredSiteInputsScenario = derived(
 export const requiredSiteInputsCurrenWeather = derived(
   [requiredInputs, siteInputs, currentWeather, currentLocation, elevationDiff],
   ([$requiredInputs, $siteInputs, $currentWeather, $currentLocation, $elevationDiff]) => {
+    console.log("requiredSiteInputsCurrentWeather")
     const requiredSiteI = {}
     const forecastInputs = {
       "site.temperature.air": "screenTemperature",
@@ -178,6 +199,7 @@ export const requiredSiteInputsCurrenWeather = derived(
 export const requiredSiteInputsForecast = derived(
   [requiredInputs, siteInputs, forecastTimeIndex, currentLocation, elevationDiff],
   ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation, $elevationDiff]) => {
+    console.log("requiredSiteInputsCurrentForecast")
     const requiredSiteInputs = new Map()
     const forecastInputs = {
       "site.temperature.air": "screenTemperature",
@@ -237,8 +259,6 @@ export const requiredSiteInputsForecast = derived(
 export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
   ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
-    console.log("requiredInputs from fuel inputs :", $requiredInputs)
-    console.log("updating requiredFuelInputs no 1")
 
     const requiredFuelI = {}
     $selectedFuels.forEach((fuel) => {
@@ -255,7 +275,6 @@ export const requiredFuelInputs = derived(
           splitKey[0] === 'site' &&
           splitKey[1] === 'moisture'
         ) {
-          console.log("fuel input moisture : ", fuelMoisture[fuel][input][$month])
           requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
         } else if (
           splitKey[0] === 'surface' &&
@@ -277,7 +296,6 @@ export const requiredFuelInputs = derived(
         }
       })
     })
-    console.log("requiredFuelI", requiredFuelI)
     return requiredFuelI
   }
 )
@@ -285,7 +303,8 @@ export const requiredFuelInputs = derived(
 export const _inputsForecast = derived(
   [requiredFuelInputs, requiredSiteInputsForecast],
   ([$requiredFuelInputs, $requiredSiteInputsForecast]) => {
-    console.log("updating requiredSiteInputs no 2")
+    console.log('_inputsForecast start')
+
     const inputsForecast = new Map()
     $requiredSiteInputsForecast.forEach((forecast, time) => {
       let inputsTime = {}
@@ -294,6 +313,7 @@ export const _inputsForecast = derived(
       })
       inputsForecast.set(time, inputsTime)
     })
+    console.log('_inputsForecast end')
     return inputsForecast
   }
 )
@@ -329,7 +349,7 @@ export const _inputsForecast = derived(
 // })
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
-  console.log("updating _outputForecast no 3, : ", $_inputsForecast)
+  console.log("_outputForecast start")
   const resultForecast = new Map()
   $_inputsForecast.forEach((forecast, time) => {
     const output = []
@@ -343,29 +363,45 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
     })
     resultForecast.set(time, output)
   })
+
+  console.log("_outputForecast end")
   return resultForecast
 })
 
 export const _outputForecastArray = derived([_outputForecast, selectedOutput],
   ([$_outputForecast, $selectedOutput]) => {
     const outputArray = []
-    const fuels = []
-    $_outputForecast.values().next().value.forEach((item) => {
-      fuels.push(item["surface.primary.fuel.model.catalogKey"])
-    })
-    fuels.forEach((fuel) => {
-      const fuelOutput = {}
-      fuelOutput["surface.primary.fuel.model.catalogKey"] = fuel
-      fuelOutput["values"] = []
-      $_outputForecast.forEach((forecast, time) => {
-        let fuelForecast = forecast.filter(obj => {
-          return obj["surface.primary.fuel.model.catalogKey"] === fuel
-        })
-        // console.log("fuel forecast ", fuelForecast[0].values)
-        fuelOutput.values.push({ "value": fuelForecast[0].values[0][$selectedOutput], "time": new Date(time) })
+    $_outputForecast.forEach((forecast, time) => {
+      const timeObject = {}
+      forecast.forEach((item) => {
+        timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput]
       })
-      outputArray.push(fuelOutput)
-
+      timeObject["time"] = time
+      outputArray.push(timeObject)
     })
     return outputArray
   })
+
+// export const _outputForecastArray = derived([_outputForecast, selectedOutput],
+//   ([$_outputForecast, $selectedOutput]) => {
+//     const outputArray = []
+//     const fuels = []
+//     $_outputForecast.values().next().value.forEach((item) => {
+//       fuels.push(item["surface.primary.fuel.model.catalogKey"])
+//     })
+//     fuels.forEach((fuel) => {
+//       const fuelOutput = {}
+//       fuelOutput["surface.primary.fuel.model.catalogKey"] = fuel
+//       fuelOutput["values"] = []
+//       $_outputForecast.forEach((forecast, time) => {
+//         let fuelForecast = forecast.filter(obj => {
+//           return obj["surface.primary.fuel.model.catalogKey"] === fuel
+//         })
+//         // console.log("fuel forecast ", fuelForecast[0].values)
+//         fuelOutput.values.push({ "value": fuelForecast[0].values[0][$selectedOutput], "time": new Date(time), fuel })
+//       })
+//       outputArray.push(fuelOutput)
+//
+//     })
+//     return outputArray
+//   })
