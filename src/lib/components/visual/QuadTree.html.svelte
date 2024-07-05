@@ -7,6 +7,7 @@
 <script>
   import { getContext } from "svelte";
   import { quadtree } from "d3-quadtree";
+  import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore.js";
 
   const { data, xGet, yGet, width, height } = getContext("LayerCake");
 
@@ -26,8 +27,18 @@
   /** @type {Array} [dataset]  The dataset to work off ofdefaults to $data if left unset. You can pass override the default here in here in case you don't want to use the main data or it's in a strange format. */
   export let dataset = undefined;
 
+  let timeSel = null;
+
   $: xGetter = x === "x" ? $xGet : $yGet;
   $: yGetter = y === "y" ? $yGet : $xGet;
+
+  function executeClick(e) {
+    console.log("click", e);
+    if ($timeMode === "current") {
+      $timeMode = "user";
+    }
+    $currentDateTime = new Date(timeSel);
+  }
 
   function findItem(evt) {
     e = evt;
@@ -37,6 +48,8 @@
 
     found = finder.find(evt[xLayerKey], evt[yLayerKey], searchRadius) || {};
     visible = Object.keys(found).length > 0;
+    timeSel = found.time;
+    console.log("evt", found);
   }
 
   $: finder = quadtree()
@@ -47,12 +60,12 @@
     .x(xGetter)
     .y(yGetter)
     .addAll(dataset || $data);
-  // $: console.log("dataset ", dataset);
 </script>
 
 <div
   class="bg"
   on:mousemove={findItem}
+  on:click={executeClick}
   on:mouseout={() => (visible = false)}
   on:blur={() => (visible = false)}
 />
@@ -67,4 +80,3 @@
     left: 0;
   }
 </style>
-
