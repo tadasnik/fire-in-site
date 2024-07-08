@@ -4,11 +4,13 @@
  -->
 <script>
   import { getContext } from "svelte";
+  import { timeParse, timeFormat } from "d3-time-format";
 
   const { data, xDomain, yDomain, xGet, yGet, zGet, flatData } =
     getContext("LayerCake");
 
-  $: console.log("Multiline data", $data);
+  const formatTickX = timeFormat("%b. %e");
+  // $: console.log("Multiline data", $data);
   $: path = (values) => {
     return (
       "M" +

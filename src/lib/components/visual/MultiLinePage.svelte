@@ -21,6 +21,7 @@
   import Labels from "$lib/components/visual/GroupLabels.html.svelte";
   import ScatterSvg from "./ScatterSvg.svelte";
   import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
+  import QuadTree from "$lib/components/visual/QeadTree.svelte";
   import { _outputForecastArray } from "$lib/shared/stores/modelStore";
 
   // This example loads csv data as json using @rollup/plugin-dsv
@@ -43,9 +44,19 @@
 
   const seriesColors = ["#ffe4b8", "#ffb3c0", "#ff7ac7", "#ff00cc"];
 
-  const formatTickX = timeFormat("%H");
+  // const formatTickX = timeFormat("%H");
+  function formatTickX(tick) {
+    let format = timeFormat("%H");
+    let longFormat = timeFormat("%a");
+    if (format(tick) === "00") {
+      return longFormat(tick);
+    } else {
+      return format(tick);
+    }
+  }
+
   const formatXtip = timeFormat("%b %d, %H:00");
-  $: console.log("data :", data);
+  // $: console.log("data :", data);
   $: seriesNames = Object.keys(data[0]).filter((d) => d !== xKey);
   // const formatTickY = (d) => format(`.${precisionFixed(d)}s`)(d);
   // const groupedData = [];
@@ -54,70 +65,11 @@
     groupTo: zKey,
     valueTo: yKey,
   });
-
-  // $: $_outputForecastArray,
-  // const groupedData = derived(_outputForecastArray, ($_outputForecastArray) => {
-  //   const seriesNames = Object.keys($_outputForecastArray[0]).filter(
-  //     (d) => d !== xKey
-  //   );
-  //   return groupLonger($_outputForecastArray, seriesNames, {
-  //     groupTo: zKey,
-  //     valueTo: yKey,
-  //   });
-  // });
-  // $: console.log("_outputForecastArray ", $_outputForecastArray);
-  $: console.log("groupedData ", groupedData);
-  // const times = (data[0].values) => {
-  //   values.map((d) => {
-  //     return $xGet(d)
-  //   })
-  // }
-  // console.log("data ", data);
-  // $: path = (values) => {
-  //   values.map((d) => {
-  //     return $xGet(d);
-  //   });
-  // };
-  // $: console.log(path(data.values));
-
-  // const daysTransformed = $data[0].map((d) => {
-  //   const parts = d.time.split("T");
-  //   const time = parts[1]
-  //     .replace("Z", "")
-  //     .split(":")
-  //     .map((q) => +q);
-  //   d[xKey] = time[0] * 60 * 60 + time[1] * 60 + time[2];
-  //   d[yKey] = parts[0];
-  //   return d;
-  // });
-  // const extents = calcExtents(daysTransformed, {
-  //   x: (d) => d.timestring,
-  // });
-  //
-  // // Convert to string even though it is one to make Typescript happy
-  // const minDate = extents.x[0]
-  //   .toString()
-  //   .split("T")[0]
-  //   .split("-")
-  //   .map((d) => +d);
-  // const maxDate = extents.x[1]
-  //   .toString()
-  //   .split("T")[0]
-  //   .split("-")
-  //   .map((d) => +d);
-  //
-  // const allDays = timeDay
-  //   .range(
-  //     new Date(Date.UTC(minDate[0], minDate[1] - 1, minDate[2])),
-  //     new Date(Date.UTC(maxDate[0], maxDate[1] - 1, maxDate[2] + 1))
-  //   )
-  //   .map((d) => d.toISOString().split("T")[0])
-  //   .sort();
 </script>
 
 <div class="chart-container">
   <LayerCake
-    padding={{ top: 7, right: 0, bottom: 20, left: 15 }}
+    padding={{ top: 7, right: 0, bottom: 30, left: 15 }}
     x={xKey}
     y={yKey}
     z={zKey}
@@ -134,6 +86,7 @@
         ticks={10}
         baseline
         formatTick={formatTickX}
+        axisLabel={null}
       />
       <AxisY
         ticks={4}
@@ -148,7 +101,6 @@
     </Svg>
 
     <Html>
-      <Labels />
       <SharedTooltip formatTitle={formatXtip} dataset={$_outputForecastArray} />
     </Html>
   </LayerCake>
