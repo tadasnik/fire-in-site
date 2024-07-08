@@ -14,19 +14,60 @@
   lng = -3;
   lat = 52;
   zoom = 9;
+  const cardinalDirections = {
+    0: "N",
+    1: "NNE",
+    2: "NNE",
+    3: "NE",
+    4: "NE",
+    5: "ENE",
+    6: "ENE",
+    7: "E",
+    8: "E",
+    9: "ESE",
+    10: "ESE",
+    11: "SE",
+    12: "SE",
+    13: "SSE",
+    14: "SSE",
+    15: "S",
+    16: "S",
+    17: "SSW",
+    18: "SSW",
+    19: "SW",
+    20: "SW",
+    21: "WSW",
+    22: "WSW",
+    23: "W",
+    24: "W",
+    25: "WNW",
+    26: "WNW",
+    27: "NW",
+    28: "NW",
+    29: "NNW",
+    30: "NNW",
+    31: "N",
+  };
+  function getWindCardinalDirection(windDir) {
+    return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
+  }
 
-  function setCurrentLocation(coordinates) {
-    const prevLoc = new LatLon(
+  function setCurrentLocation(coordinates, elevation, slope, aspect) {
+    let currentLoc = {};
+    let prevLoc = new LatLon(
       $currentLocation.latitude,
       $currentLocation.longitude
     );
-    $currentLocation.longitude = coordinates.lng;
-    $currentLocation.latitude = coordinates.lat;
-    const newLoc = new LatLon(
-      $currentLocation.latitude,
-      $currentLocation.longitude
-    );
-    $currentLocation.distanceFromPrevious = prevLoc.distanceTo(newLoc);
+    let newLoc = new LatLon(coordinates.lat, coordinates.lng);
+    let distanceFromPrevious = prevLoc.distanceTo(newLoc);
+    currentLoc.longitude = coordinates.lng;
+    currentLoc.latitude = coordinates.lat;
+    currentLoc.elevation = elevation;
+    currentLoc.slope = slope;
+    currentLoc.aspect = aspect;
+    currentLoc.distanceFromPrevious = distanceFromPrevious;
+    currentLoc.userLocation = true;
+    $currentLocation = currentLoc;
   }
 
   // Slope and aspect
@@ -40,12 +81,8 @@
     return [slope, (450 - aspectInit) % 360];
   }
 
-  function processPointSlopeAspect(map, distance) {
-    const points = pointsCardinalDirections(
-      $currentLocation.longitude,
-      $currentLocation.latitude,
-      distance
-    );
+  function processPointSlopeAspect(map, longitude, latitude, distance) {
+    const points = pointsCardinalDirections(longitude, latitude, distance);
     pointsElevation(points, map);
     return slopeAspect(points, distance);
   }
@@ -119,7 +156,12 @@
           $currentLocation.latitude,
         ]);
         map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
-        const [slope, aspect] = processPointSlopeAspect(map, 50);
+        let [slope, aspect] = processPointSlopeAspect(
+          map,
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+          50
+        );
         $currentLocation.slope = slope;
         $currentLocation.aspect = aspect;
         $currentLocation.userLocation = true;
@@ -127,19 +169,19 @@
     });
 
     map.on("click", function (e) {
-      var coordinates = e.lngLat;
-      setCurrentLocation(coordinates);
-      locMarker.setLngLat([
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-      ]);
-      $currentLocation.elevation = map.queryTerrainElevation([
+      let coordinates = e.lngLat;
+      locMarker.setLngLat([coordinates.lng, coordinates.lat]);
+      let elevation = map.queryTerrainElevation([
         coordinates.lng,
         coordinates.lat,
       ]);
-      const [slope, aspect] = processPointSlopeAspect(map, 50);
-      $currentLocation.slope = slope;
-      $currentLocation.aspect = aspect;
+      let [slope, aspect] = processPointSlopeAspect(
+        map,
+        coordinates.lng,
+        coordinates.lat,
+        50
+      );
+      setCurrentLocation(coordinates, elevation, slope, aspect);
     });
     locMarker = new Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
@@ -151,15 +193,25 @@
       map.remove();
     }
   });
-
-  // $: $currentLocation, setMarkerLocation(); // promise.then(fetchForecast());
 </script>
 
 <div class="sidebar">
-  Longitude: {$currentLocation.longitude.toFixed(3)} | Latitude: {$currentLocation.latitude.toFixed(
+  {$currentLocation.latitude.toFixed(3)}<i
+    class="text-xl wi wi-degrees"
+  />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
     3
-  )} | Zoom:
-  {zoom.toFixed(2)}
+  )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0
+    ? "E"
+    : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
+    0
+  )}%, aspect:
+  <i
+    class="text-xl wi wi-wind
+        wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
+  />
+  <strong
+    >({cardinalDirections[Math.floor($currentLocation.aspect / 11.25)]})</strong
+  >
 </div>
 <div class="">
   <div class="map" bind:this={mapContainer} />
