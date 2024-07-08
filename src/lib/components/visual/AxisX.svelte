@@ -43,6 +43,7 @@
     : typeof ticks === "function"
     ? ticks($xScale.ticks())
     : $xScale.ticks(ticks);
+  // $: console.log("tickVals Xaxis  :", tickVals);
 
   function textAnchor(i) {
     if (snapTicks === true) {
@@ -93,11 +94,13 @@
       x2={$width}
     />
   {/if}
-  <g class="tick">
-    <text text-anchor="middle" x={$width / 2} y={$height + 30}
-      >{axisLabel}
-    </text>
-  </g>
+  {#if axisLabel}
+    <g class="tick">
+      <text text-anchor="middle" x={$width / 2} y={$height + 30}
+        >{axisLabel}
+      </text>
+    </g>
+  {/if}
 </g>
 
 <style>
