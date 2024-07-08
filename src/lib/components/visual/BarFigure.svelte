@@ -5,22 +5,24 @@
 <script>
   import { LayerCake, Svg, flatten } from "layercake";
   import { scaleBand } from "d3-scale";
-
+  import { format } from "d3-format";
   import AxisX from "$lib/components/visual/AxisX.svelte";
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import Bars from "$lib/components/visual/Bars.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";
+  import { _maxVal } from "$lib/shared/stores/modelStore";
 
   export let data;
+  export let time;
   export let xKey;
   export let yKey;
 
-  $: flatData = flatten(data, "values");
+  $: plotData = data.get(time);
+  $: flatData = flatten(plotData, "values");
+  const formatLabelY = (d) => format(`.1f`)(d);
 
-  // data.forEach((d) => {
-  //   d[xKey] = +d[xKey];
-  // });
-  // $: console.log("???????????? data after BARPLOT:", data);
+  // $: console.log("???????????? BARPLOT:", data);
+  $: xMax = Math.ceil($_maxVal / 1) * 1;
 </script>
 
 <div class="chart-container">
@@ -28,15 +30,16 @@
     padding={{ bottom: 20, left: 35 }}
     x={xKey}
     y={yKey}
-    yScale={scaleBand().paddingInner(0.05)}
-    xDomain={[0, null]}
+    yScale={scaleBand().paddingInner(0.2)}
+    xDomain={[0, xMax]}
     {flatData}
-    {data}
+    data={plotData}
   >
     <Svg>
       <Bars />
       <AxisX
         gridlines={true}
+        baseline
         ticks={4}
         snapTicks={true}
         tickMarks={true}
@@ -44,12 +47,13 @@
           " (" +
           outputNodes[xKey].units +
           ")"}
+        formatTick={formatLabelY}
       />
       <AxisY
-        gridlines={true}
-        ticks={4}
+        gridlines={false}
         snapTicks={true}
         tickMarks={true}
+        baseLine
         axisLabel={outputNodes[yKey].label}
       />
     </Svg>
@@ -65,6 +69,6 @@
   */
   .chart-container {
     width: 100%;
-    height: 250px;
+    height: 360px;
   }
 </style>

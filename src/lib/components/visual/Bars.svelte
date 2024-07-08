@@ -10,8 +10,7 @@
   } from "$lib/firebase/firebase.client";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
 
-  const { data, xGet, yGet, xScale, yScale, xDomain, xRange } =
-    getContext("LayerCake");
+  const { data, xGet, yGet, xScale, yScale, xRange } = getContext("LayerCake");
 
   /** @type {String} [fill='#00bbff'] - The shape's fill color. This is technically optional because it comes with a default value but you'll likely want to replace it with your own color. */
   // export let fill = "#00bbff";
@@ -19,6 +18,7 @@
   let imageNames;
   let images = {};
 
+  const xDomain = [0, 100];
   onMount(async () => {
     imageNames = await getFuelsFileNames();
     images = await getFuelsImages(imageNames);
