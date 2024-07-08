@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 import { inputNodes } from '$lib/data/inputNodes.js'
 import { fuelNodes } from '$lib/data/fuelNodes.js'
 import { outputNodes } from "$lib/data/outputNodes.js";
@@ -9,6 +9,7 @@ import { currentWeather, elevationDiff, forecastTimeIndex } from "$lib/shared/st
 import { currentLocation } from "$lib/shared/stores/locationStore";
 import UKFuelModels from '$lib/data/UKFuelModels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
+import { simpleNelsonFuelMoisture } from '$lib/model/nelsonFMC/simpleNelson';
 
 export const inputNodesStore = writable(inputNodes)
 export const fireSim = new FireSim({ ...inputNodes, ...fuelNodes, ...outputNodes })
@@ -44,7 +45,7 @@ export const selectedScenario = writable({
 })
 
 export const modelConfigValues = writable(modelConfigOptions)
-export const selectedFuels = writable(['cl1', 'cl3', 'mxh1', 'mxh2', 'gr3', 'eg1', 'eg3', 'lnl'])
+export const selectedFuels = writable(['cl1', 'cl2', 'cl3', 'cl4', 'mxh1', 'mxh2', 'gr1', 'gr2', 'gr3', 'eg1', 'eg2', 'eg3', 'lnl'])
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
 // export const _outputForecast = writable(new Map())
@@ -89,6 +90,16 @@ export function getOutputsForecast(inputsForecast) {
   return resultForecast
 }
 
+// Not implemented
+function solarRadiationFromUVIndex(forecast) {
+  let solRad = 0
+  if (forecast.significantWeatherCode == 1) {
+    shading = 1
+  } else if (forecast.significantWeatherCode == 3 && forecast.uvIndex > 3) {
+    shading = 1
+  }
+  return shading
+}
 
 function fuelShadingMetoffice(forecast) {
   let shading = 0
@@ -153,7 +164,7 @@ export const requiredSiteInputsScenario = derived(
 export const requiredSiteInputsCurrenWeather = derived(
   [requiredInputs, siteInputs, currentWeather, currentLocation, elevationDiff],
   ([$requiredInputs, $siteInputs, $currentWeather, $currentLocation, $elevationDiff]) => {
-    console.log("requiredSiteInputsCurrentWeather")
+    // console.log("requiredSiteInputsCurrentWeather")
     const requiredSiteI = {}
     const forecastInputs = {
       "site.temperature.air": "screenTemperature",
@@ -197,9 +208,11 @@ export const requiredSiteInputsCurrenWeather = derived(
 )
 
 export const requiredSiteInputsForecast = derived(
-  [requiredInputs, siteInputs, forecastTimeIndex, currentLocation, elevationDiff],
-  ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation, $elevationDiff]) => {
-    console.log("requiredSiteInputsCurrentForecast")
+  [requiredInputs, siteInputs, forecastTimeIndex, currentLocation],
+  ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation]) => {
+    console.log("requiredSiteInputsForecast")
+    let deadFMC = null
+    // console.log("requiredSiteInputsCurrentForecast", $requiredInputs, $forecastTimeIndex)
     const requiredSiteInputs = new Map()
     const forecastInputs = {
       "site.temperature.air": "screenTemperature",
@@ -210,7 +223,8 @@ export const requiredSiteInputsForecast = derived(
     const locationInputs = {
       "site.slope.direction.aspect": $currentLocation.aspect,
       "site.slope.steepness.degrees": $currentLocation.slope,
-      "site.location.elevation.diff": $elevationDiff,
+      "site.location.elevation.diff": get(elevationDiff)
+
     }
     const liveMoistureInputs = [
       "site.moisture.live.stem", "site.moisture.live.herb"
@@ -236,6 +250,12 @@ export const requiredSiteInputsForecast = derived(
           //   splitKey[0] === 'site' &&
           //   splitKey[1] === 'moisture'
           // ) {
+        } else if (input == "site.moisture.dead.category") {
+          // console.log("time :", new Date(time))
+          // console.log("previous deadFMC :", deadFMC)
+          deadFMC = simpleNelsonFuelMoisture(deadFMC, forecast["screenTemperature"], forecast["uvIndex"] * 100, forecast["screenRelativeHumidity"], forecast["totalPrecipAmount"])
+          // console.log("deadFMC :", deadFMC)
+          requiredSiteI[input] = [deadFMC]
         } else {
           // console.log('required inputs non - forecast :', input)
           if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
@@ -260,6 +280,7 @@ export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
   ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
 
+    console.log("requiredFuelInputs")
     const requiredFuelI = {}
     $selectedFuels.forEach((fuel) => {
       requiredFuelI[fuel] = {}
@@ -273,8 +294,11 @@ export const requiredFuelInputs = derived(
           requiredFuelI[fuel][input] = [fuel]
         } else if (
           splitKey[0] === 'site' &&
-          splitKey[1] === 'moisture'
+          splitKey[1] === 'moisture' &&
+          splitKey[2] === 'live' &&
+          splitKey[3] === 'herb' | 'stem'
         ) {
+          // console.log("fuel input :", fuel, input, $month)
           requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
         } else if (
           splitKey[0] === 'surface' &&
@@ -313,7 +337,7 @@ export const _inputsForecast = derived(
       })
       inputsForecast.set(time, inputsTime)
     })
-    console.log('_inputsForecast end')
+    console.log('_inputsForecast end :')
     return inputsForecast
   }
 )
@@ -382,6 +406,16 @@ export const _outputForecastArray = derived([_outputForecast, selectedOutput],
     return outputArray
   })
 
+function maxValue(obj) {
+  let { time: _, ...rest } = obj;
+  let arr = Object.values(rest);
+  let max = Math.max(...arr);
+  return max
+}
+export const _maxVal = derived([_outputForecastArray], ([$_outputForecastArray]) => {
+  var maxA = $_outputForecastArray.reduce((prev, current) => prev > maxValue(current) ? prev : maxValue(current));
+  return maxA
+})
 // export const _outputForecastArray = derived([_outputForecast, selectedOutput],
 //   ([$_outputForecast, $selectedOutput]) => {
 //     const outputArray = []
