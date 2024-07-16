@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store'
+import { writable, derived, get, readable } from 'svelte/store'
 import { inputNodes } from '$lib/data/inputNodes.js'
 import { fuelNodes } from '$lib/data/fuelNodes.js'
 import { outputNodes } from "$lib/data/outputNodes.js";
@@ -17,13 +17,14 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'surface.weighted.fire.heatPerUnitArea',
   'surface.weighted.fire.firelineIntensity',
   'surface.weighted.fire.flameLength',
-  'ignition.firebrand.probability',
   'site.moisture.dead.tl1h',
-  'site.moisture.dead.tl10h'
-
+  'ignition.firebrand.probability'
 ])
+export const commonOutputs = readable(['site.moisture.dead.tl1h', 'ignition.firebrand.probability'])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.spreadRate')
+export const fuelMoistureModel = writable('Nelson')
+export const fuelMoistureModelOptions = readable(['Fosberg', 'Nelson', 'User input'])
 export const scenarios = writable([])
 export const selectedScenario = writable({
   "site.moisture.dead.category": [
@@ -45,7 +46,7 @@ export const selectedScenario = writable({
 })
 
 export const modelConfigValues = writable(modelConfigOptions)
-export const selectedFuels = writable(['cl1', 'cl2', 'cl3', 'cl4', 'mxh1', 'mxh2', 'gr1', 'gr2', 'gr3', 'eg1', 'eg2', 'eg3', 'lnl'])
+export const selectedFuels = writable(['cl1', 'cl2', 'cl3', 'cl4', 'mxh1', 'mxh2', 'gr1', 'gr2', 'gr3', 'eg1', 'eg2', 'eg3', 'lnl', 'snl', 'bll'])
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
 // export const _outputForecast = writable(new Map())
@@ -208,9 +209,8 @@ export const requiredSiteInputsCurrenWeather = derived(
 )
 
 export const requiredSiteInputsForecast = derived(
-  [requiredInputs, siteInputs, forecastTimeIndex, currentLocation],
-  ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation]) => {
-    console.log("requiredSiteInputsForecast")
+  [requiredInputs, siteInputs, forecastTimeIndex, currentLocation, fuelMoistureModel],
+  ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation, $fuelMoistureModel]) => {
     let deadFMC = null
     // console.log("requiredSiteInputsCurrentForecast", $requiredInputs, $forecastTimeIndex)
     const requiredSiteInputs = new Map()
@@ -226,14 +226,15 @@ export const requiredSiteInputsForecast = derived(
       "site.location.elevation.diff": get(elevationDiff)
 
     }
-    const liveMoistureInputs = [
-      "site.moisture.live.stem", "site.moisture.live.herb"
-    ]
+    const deadMoistureCategories = { "site.moisture.dead.tl1h": 0, "site.moisture.dead.tl10h": 2, "site.moisture.dead.tl100h": 4 }
     $forecastTimeIndex.forEach((forecast, time) => {
       let requiredSiteI = {}
       let timeInputs = { "site.date.month": getMonth(new Date(time)), "site.time.hour": getHour(new Date(time)) }
+      if ($fuelMoistureModel == "Nelson") {
+        deadFMC = simpleNelsonFuelMoisture(deadFMC, forecast["screenTemperature"], forecast["uvIndex"] * 100, forecast["screenRelativeHumidity"], forecast["totalPrecipAmount"])
+      }
+
       $requiredInputs.forEach((input) => {
-        // console.log("Required input :", input)
         const splitKey = input.split('.')
         if (Object.keys(forecastInputs).includes(input)) {
           requiredSiteI[input] = [forecast[forecastInputs[input]]]
@@ -244,21 +245,13 @@ export const requiredSiteInputsForecast = derived(
           requiredSiteI[input] = [timeInputs[input]]
         } else if (Object.keys(locationInputs).includes(input)) {
           requiredSiteI[input] = [locationInputs[input]]
-          // } else if (liveMoistureInputs.includes(input)) {
-          //   requiredSiteI[input] = fuelMoisture[fuel][input][getMonth(new Date(time))]
-          // } else if (
-          //   splitKey[0] === 'site' &&
-          //   splitKey[1] === 'moisture'
-          // ) {
-        } else if (input == "site.moisture.dead.category") {
-          // console.log("time :", new Date(time))
-          // console.log("previous deadFMC :", deadFMC)
-          deadFMC = simpleNelsonFuelMoisture(deadFMC, forecast["screenTemperature"], forecast["uvIndex"] * 100, forecast["screenRelativeHumidity"], forecast["totalPrecipAmount"])
-          // console.log("deadFMC :", deadFMC)
-          requiredSiteI[input] = [deadFMC]
+        } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
+
+          requiredSiteI[input] = [deadFMC + deadMoistureCategories[input]]
         } else {
           // console.log('required inputs non - forecast :', input)
           if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
+            // console.log("site input :", input, $siteInputs[input].value)
             requiredSiteI[input] = $siteInputs[input].value
           } else if (
             splitKey[0] === 'surface' &&
@@ -280,7 +273,7 @@ export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
   ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
 
-    console.log("requiredFuelInputs")
+    console.log("requiredFuelInputs", $requiredInputs)
     const requiredFuelI = {}
     $selectedFuels.forEach((fuel) => {
       requiredFuelI[fuel] = {}
@@ -295,10 +288,9 @@ export const requiredFuelInputs = derived(
         } else if (
           splitKey[0] === 'site' &&
           splitKey[1] === 'moisture' &&
-          splitKey[2] === 'live' &&
-          splitKey[3] === 'herb' | 'stem'
+          splitKey[2] === 'live'
         ) {
-          // console.log("fuel input :", fuel, input, $month)
+          console.log("live moisture input :", input, fuelMoisture[fuel][input][$month])
           requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
         } else if (
           splitKey[0] === 'surface' &&
@@ -392,19 +384,24 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
   return resultForecast
 })
 
-export const _outputForecastArray = derived([_outputForecast, selectedOutput],
-  ([$_outputForecast, $selectedOutput]) => {
+export const _outputForecastArray = derived([_outputForecast, commonOutputs, selectedOutput],
+  ([$_outputForecast, $commonOutputs, $selectedOutput]) => {
     const outputArray = []
     $_outputForecast.forEach((forecast, time) => {
       const timeObject = {}
-      forecast.forEach((item) => {
-        timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput]
-      })
+      if ($commonOutputs.includes($selectedOutput)) {
+        timeObject['all'] = forecast[0].values[0][$selectedOutput]
+      } else {
+        forecast.forEach((item) => {
+          timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput]
+        })
+      }
       timeObject["time"] = time
       outputArray.push(timeObject)
     })
     return outputArray
   })
+
 
 function maxValue(obj) {
   let { time: _, ...rest } = obj;
