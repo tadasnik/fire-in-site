@@ -13,7 +13,7 @@
 
   lng = -3;
   lat = 52;
-  zoom = 9;
+  zoom = 12;
   const cardinalDirections = {
     0: "N",
     1: "NNE",
@@ -52,22 +52,24 @@
     return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
   }
 
-  function setCurrentLocation(coordinates, elevation, slope, aspect) {
+  function setCurrentLocation(longitude, latitude, elevation, slope, aspect) {
+    console.log("setCurrent");
     let currentLoc = {};
     let prevLoc = new LatLon(
       $currentLocation.latitude,
       $currentLocation.longitude
     );
-    let newLoc = new LatLon(coordinates.lat, coordinates.lng);
+    let newLoc = new LatLon(latitude, longitude);
     let distanceFromPrevious = prevLoc.distanceTo(newLoc);
-    currentLoc.longitude = coordinates.lng;
-    currentLoc.latitude = coordinates.lat;
+    currentLoc.longitude = longitude;
+    currentLoc.latitude = latitude;
     currentLoc.elevation = elevation;
     currentLoc.slope = slope;
     currentLoc.aspect = aspect;
     currentLoc.distanceFromPrevious = distanceFromPrevious;
     currentLoc.userLocation = true;
     $currentLocation = currentLoc;
+    console.log("setCurrent currentLoc", $currentLocation);
   }
 
   // Slope and aspect
@@ -83,7 +85,9 @@
 
   function processPointSlopeAspect(map, longitude, latitude, distance) {
     const points = pointsCardinalDirections(longitude, latitude, distance);
+    console.log("points", points);
     pointsElevation(points, map);
+    console.log("points", points);
     return slopeAspect(points, distance);
   }
 
@@ -127,6 +131,12 @@
 
   onMount(() => {
     const initialState = { lng: lng, lat: lat, zoom: zoom };
+    console.log(
+      "Map onMount",
+      $currentLocation.longitude,
+      $currentLocation.latitude,
+      $currentLocation.userLocation
+    );
 
     map = new Map({
       container: mapContainer,
@@ -136,6 +146,9 @@
       center: [$currentLocation.longitude, $currentLocation.latitude],
       zoom: initialState.zoom,
     });
+    map._isReady = false;
+    map.ready = () => map._isReady;
+    map.once("load", () => (map._isReady = true));
     map.on("style.load", () => {
       // add the digital elevation model tiles
       map.addSource("mapbox-dem", {
@@ -146,29 +159,40 @@
       });
       map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
     });
-    map.on("sourcedata", (e) => {
-      if (
-        e.source.type === "raster-dem" &&
-        $currentLocation.userLocation === false
-      ) {
-        locMarker.setLngLat([
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-        ]);
-        map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
-        let [slope, aspect] = processPointSlopeAspect(
-          map,
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-          50
-        );
-        $currentLocation.slope = slope;
-        $currentLocation.aspect = aspect;
-        $currentLocation.userLocation = true;
-      }
+    // map.on("sourcedata", (e) => {
+    map.on("load", () => {
+      // if (e.source.type === "raster-dem") {
+      console.log("Map on load", map.ready());
+      console.log("sourcedata true");
+      locMarker.setLngLat([
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ]);
+      map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+      let elevation = map.queryTerrainElevation([
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ]);
+      console.log("elevation", elevation);
+
+      let [slope, aspect] = processPointSlopeAspect(
+        map,
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        50
+      );
+      setCurrentLocation(
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        elevation,
+        slope,
+        aspect
+      );
+      // map.off("sourcedata");
     });
 
     map.on("click", function (e) {
+      console.log("click", e);
       let coordinates = e.lngLat;
       locMarker.setLngLat([coordinates.lng, coordinates.lat]);
       let elevation = map.queryTerrainElevation([
@@ -181,7 +205,13 @@
         coordinates.lat,
         50
       );
-      setCurrentLocation(coordinates, elevation, slope, aspect);
+      setCurrentLocation(
+        coordinates.lng,
+        coordinates.lat,
+        elevation,
+        slope,
+        aspect
+      );
     });
     locMarker = new Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
@@ -195,7 +225,8 @@
   });
 </script>
 
-<div class="sidebar">
+<div class="absolute bg-slate-600 bg-opacity-90 text-gray-50 z-10 m-4 p-2">
+  <div class="text-xl">Fire Location:</div>
   {$currentLocation.latitude.toFixed(3)}<i
     class="text-xl wi wi-degrees"
   />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
@@ -206,16 +237,14 @@
     0
   )}%, aspect:
   <i
-    class="text-xl wi wi-wind
-        wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
+    class="text-2xl wi wi-wind
+      wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
   />
   <strong
     >({cardinalDirections[Math.floor($currentLocation.aspect / 11.25)]})</strong
   >
 </div>
-<div class="">
-  <div class="map" bind:this={mapContainer} />
-</div>
+<div class="map z-0" bind:this={mapContainer} />
 
 <style>
   .map {
