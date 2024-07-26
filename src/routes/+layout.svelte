@@ -1,13 +1,21 @@
+<script context="module">
+  export const ssr = false;
+</script>
+
 <script>
   import "../app.postcss";
 
   import { onMount } from "svelte";
+  import { sineIn } from "svelte/easing";
   import { auth, db } from "$lib/firebase/firebase.client";
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     Sidebar,
+    Drawer,
+    Dropdown,
+    DropdownItem,
     Navbar,
     NavBrand,
     NavLi,
@@ -16,98 +24,163 @@
     Toggle,
     Button,
     CloseButton,
+    Radio,
+    Helper,
+    Footer,
+    FooterBrand,
   } from "flowbite-svelte";
+  import { ChevronDownOutline } from "flowbite-svelte-icons";
+  import { timeFormat } from "d3-time-format";
   import { DarkMode } from "flowbite-svelte";
+  import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
+
   import SiteInputs from "$lib/components/SiteInputs.svelte";
   import FuelInputs from "$lib/components/fuelInputs.svelte";
+  import InfoTable from "$lib/components/visual/InfoTable.svelte";
   import {
     selectedFuels,
     requiredFuelInputs,
+    requiredSiteInputsForecast,
     advancedMode,
-    coordinates,
-    forecast,
+    fuelInputs,
+    fuelMoistureModel,
+    fuelMoistureModelOptions,
+    modelConfigValues,
   } from "$lib/shared/stores/modelStore";
+  import {
+    forecastTimeIndex,
+    getForecast,
+  } from "$lib/shared/stores/forecastStore";
+  import {
+    getLocation,
+    currentLocation,
+  } from "$lib/shared/stores/locationStore";
+  import {
+    currentDateTime,
+    timeMode,
+    dateTime,
+    hour,
+  } from "$lib/shared/stores/timeStore";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
-  import fetchForecastJSON from "$lib/weather/metoffice";
   import AuthReset from "$lib/components/AuthReset.svelte";
-
-  const successCallback = (pos) => {
-    return pos;
-    // $coordinates.latitude = pos.coords.latitude;
-    // $coordinates.longitude = pos.coords.longitude;
-  };
-
-  const errorCallback = (error) => {
-    console.log("there was ", error);
-  };
-  let userScenarios;
-  let cwd = 0;
-  onMount(() => {
-    var promise1 = new Promise(function (resolve, reject) {
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        $coordinates.latitude = pos.coords.latitude;
-        $coordinates.longitude = pos.coords.longitude;
-        resolve(pos);
-      });
-    });
-    promise1.then(function () {
-      var promise2 = fetchForecastJSON(
-        $coordinates.latitude,
-        $coordinates.longitude
+  function handleFuelMoistureChange(value) {
+    console.log("Fuel moisture model changed to ", value);
+    if (value === "Fosberg") {
+      $fuelMoistureModel = "Fosberg";
+      console.log(
+        "modelConfigValues ",
+        $modelConfigValues["configure.fuel.moisture"]
       );
-      promise2.then(function (result) {
-        $forecast = result;
-      });
-    });
+      $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
+      console.log("Fuel moisture model changed to ", value);
+    } else {
+      $fuelMoistureModel = "Nelson";
+      $modelConfigValues["configure.fuel.moisture"].value = "individual";
+      console.log("Fuel moisture model changed to ", value);
+    }
+  }
 
-    // .then(fetchForecastJSON($coordinates.latitude, $coordinates.longitude))
-    // .then((result) => ($forecast = result));
+  let transitionParams = {
+    x: -320,
+    duration: 200,
+    easing: sineIn,
+  };
+  onMount(() => {
+    const interval = setInterval(() => {
+      if ($timeMode === "current") {
+        console.log("current time mode");
+        $currentDateTime = new Date();
+      } else {
+        console.log("user time mode");
+      }
+    }, 10000);
 
+    // differenceHours($dateTime - Date($forecast.timeSeries[0].time));
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
       // console.log("user changed ", user);
       authStore.update((curr) => {
-        return { ...curr, isLoading: false, currentUser: user };
+        return { ...curr, currentUser: user };
       });
+      console.log("user changed", user);
       if (
         // if browser and no user
         browser &&
-        !$authStore.currentUser &&
-        !$authStore.isLoading
+        !$authStore.currentUser
+        // !$authStore.isLoading
         // window.location.pathname !== "/"
       ) {
         // window.location.href = "/";
         console.log(
-          "current User ",
+          " NOOO current User ",
           $authStore.currentUser,
           $authStore.isLoading
         );
-        return;
-      }
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocContent = await getDoc(userDocRef);
-      if (!userDocContent.exists()) {
-        const userRef = doc(db, "users", user.uid);
-        await setDoc(
-          userRef,
-          {
-            email: user.email,
-            displayName: user.displayName,
-          },
-          { merge: true }
-        );
-      } else {
-        userScenarios = userDocContent;
-      }
-      //   const forecast = fetchForecastJSON(crd.latitude, crd.longitude).then(
-      //     (forecast) => {
-      //         console.log("!!!!!!!! forecast ", forecast.features[0].properties);
-      //     }
-      // );
-      //
-      //   console.log("!!!!!!!! forecast ", forecast.features[0].properties);
-    });
+        const [latitude, longitude] = await getLocation();
+        console.log(" GOT longitude", longitude, "GOT latitude", latitude);
+        currentLocation.update((current) => ({
+          ...current,
+          userLocation: true,
+          distanceFromPrevious: 10000,
+          latitude: latitude,
+          longitude: longitude,
+        }));
+        console.log(" executing getForecast");
+        getForecast();
+      } else if (browser && $authStore.currentUser) {
+        console.log(" ++++++++++++current User ", $authStore.currentUser);
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocContent = await getDoc(userDocRef);
+        if (!userDocContent.exists()) {
+          const userRef = doc(db, "users", user.uid);
+          await setDoc(
+            userRef,
+            {
+              email: user.email,
+              displayName: user.displayName,
+            },
+            { merge: true }
+          );
+        } else {
+          const defLocationRef = doc(
+            db,
+            "users",
+            user.uid,
+            "Locations",
+            "default"
+          );
+          getDoc(defLocationRef)
+            .then((defLoc) => {
+              if (defLoc.exists()) {
+                console.log("Document data:", defLoc.data());
+                currentLocation.update((current) => ({
+                  ...current,
+                  userLocation: true,
+                  distanceFromPrevious: 10000,
+                  latitude: defLoc.data().latitude,
+                  longitude: defLoc.data().longitude,
+                }));
+              } else {
+                console.log("No default location for user!");
+                getLocation();
+              }
+            })
 
-    return unsuscribe;
+            .catch((error) => {
+              console.error("Error getting documents: ", error);
+            });
+        }
+      } else {
+      }
+      console.log("executing isLoading false");
+      authStore.update((curr) => {
+        console.log("curr", curr);
+        return { ...curr, isLoading: false };
+      });
+    });
+    return () => {
+      unsuscribe;
+      clearInterval(interval);
+    };
   });
 
   let spanClass = "flex-1 ml-3 whitespace-nowrap";
@@ -115,19 +188,28 @@
   $: activeUrl = $page.url.pathname;
   $: console.log("layout activeURl", activeUrl);
 
+  $: $currentLocation, getForecast(); // promise.then(fetchForecast());
+
   let hidden1 = true;
   const toggleDrawer = () => {
     hidden1 = false;
   };
 
-  $: console.log("advanced mode : ", $advancedMode);
-  $: console.log(" $$$$$$$ cordinates:", $coordinates);
-  $: console.log(" $$$$$$$ cwd:", cwd);
-  $: console.log(" $$$$$$$ forecast:", $forecast);
+  $: console.log(" $$$$$$$ currentLocation:", $currentLocation);
+  // $: console.log(" $$$$$$$ currentWeather:", $currentWeather);
+  // $: console.log(" $$$$$$$ forecastTimeSeries:", $forecastTimeSeries);
+  // $: console.log(" $$$$$$$ time:", $dateTime);
+  // $: console.log(" $$$$$$$ fuel moisture:", $fuelM&oistureModel);
+  // $: console.log(" $$$$$$$ config options :", $modelConfigValues);
+  // $: console.log(
+  // " $$$$$$$ requiredSiteInputsForecast:",
+  // $requiredSiteInputsForecast
+  // );
+  const dateFormat = timeFormat("%a %b %e, %H %p");
 </script>
 
 <header
-  class="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
+  class="top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
 >
   <Navbar
     color="default"
@@ -138,13 +220,39 @@
   >
     <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
     <NavBrand href="/">
-      <span class="self-center whitespace-nowrap text-xl font-bold uppercase">
-        UKFDRS
-      </span>
-      <span class="pl-4 whitespace-nowrap">misBehavePlus</span>
+      <span class="px-4 text-xl text-primary-800">misBehavePlus</span>
     </NavBrand>
     <NavUl>
-      <NavLi href="/">Home</NavLi>
+      <NavLi href="/fuelModels">Fuel Models</NavLi>
+      <NavLi class="cursor-pointer">
+        Fuel Moisture {$fuelMoistureModel}<ChevronDownOutline
+          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
+        />
+      </NavLi>
+      <Dropdown class="w-60 p-3 space-y-1">
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          <Radio
+            name="fuelMoistureModel"
+            bind:group={$fuelMoistureModel}
+            value={"Fosberg"}
+            on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
+          >
+          <Helper class="ps-6"
+            >Calculate dead fuel mosture using Fosberg model.</Helper
+          >
+        </li>
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          <Radio
+            name="fuelMoistureModel"
+            bind:group={$fuelMoistureModel}
+            value={"Nelson"}
+            on:change={() => handleFuelMoistureChange("Nelson")}>Nelson</Radio
+          >
+          <Helper class="ps-6"
+            >Use simple Nelson dead fuel moisture model.</Helper
+          >
+        </li>
+      </Dropdown>
       {#if !$authStore.currentUser}
         <NavLi href="/authenticate">Log in</NavLi>
       {:else}
@@ -156,22 +264,25 @@
         >
       {/if}
     </NavUl>
-    <div class="flex items-center ml-auto">
-      <DarkMode
-        size="lg"
-        class="inline-block dark:hover:text-white hover:text-gray-900"
-      />
-    </div>
+
     <div class="flex items-center ml-auto">
       <Toggle size="small" bind:checked={$advancedMode}>Advanced mode</Toggle>
     </div>
   </Navbar>
 </header>
-{#if activeUrl === "/"}
+{#if activeUrl === "/" && $advancedMode}
   <Sidebar
     {activeUrl}
     asideClass="hidden overflow-y-auto md:block fixed inset-0 pt-20 z-30 flex-none h-full w-96 border-r border-gray-200 dark:border-gray-600"
   >
+    <section class="p-4">
+      <div class="flex mb-4">
+        <InfoTable
+          data={$forecastTimeIndex.get($dateTime)}
+          title="Forecast for {dateFormat(new Date($dateTime))}"
+        />
+      </div>
+    </section>
     <SiteInputs />
     <h3 class="pl-4 h3 font-bold">Fuel inputs</h3>
 
@@ -190,16 +301,50 @@
     {/each}
   </Sidebar>
 {/if}
-
-<main class="md:ml-96 h-auto max-w-xl p-10">
-  <!-- {#if $authStore.currentUser} -->
-  <!--   <heading class="p-8" tag="h1" customSize="text-3xl" -->
-  <!--     >Private page user: {$authStore.currentUser.displayName} -->
-  <!--   </heading> -->
-  <!--   <AuthReset /> -->
-  <!-- {:else} -->
-  <!--   <h1>Loading....</h1> -->
-  <!-- {/if} -->
-
-  <slot />
+<Drawer
+  transitionType="fly"
+  {transitionParams}
+  bind:hidden={hidden1}
+  id="sidebar1"
+>
+  <CloseButton on:click={() => (hidden1 = true)} class="mb-4 dark:text-white" />
+  <div class="p-4">
+    <h1 class="h1">Sidebar</h1>
+    <p class="text-sm">This is a sidebar</p>
+  </div></Drawer
+>
+<main class="">
+  {#if !$authStore.isLoading && $authStore.currentUser}
+    <heading class="p-8" tag="h1" customSize="text-3xl"
+      >Private page user: {$authStore.currentUser.displayName}
+    </heading>
+    <AuthReset />
+    <div><p>{$currentLocation.longitude}</p></div>
+    <slot />
+  {:else if !$authStore.isLoading}
+    <div><p>{$currentLocation.longitude}</p></div>
+    <slot />
+  {:else}
+    <h1>Loading....</h1>
+  {/if}
 </main>
+<Footer footerType="logo">
+  <hr class="my-6 border-gray-200 mx-auto dark:border-gray-700" />
+  <div class="flex items-center justify-between px-10">
+    <p>
+      Fire behaviour predictions leverage BehavePlus fire behaviour model, fuel
+      models representative of UK vegetation and MetOffice forecasts.
+      Implementation: Tadas Nikonovas, Centre for Wildfire Research, Swansea
+      University. Scientific data: Toward a UK Fire Danger Rating System project
+      team.
+    </p>
+  </div>
+  <div class="px-10 flex items-center justify-center">
+    <FooterBrand
+      href="https://ukfdrs.com/"
+      src={ukfdrsLogo}
+      alt="UKFDRS Logo"
+      name="UKFDRS"
+    />
+  </div>
+</Footer>
