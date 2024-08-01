@@ -6,7 +6,10 @@
     getFuelModelsFileNames,
   } from "$lib/firebase/firebase.client";
 
-  import { selectedFuel } from "$lib/shared/stores/modelStore.js";
+  import {
+    selectedFuel,
+    selectedOutput,
+  } from "$lib/shared/stores/modelStore.js";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
@@ -21,13 +24,17 @@
    * in units of cellSize. */
   export let gapSize;
 
-  /** @type {Function} [getText=d => d.text] - An accessor function to get the field to display. */
-  export let getText = (d) => d.text;
-
   export let forecastData;
 
   /** @type {string} Selectede fire behaviour, y axis label. */
   export let axisLabel;
+
+  /** @type {boolean} Selecteded fire behaviour output type (per fuel or common
+   * to all fuels). */
+  export let commonOutput;
+
+  /** @type {number} leftMargin - annotation (y axis) element width in px. */
+  export let leftMargin;
 
   let clickOutsideModal = false;
   function handleFuelClick(fuelObject) {
@@ -37,8 +44,6 @@
     clickOutsideModal = !clickOutsideModal;
     console.log("clickOutsideModal parrent", clickOutsideModal);
   }
-
-  $: console.log("forecastData", forecastData);
 </script>
 
 {#each Object.values(weatherProps) as prop, i}
@@ -63,31 +68,42 @@
   >
 {/each}
 
-<div class="flex" style:height={cellSize + "px"}>
-  {#each forecastData as weatherObject, x}
-    <div
-      class="shrink-0 items-center justify-center align-middle"
-      style:height={cellSize + "px"}
-      style:width={cellSize + "px"}
-    >
-      <i
-        class="text-xl wi wi-wind wi-from-{Math.round(
-          weatherObject['windDirectionFrom10m']
-        )}"
-        style="fill:grey"
-      />
-    </div>
-  {/each}
-  <!---->
-  <!-- <div class="" /> -->
-  <!--         <i -->
-  <!--           class="text-xl wi wi-wind -->
-  <!--       wi-from-{getWindCardinalDirection(data.windDirectionFrom10m)}" -->
-  <!--         /> -->
-</div>
+<!-- {#each forecastData as weatherObject, x} -->
+<!--   <div -->
+<!--     class="flex shrink-0 items-center justify-center align-middle" -->
+<!--     style:height={cellSize + "px"} -->
+<!--     style:width={cellSize + "px"} -->
+<!--   > -->
+<!--     <div class="text-xl"> -->
+<!--       <i -->
+<!--         class="text-xl wi wi-wind from-{Math.round( -->
+<!--           weatherObject['windDirectionFrom10m'] -->
+<!--         )}-deg" -->
+<!--         style="fill:grey" -->
+<!--       /> -->
+<!--     </div> -->
+<!--   </div> -->
+<!-- {/each} -->
+<!---->
+<!-- <div class="" /> -->
+<!--         <i -->
+<!--           class="text-xl wi wi-wind -->
+<!--       wi-from-{getWindCardinalDirection(data.windDirectionFrom10m)}" -->
+<!--         /> -->
 
+<div
+  class="flex columns-2 items-end min-w-96"
+  style:height={cellSize * gapSize + "px"}
+>
+  <div class="w-[{leftMargin}px]" />
+  <div class="pl-2">
+    {axisLabel}
+  </div>
+</div>
 <div class="flex justify-end">
-  <div class="label text-base" style:width="35px">{axisLabel}</div>
+  {#if !commonOutput}
+    <div class="label-vertical text-base" style:width="35px">Fuel model</div>
+  {/if}
   <div class="text-right justify-end pr-2 pl-2">
     {#each $data as fuelObject, i}
       <div
@@ -118,33 +134,8 @@
   </div>
 </div>
 
-<!-- <Modal -->
-<!--   title="{UKFuelModels[$selectedFuel] -->
-<!--     .displayLabel} ({$selectedFuel}) Fuel Model" -->
-<!--   bind:open={clickOutsideModal} -->
-<!--   autoclose -->
-<!--   outsideclose -->
-<!-- > -->
-<!--   <Gallery class="gap-4 grid-cols-2 md:grid-cols-4"> -->
-<!--     <Gallery items={images1} /> -->
-<!--   </Gallery> -->
-<!--   <p>{UKFuelModels[$selectedFuel].description}</p> -->
-<!--   <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400"> -->
-<!--     With less than a month to go before the European Union enacts new consumer -->
-<!--     privacy laws for its citizens, companies around the world are updating their -->
-<!--     terms of service agreements to comply. -->
-<!--   </p> -->
-<!--   <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400"> -->
-<!--     {Object.keys(UKFuelModels[$selectedFuel])} -->
-<!--   </p> -->
-<!--   <svelte:fragment slot="footer"> -->
-<!--     <Button on:click={() => alert('Handle "success"')}>I accept</Button> -->
-<!--     <Button color="alternative">Decline</Button> -->
-<!--   </svelte:fragment> -->
-<!-- </Modal> -->
-
 <style>
-  .label {
+  .label-vertical {
     display: inline-block;
     writing-mode: vertical-lr;
     transform: scale(-1);
