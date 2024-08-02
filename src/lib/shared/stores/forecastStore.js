@@ -1,9 +1,9 @@
-import { writable, get } from 'svelte/store'
-import { locations } from '$lib/shared/stores/locationStore'
+import { writable, derived, get } from 'svelte/store'
+import { currentLocation } from '$lib/shared/stores/locationStore'
 import { dateTime, differenceHours } from '$lib/shared/stores/timeStore'
 import fetchForecastJSON from "$lib/weather/metoffice";
 
-export const currentWeather = writable({
+export const forecastTimeSeries = writable([{
   feelsLikeTemperature: 15.05,
   max10mWindGust: 5.05,
   maxScreenAirTemp: 15.94,
@@ -23,29 +23,60 @@ export const currentWeather = writable({
   windDirectionFrom10m: 330,
   windGustSpeed10m: 5.05,
   windSpeed10m: 3.12
-})
+}])
 
-export const forecastLocation = writable({ coordinates: [], name: "" })
-export const forecastTimeSeries = writable([])
+export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 
 export function getForecast() {
-  console.log(get(locations).currentLocation)
-  if (get(locations).currentLocation.latitude) {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!calling fetchForecastJSON with location : ', get(locations).currentLocation)
+  // console.log("checking forecast conditions, currentLocation : ", get(currentLocation))
+  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
+    console.log("fetching forecast")
     var promise = fetchForecastJSON(
-      get(locations).currentLocation.latitude,
-      get(locations).currentLocation.longitude,
+      get(currentLocation).latitude,
+      get(currentLocation).longitude,
     );
-    promise.then(function(result) {
-      console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentW')
-      const indexCurrent = differenceHours(new Date(get(dateTime)), new Date(result.features[0].properties.timeSeries[0].time))
-      currentWeather.set(result.features[0].properties.timeSeries[indexCurrent])
+    promise.then(function (result) {
+      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentWeather', result)
+      // const indexCurrent = differenceHours(new Date(get(dateTime)), new Date(result.features[0].properties.timeSeries[0].time))
+      // currentWeather.set(result.features[0].properties.timeSeries[indexCurrent])
+
+      console.log("setting forecast location")
       forecastLocation.set({ coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name })
+      console.log("setting forecast timeSerie")
       forecastTimeSeries.set(result.features[0].properties.timeSeries)
-      console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentWeather, done')
+      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentWeather, done')
     })
   }
 }
+
+export const forecastTimeIndex = derived(forecastTimeSeries, ($forecastTimeSeries) => {
+  let indexMap = new Map()
+  for (const [i, value] of $forecastTimeSeries.entries()) {
+    indexMap.set(3600000 * (Math.round(new Date(value.time) / 3600000)), value)
+  }
+  return indexMap
+})
+
+export const currentWeather = derived([forecastTimeSeries, dateTime], ([$forecastTimeSeries, $dateTime]) => {
+  let currForecast = {}
+  const indexCurrent = differenceHours(new Date($dateTime), new Date($forecastTimeSeries[0].time))
+  if (indexCurrent < 5) {
+    currForecast = $forecastTimeSeries[indexCurrent]
+  } else {
+    currForecast = $forecastTimeSeries[0]
+  }
+  return currForecast
+});
+
+
+export const elevationDiff = derived([forecastLocation, currentLocation], ([$forecastLocation, $currentLocation]) => {
+  return $forecastLocation.coordinates[2] - $currentLocation.elevation
+})
+
+export const currentTimeIndex = derived([forecastTimeIndex, dateTime], ([$forecastTimeIndex, $dateTime]) => {
+  return Array.from($forecastTimeIndex.keys()).indexOf($dateTime)
+})
+
 
 // export const currentWeather = derived([currentWeatherInit, locations, dateTime], ([$currentWeatherInit, $locations, $dateTime]) => {
 //   if ($locations.currentLocation.latitude) {
