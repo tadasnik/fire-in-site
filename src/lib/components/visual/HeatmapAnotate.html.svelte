@@ -29,12 +29,18 @@
   /** @type {string} Selectede fire behaviour, y axis label. */
   export let axisLabel;
 
+  /** @type {string} Forecast model. */
+  export let forecastLabel;
+
   /** @type {boolean} Selecteded fire behaviour output type (per fuel or common
    * to all fuels). */
   export let commonOutput;
 
   /** @type {number} leftMargin - annotation (y axis) element width in px. */
   export let leftMargin;
+
+  /** @type {number} topMargin - annotation (y axis) element width in px. */
+  export let topMargin;
 
   let clickOutsideModal = false;
   function handleFuelClick(fuelObject) {
@@ -45,6 +51,17 @@
     console.log("clickOutsideModal parrent", clickOutsideModal);
   }
 </script>
+
+<div
+  class="flex absolute columns-2 items-end min-w-96"
+  style:top="-{topMargin}px"
+  style:height={cellSize + "px"}
+>
+  <div class="w-[{leftMargin}px]" />
+  <div class="pl-2 text-xl">
+    {forecastLabel}
+  </div>
+</div>
 
 {#each Object.values(weatherProps) as prop, i}
   <div
@@ -68,36 +85,13 @@
   >
 {/each}
 
-<!-- {#each forecastData as weatherObject, x} -->
-<!--   <div -->
-<!--     class="flex shrink-0 items-center justify-center align-middle" -->
-<!--     style:height={cellSize + "px"} -->
-<!--     style:width={cellSize + "px"} -->
-<!--   > -->
-<!--     <div class="text-xl"> -->
-<!--       <i -->
-<!--         class="text-xl wi wi-wind from-{Math.round( -->
-<!--           weatherObject['windDirectionFrom10m'] -->
-<!--         )}-deg" -->
-<!--         style="fill:grey" -->
-<!--       /> -->
-<!--     </div> -->
-<!--   </div> -->
-<!-- {/each} -->
-<!---->
-<!-- <div class="" /> -->
-<!--         <i -->
-<!--           class="text-xl wi wi-wind -->
-<!--       wi-from-{getWindCardinalDirection(data.windDirectionFrom10m)}" -->
-<!--         /> -->
-
 <div
   class="flex columns-2 items-end min-w-96"
   style:height={cellSize * gapSize + "px"}
 >
   <div class="w-[{leftMargin}px]" />
-  <div class="pl-2">
-    {axisLabel}
+  <div class="pl-2 text-xl">
+    {axisLabel} bla
   </div>
 </div>
 <div class="flex justify-end">

@@ -1,13 +1,7 @@
 <script>
   import { LayerCake, Svg, Html, groupLonger, flatten } from "layercake";
   import { scaleBand } from "d3-scale";
-  import {
-    scaleOrdinal,
-    scaleTime,
-    scaleQuantize,
-    scaleSequential,
-    scaleLinear,
-  } from "d3-scale";
+  import { scaleSequential } from "d3-scale";
   import {
     interpolatePuOr,
     interpolateYlOrRd,
@@ -39,46 +33,40 @@
   const scaleTemp = scaleSequential(interpolatePuOr).domain([5, 30]);
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
-  const scaleWind = scaleSequential(interpolateRdYlGn).domain([10, 0]);
+  const scaleWind = scaleSequential(interpolateRdYlGn).domain([15, 0]);
   const scaleProb = scaleSequential(interpolateRdYlGn).domain([30, 0]);
 
   const weatherProps = {
-    Temperature: [
-      "screenTemperature",
+    temperature2m: [
+      "temerature2m",
       "wi wi-thermometer",
       scaleTemp,
       0,
       "Temp. (C)",
     ],
-    "Relative Humidity": [
+    relativeHumidity2m: [
       "screenRelativeHumidity",
       "wi wi-humidity",
       scaleHum,
       0,
       "Rel. Hum. (%)",
     ],
-    Precipitation: [
+    precipitation: [
       "totalPrecipAmount",
       "wi wi-rain",
       scalePrec,
       1,
       "Rain (mm)",
     ],
-    "Wind Speed at 10m": [
-      "windSpeed10m",
-      "wi wi-windy",
-      scaleWind,
-      0,
-      "Wind (m/s)",
-    ],
-    "Wind Gust Speed at 10m": [
+    windSpeed10m: ["windSpeed10m", "wi wi-windy", scaleWind, 0, "Wind (m/s)"],
+    windGusts10m: [
       "windGustSpeed10m",
       "wi wi-strong-wind",
       scaleWind,
       0,
       "Wind gust (m/s)",
     ],
-    "Wind From": [
+    windDirection10m: [
       "windDirectionFrom10m",
       "wi wi-wind-direction",
       scaleTemp,
@@ -129,7 +117,7 @@
   }
   const formatTickX = timeFormat("%H");
   const leftMargin = 100;
-  const topMargin = 35;
+  const topMargin = 60;
   const bottomMargin = 20;
   const cellSize = 25;
   const gapSize = 1.5;
@@ -152,7 +140,7 @@
 >
   <div
     class="flex sticky
-    left-0 bg-gray-100 z-10 justify-end"
+    left-0 bg-white z-10 justify-end"
     style="height:{topMargin +
       chartHeight +
       bottomMargin}px; width:{leftMargin}px"
@@ -169,12 +157,14 @@
           {gapSize}
           {forecastData}
           {weatherProps}
+          forecastLabel="Weather forecast"
           axisLabel={outputNodes[$selectedOutput].label +
             " (" +
-            outputNodes[$selectedOutput].units +
+            outputNodes[$selectedOutput].displayUnits +
             ")"}
           commonOutput={isCommonOutput($selectedOutput)}
           {leftMargin}
+          {topMargin}
         />
       </Html>
     </LayerCake>
