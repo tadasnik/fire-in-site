@@ -2,6 +2,20 @@ import { writable, derived, get } from 'svelte/store'
 import { currentLocation } from '$lib/shared/stores/locationStore'
 import { dateTime, differenceHours } from '$lib/shared/stores/timeStore'
 import fetchForecastJSON from "$lib/weather/metoffice";
+import { fetchForecastMeteo, fetchHistoryMeteo } from "$lib/weather/openMeteo.ts";
+
+export const forecastOpenMeteo = writable({
+  time: [1403984000],
+  temperature2m: [15.05],
+  relativeHumidity2m: [78.61],
+  precipitation: [0],
+  weatherCode: [3],
+  cloudCover: [75],
+  windSpeed10m: [3.12],
+  windDirection10m: [150],
+  windGusts10m: [5.05],
+  globalTiltedIrradiance: [0],
+})
 
 export const forecastTimeSeries = writable([{
   feelsLikeTemperature: 15.05,
@@ -27,6 +41,22 @@ export const forecastTimeSeries = writable([{
 
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 
+
+export function getForecastOpenMeteo() {
+  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
+    console.log("fetching forecast openMeteo")
+    var promise = fetchForecastMeteo(
+      get(currentLocation).latitude,
+      get(currentLocation).longitude,
+      get(currentLocation).slope,
+      get(currentLocation).aspect
+    );
+    promise.then(function (result) {
+      console.log("setting OpenMeteo result", result)
+      forecastOpenMeteo.set(result)
+    })
+  }
+}
 export function getForecast() {
   // console.log("checking forecast conditions, currentLocation : ", get(currentLocation))
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
@@ -73,9 +103,12 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
   return $forecastLocation.coordinates[2] - $currentLocation.elevation
 })
 
-export const currentTimeIndex = derived([forecastTimeIndex, dateTime], ([$forecastTimeIndex, $dateTime]) => {
-  return Array.from($forecastTimeIndex.keys()).indexOf($dateTime)
+export const currentTimeIndex = derived([forecastOpenMeteo, dateTime], ([$forecastOpenMeteo, $dateTime]) => {
+  return $forecastOpenMeteo['time'].indexOf($dateTime)
 })
+// export const currentTimeIndex = derived([forecastTimeIndex, dateTime], ([$forecastTimeIndex, $dateTime]) => {
+//   return Array.from($forecastTimeIndex.keys()).indexOf($dateTime)
+// })
 
 
 // export const currentWeather = derived([currentWeatherInit, locations, dateTime], ([$currentWeatherInit, $locations, $dateTime]) => {
