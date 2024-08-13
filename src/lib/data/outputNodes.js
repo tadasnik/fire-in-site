@@ -10,6 +10,8 @@ export const outputNodes = {
     selected: true,
     label: 'Fire spread rate',
     units: 'm/min',
+    displayUnits: 'm/min',
+    multiplier: 1,
     decimals: 2,
     description:
       'Surface fire rate of spread is the "speed" at which the fire travels through the surface fuels. Surface fuels include the litter, grass, brush, and other dead and live vegetation within about 6 feet (1.8 meters) of the ground. \nThe SURFACE module allows the user to determine whether rate of spread calculations are done for heading fire, flanking fire, backing fire, or for specified directions from the ignition point or from the fire perimeter. The heading on the output pages specifies which spread direction option has been selected. \nThe surface fire rate of spread prediction uses the Rothermel (1972) surface fire spread model, which assumes the weather, topography and fuel are constant and uniform for the elapsed time. The basic model was developed for a head fire spreading upslope with the wind. Adaptations have been made to allow calculations for other direction options.'
@@ -21,6 +23,8 @@ export const outputNodes = {
     selected: true,
     label: 'Fire flame length',
     units: 'm',
+    displayUnits: 'm',
+    multiplier: 1,
     decimals: 2,
     description:
       'Surface fire flame length of a spreading surface fire within the flaming front is measured from midway in the active flaming combustion zone to the average tip of the flames. According to Rothermel (1991), "Flame length is an elusive parameter that exists in the eye of the beholder. It is a poor quantity to use in a scientific or engineering sense, but it is so readily apparent to fireline personnel and so readily conveys a sense of fire intensity that it is worth featuring as a primary fire variable."\nBoth surface fireline intensity and surface fire flame length are related to the heat felt by a person standing next to the flames. Flame length is calculated from fireline intensity, which is a function of surface fire rate of spread and heat per unit area.'
@@ -32,6 +36,8 @@ export const outputNodes = {
     selected: true,
     label: 'Heat per Unit Area',
     units: 'J/m2',
+    displayUnits: 'MJ/m2',
+    multiplier: 1e-6,
     decimals: 0,
     description:
       'The total heat released per unit area, a product of the reaction intensity and the time that the area is in the flaming zone, as indicated by the residence time.'
@@ -54,6 +60,8 @@ export const outputNodes = {
     selected: true,
     label: 'Fireline intensity',
     units: 'J/m/s',
+    displayUnits: 'MJ/m/s',
+    multiplier: 1e-6,
     decimals: 0,
     description:
       'Surface fireline intensity is the heat energy release per unit time from a one-foot (one-meter) wide section of the fuel bed extending from the front to the rear of the flaming zone of a surface fire. Surface fireline intensity is a function of surface fire rate of spread and surface fire heat per unit area. \nBoth surface fireline intensity and surface fire flame length are related to the heat felt by a person standing next to the flames. Surface fireline intensity is directly related to and is used in the calculation of flame length.'
@@ -141,7 +149,51 @@ export const outputNodes = {
     decimals: 0,
     description:
       'Probability of mortality is the likelihood that a tree will be killed by a fire. The equation used to calculate probability of mortality depends on the mortality tree species. There are 13 mortality equations, which variously include bark thickness, tree crown length scorched and/or tree crown volume scorched. \nProbability of mortality can be interpreted as the probability of an individual tree dying, or it can be multiplied by the number of trees on a site to estimate the number of trees that will die.'
+  },
+  'site.moisture.dead.category': {
+    label: 'Dead fuel moisture',
+    code: 'deadFuelMoisture',
+    units: '%',
+    selected: true,
+    decimals: 0,
+    description:
+      'Dead fuel moisture content is the portion (percent or fraction) of the fuel that is water, calculated on a dry weight basis.'
+  },
+
+  'site.moisture.dead.tl1h': {
+    label: 'Dead 1h fuel moisture',
+    code: 'dead1hFuelMoisture',
+    units: '%',
+    displayUnits: '%',
+    selected: true,
+    decimals: 0,
+    description:
+      '1-h fuel moisture content is the portion (percent or fraction) of the 1-h timelag dead fuel that is water, calculated on a dry weight basis.'
+  },
+  'site.moisture.dead.tl10h': {
+    label: 'Dead 10h fuel moisture',
+    code: 'dead10hFuelMoisture',
+    units: '%',
+    selected: true,
+    decimals: 0,
+    description:
+      'The 10-h fuel moisture content is the portion of the 10-h timelag dead fuel that is water, calculated on a dry weight basis.'
+  },
+
+  'ignition.firebrand.probability': {
+    label: 'Probability of ignition',
+    code: 'IgnitionProbability',
+    units: '%',
+    displayUnits: '%',
+    selected: true,
+    decimals: 0,
+    description:
+      'The probability that a firebrand will cause an ignition. Depends on dead 1 hour fuel moisture, temperature and fuel shading.'
+
+
   }
+
+
 }
 
 
