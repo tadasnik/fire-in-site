@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store'
 import { currentLocation } from '$lib/shared/stores/locationStore'
-import { dateTime, differenceHours } from '$lib/shared/stores/timeStore'
+import { dateTime, currentDateTime, differenceHours, dateString } from '$lib/shared/stores/timeStore'
 import fetchForecastJSON from "$lib/weather/metoffice";
 import { fetchForecastMeteo, fetchHistoryMeteo } from "$lib/weather/openMeteo.ts";
 
@@ -41,20 +41,26 @@ export const forecastTimeSeries = writable([{
 
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 
+export const forecastMode = writable('forecast')
+export const forecastModes = ['forecast', 'historical']
+export const fetchingForecast = writable(true)
 
 export function getForecastOpenMeteo() {
-  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
+  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
     console.log("fetching forecast openMeteo")
     var promise = fetchForecastMeteo(
       get(currentLocation).latitude,
       get(currentLocation).longitude,
       get(currentLocation).slope,
-      get(currentLocation).aspect
+      get(currentLocation).aspect,
+      get(forecastMode),
+      get(dateString),
     );
     promise.then(function (result) {
       console.log("setting OpenMeteo result", result)
       forecastOpenMeteo.set(result)
     })
+    fetchingForecast.set(false)
   }
 }
 export function getForecast() {

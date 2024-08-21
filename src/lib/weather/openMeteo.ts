@@ -64,28 +64,38 @@ export async function fetchHistoryMeteo(latitude: Number, longitude: Number) {
   //   );
   // }
 }
-export async function fetchForecastMeteo(latitude: Number, longitude: Number, slope: Number, aspect: Number) {
-  const params = {
-    "latitude": latitude,
-    "longitude": longitude,
-    "hourly": ["temperature_2m",
-      "relative_humidity_2m",
-      "precipitation",
-      "weather_code",
-      "cloud_cover",
-      "wind_speed_10m",
-      "wind_direction_10m",
-      "wind_gusts_10m",
-      "global_tilted_irradiance"],
-    "wind_speed_unit": "ms",
-    "tilt": slope,
-    "azimuth": aspect,
-    "models": "best_match",
-    "past_days": 0,
-    "forecast_days": 2,
-  };
-  const url = "https://api.open-meteo.com/v1/forecast";
-  const responses = await fetchWeatherApi(url, params);
+export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, date: string) {
+  function fillParams() {
+    const past_days = 0;
+    const forecast_days = 2;
+    const start_date = date;
+    const end_date = date;
+    const baseParams = {
+      "latitude": latitude,
+      "longitude": longitude,
+      "hourly": ["temperature_2m",
+        "relative_humidity_2m",
+        "precipitation",
+        "weather_code",
+        "cloud_cover",
+        "wind_speed_10m",
+        "wind_direction_10m",
+        "wind_gusts_10m",
+        "global_tilted_irradiance"],
+      "wind_speed_unit": "ms",
+      "tilt": slope,
+      "azimuth": aspect - 180,
+      "models": "best_match",
+    };
+    if (forecastMode === "forecast") {
+      return { ...baseParams, past_days, forecast_days };
+    } else if (forecastMode === "historical") {
+      return { ...baseParams, start_date, end_date };
+    }
+  }
+  const url = forecastMode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
+  console.log("open meteo params", url, forecastMode, fillParams())
+  const responses = await fetchWeatherApi(url, fillParams())
 
   // Helper function to form time ranges
   const range = (start: number, stop: number, step: number) =>
@@ -104,7 +114,7 @@ export async function fetchForecastMeteo(latitude: Number, longitude: Number, sl
   const forecastModel = response.model();
   console.log("Location ", forecastLatitude, forecastLongitude, forecastLocationId, forecastModel);
 
-  const hourly = response.hourly()!;
+  const hourly = response.hourly();
 
   // Note: The order of weather variables in the URL query and the indices below need to match!
   const weatherData = {
