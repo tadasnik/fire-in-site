@@ -3,6 +3,7 @@
   import "$lib/styles/weather-icons.css";
   import "$lib/styles/weather-icons-wind.css";
   import FireCharAnotations from "./FireCharAnotations.svelte";
+  import { currentDateTime } from "$lib/shared/stores/timeStore";
 
   export let data;
   export let forecastLocation;
@@ -79,7 +80,7 @@
   function getWindCardinalDirection(windDir) {
     return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
   }
-  const dateFormat = timeFormat("%a %I%p");
+  const dateFormat = timeFormat("%Y-%m-%d %a %I%p");
 
   const displayProps = {
     Temperature: ["screenTemperature", 0, "wi wi-thermometer"],
@@ -93,16 +94,17 @@
 <div class="container mx-auto">
   {#if data}
     <!-- <div class="sm:w-full md:w-1/2 p-4 min-w-80 bg-gray-100"> -->
-    <div class="w-full p-4 min-w-80 bg-gray-100">
+    <div class="w-full p-4 min-w-80">
       <div class="flex flex-wrap flex-row justify-center space-x-2 text-2xl">
         <div>Fire Behaviour prediction for</div>
-        <div><strong>{forecastLocation}</strong></div>
         <div>
-          {dateFormat(new Date(data.time))}
+          <strong>{dateFormat(new Date($currentDateTime))}</strong>
         </div>
       </div>
 
-      <div class="flex align-middle justify-center items-end space-x-3">
+      <div class="flex align-middle justify-center items-end space-x-2">
+        <div>Weather :</div>
+
         <div class="">
           <i
             class="text-2xl {metOfficeWeatherTypes[
@@ -112,21 +114,21 @@
         </div>
 
         <div class="space-x-0">
-          <span class="">{data.screenTemperature.toFixed(0)}</span><i
+          <span class="">{data.temperature2m[0].toFixed(0)}</span><i
             class="text-xl wi wi-degrees"
           /><span class="font-bold">C</span>
         </div>
         <div>
-          <span class="pl-0">{data.screenRelativeHumidity.toFixed(0)}</span>
+          <span class="pl-0">{data.relativeHumidity2m[0].toFixed(0)}</span>
           <i class="wi wi-humidity" />
         </div>
         <div>
           <i
             class="text-xl wi wi-wind
-        wi-from-{getWindCardinalDirection(data.windDirectionFrom10m)}"
+        wi-from-{getWindCardinalDirection(data.windDirection10m[0])}"
           />
 
-          <span class="pl-0"> {data.windSpeed10m.toFixed(0)}</span><span
+          <span class="pl-0"> {data.windSpeed10m[0].toFixed(0)}</span><span
             class="font-bold pl-1"
           >
             m/s</span
