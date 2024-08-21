@@ -15,6 +15,7 @@
     Sidebar,
     Drawer,
     Dropdown,
+    DropdownDivider,
     DropdownItem,
     Navbar,
     NavBrand,
@@ -46,10 +47,17 @@
     fuelMoistureModel,
     fuelMoistureModelOptions,
     modelConfigValues,
+    selectedOutput,
+    selectedOutputs,
   } from "$lib/shared/stores/modelStore";
   import {
     forecastTimeIndex,
     getForecast,
+    getForecastOpenMeteo,
+    forecastOpenMeteo,
+    forecastMode,
+    forecastModes,
+    fetchingForecast,
   } from "$lib/shared/stores/forecastStore";
   import {
     getLocation,
@@ -61,8 +69,11 @@
     dateTime,
     hour,
   } from "$lib/shared/stores/timeStore";
+  import { outputNodes } from "$lib/data/outputNodes.js";
+
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
   import AuthReset from "$lib/components/AuthReset.svelte";
+
   function handleFuelMoistureChange(value) {
     console.log("Fuel moisture model changed to ", value);
     if (value === "Fosberg") {
@@ -77,6 +88,20 @@
       $fuelMoistureModel = "Nelson";
       $modelConfigValues["configure.fuel.moisture"].value = "individual";
       console.log("Fuel moisture model changed to ", value);
+    }
+  }
+  function handleTimeModeChange(value) {
+    console.log("Time mode changed to ", value);
+    $forecastMode = value;
+    if (value === "historical") {
+      if ($timeMode === "current") {
+        console.log("current time mode changing to USER");
+        $timeMode = "user";
+        $fetchingForecast = true;
+      }
+    } else {
+      $fetchingForecast = true;
+      getForecastOpenMeteo();
     }
   }
 
@@ -125,7 +150,7 @@
           longitude: longitude,
         }));
         console.log(" executing getForecast");
-        getForecast();
+        // getForecast();
       } else if (browser && $authStore.currentUser) {
         console.log(" ++++++++++++current User ", $authStore.currentUser);
         const userDocRef = doc(db, "users", user.uid);
@@ -188,7 +213,7 @@
   $: activeUrl = $page.url.pathname;
   $: console.log("layout activeURl", activeUrl);
 
-  $: $currentLocation, getForecast(); // promise.then(fetchForecast());
+  $: $currentLocation, getForecastOpenMeteo(); // promise.then(fetchForecast());
 
   let hidden1 = true;
   const toggleDrawer = () => {
@@ -220,7 +245,7 @@
   >
     <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
     <NavBrand href="/">
-      <span class="px-4 text-xl text-primary-800">misBehavePlus</span>
+      <span class="px-4 text-xl text-primary-800">UKBehavePlus</span>
     </NavBrand>
     <NavUl>
       <NavLi href="/fuelModels">Fuel Models</NavLi>
@@ -253,6 +278,40 @@
           >
         </li>
       </Dropdown>
+      <NavLi class="cursor-pointer">
+        {$forecastMode} Weather<ChevronDownOutline
+          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
+        />
+      </NavLi>
+
+      <Dropdown class="w-60 p-3 space-y-1">
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          {#each forecastModes as mode}
+            <Radio
+              bind:group={$forecastMode}
+              value={mode}
+              on:change={() => handleTimeModeChange(mode)}
+            >
+              {mode}
+            </Radio>
+          {/each}
+        </li>
+      </Dropdown>
+      <NavLi class="cursor-pointer">
+        {outputNodes[$selectedOutput].label}<ChevronDownOutline
+          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
+        />
+      </NavLi>
+      <Dropdown class="w-60 p-3 space-y-1">
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          {#each $selectedOutputs as output}
+            <Radio bind:group={$selectedOutput} value={output}
+              >{outputNodes[output].label}</Radio
+            >
+          {/each}
+        </li>
+      </Dropdown>
+
       {#if !$authStore.currentUser}
         <NavLi href="/authenticate">Log in</NavLi>
       {:else}
@@ -266,40 +325,42 @@
     </NavUl>
 
     <div class="flex items-center ml-auto">
-      <Toggle size="small" bind:checked={$advancedMode}>Advanced mode</Toggle>
+      <Toggle size="small" bind:checked={$advancedMode}
+        >Fire Characteristics</Toggle
+      >
     </div>
   </Navbar>
 </header>
 {#if activeUrl === "/" && $advancedMode}
-  <Sidebar
-    {activeUrl}
-    asideClass="hidden overflow-y-auto md:block fixed inset-0 pt-20 z-30 flex-none h-full w-96 border-r border-gray-200 dark:border-gray-600"
-  >
-    <section class="p-4">
-      <div class="flex mb-4">
-        <InfoTable
-          data={$forecastTimeIndex.get($dateTime)}
-          title="Forecast for {dateFormat(new Date($dateTime))}"
-        />
-      </div>
-    </section>
-    <SiteInputs />
-    <h3 class="pl-4 h3 font-bold">Fuel inputs</h3>
-
-    {#each $selectedFuels as fuel}
-      {@const key = Object.keys($requiredFuelInputs[fuel])}
-      <section class="space-y-1">
-        <div class="pl-4 pt-2 flex flex-wrap">
-          <!-- {#if key === "surface.primary.fuel.model.catalogKey" || key === "surface.secondary.fuel.model.catalogKey"} -->
-          {#if key.length === 1}
-            <p>{fuel}</p>
-          {:else}
-            <FuelInputs {fuel} />
-          {/if}
-        </div>
-      </section>
-    {/each}
-  </Sidebar>
+  <!-- <Sidebar -->
+  <!--   {activeUrl} -->
+  <!--   asideClass="hidden overflow-y-auto md:block fixed inset-0 pt-20 z-30 flex-none h-full w-96 border-r border-gray-200 dark:border-gray-600" -->
+  <!-- > -->
+  <!--   <section class="p-4"> -->
+  <!--     <div class="flex mb-4"> -->
+  <!--       <InfoTable -->
+  <!--         data={$forecastTimeIndex.get($dateTime)} -->
+  <!--         title="Forecast for {dateFormat(new Date($dateTime))}" -->
+  <!--       /> -->
+  <!--     </div> -->
+  <!--   </section> -->
+  <!--   <SiteInputs /> -->
+  <!--   <h3 class="pl-4 h3 font-bold">Fuel inputs</h3> -->
+  <!---->
+  <!--   {#each $selectedFuels as fuel} -->
+  <!--     {@const key = Object.keys($requiredFuelInputs[fuel])} -->
+  <!--     <section class="space-y-1"> -->
+  <!--       <div class="pl-4 pt-2 flex flex-wrap"> -->
+  <!--         <!-- {#if key === "surface.primary.fuel.model.catalogKey" || key === "surface.secondary.fuel.model.catalogKey"} -->
+  <!--         {#if key.length === 1} -->
+  <!--           <p>{fuel}</p> -->
+  <!--         {:else} -->
+  <!--           <FuelInputs {fuel} /> -->
+  <!--         {/if} -->
+  <!--       </div> -->
+  <!--     </section> -->
+  <!--   {/each} -->
+  <!-- </Sidebar> -->
 {/if}
 <Drawer
   transitionType="fly"
@@ -315,15 +376,13 @@
 >
 <main class="">
   {#if !$authStore.isLoading && $authStore.currentUser}
-    <heading class="p-8" tag="h1" customSize="text-3xl"
-      >Private page user: {$authStore.currentUser.displayName}
-    </heading>
-    <AuthReset />
-    <div><p>{$currentLocation.longitude}</p></div>
+    <!-- <heading class="p-8" tag="h1" customSize="text-3xl" -->
+    <!--   >Private page user: {$authStore.currentUser.displayName} -->
+    <!-- </heading> -->
+    <!-- <AuthReset /> -->
     <slot />
-  {:else if !$authStore.isLoading}
+  {:else if !$authStore.isLoading && $forecastOpenMeteo.time.length > 1}
     <div><p>{$currentLocation.longitude}</p></div>
-    <slot />
   {:else}
     <h1>Loading....</h1>
   {/if}
