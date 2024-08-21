@@ -14,7 +14,8 @@
 
   import { outputNodes } from "$lib/data/outputNodes.js";
   import { _maxVal, selectedOutput } from "$lib/shared/stores/modelStore";
-  import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
+  import { forecastMode } from "$lib/shared/stores/forecastStore";
+  import { dateString } from "$lib/shared/stores/timeStore";
 
   import Heatmap from "$lib/components/visual/HeatmapInner.svelte";
   import HeatmapAnotate from "$lib/components/visual/HeatmapAnotate.html.svelte";
@@ -35,6 +36,7 @@
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([15, 0]);
   const scaleProb = scaleSequential(interpolateRdYlGn).domain([30, 0]);
+  const scaleMoist = scaleSequential(interpolatePuOr).domain([60, 0]);
 
   const weatherProps = {
     temperature2m: [
@@ -42,6 +44,7 @@
       "wi wi-thermometer",
       scaleTemp,
       0,
+      [13, 28],
       "Temp. (C)",
     ],
     relativeHumidity2m: [
@@ -49,6 +52,7 @@
       "wi wi-humidity",
       scaleHum,
       0,
+      [20, 80],
       "Rel. Hum. (%)",
     ],
     precipitation: [
@@ -56,14 +60,23 @@
       "wi wi-rain",
       scalePrec,
       1,
+      [0, 2],
       "Rain (mm)",
     ],
-    windSpeed10m: ["windSpeed10m", "wi wi-windy", scaleWind, 0, "Wind (m/s)"],
+    windSpeed10m: [
+      "windSpeed10m",
+      "wi wi-windy",
+      scaleWind,
+      0,
+      [3, 14],
+      "Wind (m/s)",
+    ],
     windGusts10m: [
       "windGustSpeed10m",
       "wi wi-strong-wind",
       scaleWind,
       0,
+      [3, 14],
       "Wind gust (m/s)",
     ],
     windDirection10m: [
@@ -78,7 +91,7 @@
     DeadFuelMoisture1hr: [
       "site.moisture.dead.tl1h",
       "wi wi-water",
-      scaleProb,
+      scaleMoist,
       0,
     ],
     ignitionProbability: [
@@ -121,15 +134,12 @@
   const bottomMargin = 20;
   const cellSize = 25;
   const gapSize = 1.5;
+
   $: fuelsTicks = Object.keys(fireBehaviourData[0]);
-  // $: yCount = Object.keys(fireBehaviourData[0]).length - 1;
   $: yCountWeather = Object.keys(weatherProps).length;
   $: yCount = Object.keys(fireBehaviourData[0]).length;
   $: chartHeight = (yCountWeather + yCount) * cellSize + cellSize;
   $: heatmapWidth = fireBehaviourData.length * cellSize;
-  $: console.log("current timeIndex", $currentTimeIndex);
-  // $: console.log("chartHeight", chartHeight, yCount, yCountWeather);
-  // $: console.log("grouped data", groupedData);
 </script>
 
 <div
@@ -157,7 +167,9 @@
           {gapSize}
           {forecastData}
           {weatherProps}
-          forecastLabel="Weather forecast"
+          forecastLabel={$forecastMode === "forecast"
+            ? "Weather forecast"
+            : "Historical weather " + $dateString}
           axisLabel={outputNodes[$selectedOutput].label +
             " (" +
             outputNodes[$selectedOutput].displayUnits +

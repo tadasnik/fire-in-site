@@ -21,18 +21,14 @@
 >
   <div class="flex justify-end overflow text-right items-center" />
 
-  {#each forecastData as dataObject, x}
+  {#each forecastData["windDirection10m"] as dataObject, x}
     <div
       class="flex shrink-0 items-center justify-center align-middle"
       style:height={cellSize + "px"}
       style:width={cellSize + "px"}
     >
       <div class={isSelectedClass(x)}>
-        <i
-          class="wi wi-wind from-{Math.round(
-            dataObject['windDirectionFrom10m']
-          )}-deg"
-        />
+        <i class="wi wi-wind from-{Math.round(dataObject)}-deg" />
       </div>
     </div>
   {/each}

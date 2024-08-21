@@ -62,7 +62,10 @@
           class={isSelectedClass(x)}
           text-anchor="middle"
           dominant-baseline="middle"
-          style:fill="rgb(115 115 115)">{weatherObject.toFixed(values[3])}</text
+          style="fill:{Math.round(weatherObject) >= values[4][0] &&
+          Math.round(weatherObject) < values[4][1]
+            ? 'grey'
+            : 'white'}">{weatherObject.toFixed(values[3])}</text
         >
       {/if}
     {/each}

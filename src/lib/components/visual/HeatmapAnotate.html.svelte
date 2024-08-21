@@ -72,7 +72,7 @@
   >
     <!-- <i class="text-xl {prop[1]} hover:text-primary-900" /> -->
     <div class="text-xs hover:text-primary-900 pr-1" id={"is" + i}>
-      {prop[4]}
+      {prop[5]}
     </div>
   </div>
   <Popover
@@ -91,7 +91,7 @@
 >
   <div class="w-[{leftMargin}px]" />
   <div class="pl-2 text-xl">
-    {axisLabel} bla
+    {axisLabel}
   </div>
 </div>
 <div class="flex justify-end">
