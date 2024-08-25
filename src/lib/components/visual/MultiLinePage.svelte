@@ -21,7 +21,6 @@
   import Labels from "$lib/components/visual/GroupLabels.html.svelte";
   import ScatterSvg from "./ScatterSvg.svelte";
   import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
-  import QuadTree from "$lib/components/visual/QeadTree.svelte";
   import { _outputForecastArray } from "$lib/shared/stores/modelStore";
 
   // This example loads csv data as json using @rollup/plugin-dsv
