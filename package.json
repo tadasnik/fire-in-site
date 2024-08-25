@@ -14,7 +14,6 @@
   "devDependencies": {
     "@rollup/plugin-dsv": "^3.0.4",
     "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/enhanced-img": "^0.3.0",
     "@sveltejs/kit": "^1.20.4",
     "autoprefixer": "^10.4.14",
     "d3-collection": "^1.0.7",
@@ -48,7 +47,6 @@
     "layercake": "^8.0.2",
     "mapbox-gl": "^3.4.0",
     "openmeteo": "^1.1.4",
-    "svelte-weather": "^1.0.2",
-    "svelty-picker": "^5.2.9"
+    "svelte-weather": "^1.0.2"
   }
 }
