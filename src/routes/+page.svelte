@@ -8,44 +8,22 @@
     Button,
     Popover,
     Label,
-    Badge,
-    Spinner,
   } from "flowbite-svelte";
-  import { timeFormat } from "d3-time-format";
-  import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
   import Map from "$lib/components/ui/Map.svelte";
   import Auth from "$lib/components/Auth.svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
-  import SveltyPicker from "svelty-picker";
-  import { DateInput } from "date-picker-svelte";
   import { simpleNelsonFuelMoisture } from "$lib/model/nelsonFMC/simpleNelson.js";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import {
     selectedOutput,
     selectedOutputs,
     modelConfigValues,
-    requiredConfig,
-    config,
-    siteInputs,
-    selectedFuels,
-    selectedInput,
-    requiredFuelInputs,
-    requiredInputs,
-    fuelInputs,
-    scenarios,
-    selectedScenario,
-    // _inputs,
-    // _output,
     advancedMode,
-    requiredSiteInputsForecast,
-    _inputsForecast,
     _outputForecast,
     _outputForecastArray,
   } from "$lib/shared/stores/modelStore.js";
   import {
-    forecastTimeSeries,
     forecastOpenMeteo,
-    forecastTimeIndex,
     forecastLocation,
     getForecastOpenMeteo,
     forecastMode,
@@ -55,16 +33,12 @@
   import {
     dateTime,
     currentDateTime,
-    dateString,
     historicalYear,
     historicalMonth,
     historicalDay,
   } from "$lib/shared/stores/timeStore.js";
-  import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
-  import MultilineTestPage from "$lib/components/visual/MultilineTestPage.svelte";
   import BarFigure from "$lib/components/visual/BarFigure.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
-  import InfoTable from "$lib/components/visual/InfoTable.svelte";
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
   import { getLocation } from "$lib/shared/stores/locationStore";
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
@@ -176,12 +150,23 @@
           </Select>
         </Label>
 
-        <BarFigure
-          data={$_outputForecast.get($dateTime)}
-          time={$dateTime}
-          xKey={$selectedOutput}
-          yKey="surface.primary.fuel.model.catalogKey"
-        />
+        {#if $selectedOutput !== "ignition.firebrand.probability" && $selectedOutput !== "site.moisture.dead.tl1h"}
+          <BarFigure
+            data={$_outputForecast.get($dateTime)}
+            time={$dateTime}
+            xKey={$selectedOutput}
+            yKey="surface.primary.fuel.model.catalogKey"
+          />
+        {:else}
+          <div class="flex flex-col p-2 text-primary-500">
+            <div class="text-center text-2xl">All fuels</div>
+            <div class="text-center text-9xl">
+              {Math.round(
+                $_outputForecast.get($dateTime)[0].values[0][$selectedOutput]
+              )}%
+            </div>
+          </div>
+        {/if}
       {/if}
       <Popover
         class="absolute w-64 text-sm font-light z-50 "
@@ -192,7 +177,7 @@
     </div>
   </div>
   {#if $forecastMode === "historical"}
-    <div class="w-full text-center pt-4">Weather</div>
+    <div class="w-full text-center pt-4 mt-6">Historical Weather</div>
     <div class="flex flex-row pt-2 justify-center space-x-2">
       <div>
         <Select

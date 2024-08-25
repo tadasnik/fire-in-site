@@ -32,27 +32,14 @@
   } from "flowbite-svelte";
   import { ChevronDownOutline } from "flowbite-svelte-icons";
   import { timeFormat } from "d3-time-format";
-  import { DarkMode } from "flowbite-svelte";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
 
-  import SiteInputs from "$lib/components/SiteInputs.svelte";
-  import FuelInputs from "$lib/components/fuelInputs.svelte";
-  import InfoTable from "$lib/components/visual/InfoTable.svelte";
   import {
-    selectedFuels,
-    requiredFuelInputs,
-    requiredSiteInputsForecast,
-    advancedMode,
-    fuelInputs,
     fuelMoistureModel,
-    fuelMoistureModelOptions,
-    modelConfigValues,
     selectedOutput,
     selectedOutputs,
   } from "$lib/shared/stores/modelStore";
   import {
-    forecastTimeIndex,
-    getForecast,
     getForecastOpenMeteo,
     forecastOpenMeteo,
     forecastMode,
@@ -66,8 +53,6 @@
   import {
     currentDateTime,
     timeMode,
-    dateTime,
-    hour,
   } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
 
@@ -149,8 +134,6 @@
           latitude: latitude,
           longitude: longitude,
         }));
-        console.log(" executing getForecast");
-        // getForecast();
       } else if (browser && $authStore.currentUser) {
         console.log(" ++++++++++++current User ", $authStore.currentUser);
         const userDocRef = doc(db, "users", user.uid);
@@ -331,7 +314,7 @@
     </div>
   </Navbar>
 </header>
-{#if activeUrl === "/" && $advancedMode}
+{#if activeUrl === "/"}
   <!-- <Sidebar -->
   <!--   {activeUrl} -->
   <!--   asideClass="hidden overflow-y-auto md:block fixed inset-0 pt-20 z-30 flex-none h-full w-96 border-r border-gray-200 dark:border-gray-600" -->
@@ -383,6 +366,7 @@
     <slot />
   {:else if !$authStore.isLoading && $forecastOpenMeteo.time.length > 1}
     <div><p>{$currentLocation.longitude}</p></div>
+    <slot />
   {:else}
     <h1>Loading....</h1>
   {/if}
