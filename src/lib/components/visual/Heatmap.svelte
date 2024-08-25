@@ -35,8 +35,11 @@
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([15, 0]);
-  const scaleProb = scaleSequential(interpolateRdYlGn).domain([30, 0]);
+  const scaleProb = scaleSequential(interpolateRdYlGn).domain([60, 0]);
   const scaleMoist = scaleSequential(interpolatePuOr).domain([60, 0]);
+  const scaleFlame = scaleSequential(interpolateReds).domain([0, 10]);
+  const scaleSpread = scaleSequential(interpolateReds).domain([0, 60]);
+  const scaleHeat = scaleSequential(interpolateReds).domain([0, 60]);
 
   const weatherProps = {
     temperature2m: [
@@ -44,7 +47,7 @@
       "wi wi-thermometer",
       scaleTemp,
       0,
-      [13, 28],
+      [13, 26],
       "Temp. (C)",
     ],
     relativeHumidity2m: [
@@ -52,7 +55,7 @@
       "wi wi-humidity",
       scaleHum,
       0,
-      [20, 80],
+      [42, 80],
       "Rel. Hum. (%)",
     ],
     precipitation: [
@@ -84,22 +87,17 @@
       "wi wi-wind-direction",
       scaleTemp,
       0,
+      [0, 360],
       "Wind dir.",
     ],
   };
-  const commonOutputProps = {
-    DeadFuelMoisture1hr: [
-      "site.moisture.dead.tl1h",
-      "wi wi-water",
-      scaleMoist,
-      0,
-    ],
-    ignitionProbability: [
-      "ignition.firebrand.probability",
-      "wi wi-fire",
-      scaleProb,
-      0,
-    ],
+  const modelOutputProps = {
+    "site.moisture.dead.tl1h": [scaleMoist, 0, [10, 40], true],
+    "ignition.firebrand.probability": [scaleProb, 0, [10, 50], true],
+    "surface.weighted.fire.flameLength": [scaleFlame, 0, [0, 5], false],
+    "surface.weighted.fire.spreadRate": [scaleSpread, 0, [0, 40], false],
+    "surface.weighted.fire.heatPerUnitArea": [scaleHeat, 0, [0, 20], false],
+    "surface.weighted.fire.firelineIntensity": [scaleHeat, 0, [0, 20], false],
   };
 
   function isCommonOutput(output) {
@@ -113,6 +111,7 @@
   // return d == $dateTime ? "font-bold text-primary-500" : "";
   // };
 
+  $: console.log("Selected output", $selectedOutput);
   $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
   $: groupedData = groupLonger(fireBehaviourData, seriesNames, {
     groupTo: yKey,
@@ -169,12 +168,12 @@
           {weatherProps}
           forecastLabel={$forecastMode === "forecast"
             ? "Weather forecast"
-            : "Historical weather " + $dateString}
+            : "Weather " + $dateString}
           axisLabel={outputNodes[$selectedOutput].label +
             " (" +
             outputNodes[$selectedOutput].displayUnits +
             ")"}
-          commonOutput={isCommonOutput($selectedOutput)}
+          commonOutput={modelOutputProps[$selectedOutput][2]}
           {leftMargin}
           {topMargin}
         />
@@ -194,8 +193,6 @@
       z={zKey}
       xScale={scaleBand()}
       yScale={scaleBand()}
-      zScale={scaleSequential(interpolateReds)}
-      zDomain={[0, $_maxVal]}
       data={groupedData}
       flatData={flatten(groupedData, "values")}
     >
@@ -210,7 +207,7 @@
           {gapSize}
           {forecastData}
           {weatherProps}
-          {commonOutputProps}
+          {modelOutputProps}
           halfPoint={$_maxVal / 2}
         />
       </Svg>
