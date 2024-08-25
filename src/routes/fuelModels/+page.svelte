@@ -62,7 +62,7 @@
           <TableBodyCell colspan="4" class="p-0">
             <div
               class="px-2 py-3"
-              transition:slide={{ duration: 300, axis: "y" }}
+              transition:slide|global={{ duration: 300, axis: "y" }}
             >
               <ImagePlaceholder />
             </div>
