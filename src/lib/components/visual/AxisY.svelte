@@ -5,7 +5,7 @@
 <script>
   import { getContext } from "svelte";
 
-  const { padding, height, xRange, yScale } = getContext("LayerCake");
+  const { padding, height, xRange, yRange, yScale } = getContext("LayerCake");
 
   /** @type {Boolean} [gridlines=true] - Extend lines from the ticks into the chart space */
   export let gridlines = true;
@@ -46,9 +46,13 @@
     : typeof ticks === "function"
     ? ticks($yScale.ticks())
     : $yScale.ticks(ticks);
+  $: console.log("padding left :", $padding.left);
 </script>
 
-<g class="axis y-axis" transform="translate({-$padding.left}, 0)">
+<g
+  class="axis y-axis"
+  transform="translate({isBandwidth ? -$padding.left : 0} , 0)"
+>
   {#each tickVals as tick (tick)}
     <g
       class="tick tick-{tick}"
@@ -67,7 +71,7 @@
         <line
           class="tick-mark"
           x1="0"
-          x2={isBandwidth ? -6 : 6}
+          x2={isBandwidth ? -6 : -6}
           y1={isBandwidth ? $yScale.bandwidth() / 2 : 0}
           y2={isBandwidth ? $yScale.bandwidth() / 2 : 0}
         />
@@ -85,7 +89,7 @@
   <g class="tick">
     <text
       text-anchor="middle"
-      y={-10}
+      y={-0}
       x={-$height / 2}
       dy=".75em"
       transform="rotate(-90)">{axisLabel}</text

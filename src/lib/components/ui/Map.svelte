@@ -64,8 +64,8 @@
     currentLoc.longitude = longitude;
     currentLoc.latitude = latitude;
     currentLoc.elevation = elevation;
-    currentLoc.slope = slope;
-    currentLoc.aspect = aspect;
+    currentLoc.slope = Math.round(slope);
+    currentLoc.aspect = Math.round(aspect);
     currentLoc.distanceFromPrevious = distanceFromPrevious;
     currentLoc.userLocation = true;
     $currentLocation = currentLoc;

@@ -62,6 +62,7 @@
   {#each tickVals as tick, i (tick)}
     <g
       class="tick tick-{i}"
+      id="tick-{i}"
       transform="translate({$xScale(tick)},{Math.max(...$yRange)})"
     >
       {#if gridlines !== false}
@@ -85,6 +86,7 @@
       >
     </g>
   {/each}
+
   {#if baseline === true}
     <line
       class="baseline"

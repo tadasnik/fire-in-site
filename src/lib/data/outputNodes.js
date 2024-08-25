@@ -31,7 +31,7 @@ export const outputNodes = {
   },
 
   'surface.weighted.fire.heatPerUnitArea': {
-    code: 'FireHeatPerUnitArea',
+    code: 'fireHeatPerUnitArea',
     group: 'primary',
     selected: true,
     label: 'Heat per Unit Area',
@@ -170,6 +170,7 @@ export const outputNodes = {
     description:
       '1-h fuel moisture content is the portion (percent or fraction) of the 1-h timelag dead fuel that is water, calculated on a dry weight basis.'
   },
+
   'site.moisture.dead.tl10h': {
     label: 'Dead 10h fuel moisture',
     code: 'dead10hFuelMoisture',
@@ -182,7 +183,7 @@ export const outputNodes = {
 
   'ignition.firebrand.probability': {
     label: 'Probability of ignition',
-    code: 'IgnitionProbability',
+    code: 'ignitionProbability',
     units: '%',
     displayUnits: '%',
     selected: true,

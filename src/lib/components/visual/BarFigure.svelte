@@ -17,23 +17,23 @@
   export let xKey;
   export let yKey;
 
-  $: plotData = data.get(time);
-  $: flatData = flatten(plotData, "values");
+  // $: plotData = data.get(time);
+  $: flatData = flatten(data, "values");
   const formatLabelY = (d) => format(`.1f`)(d);
 
-  // $: console.log("???????????? BARPLOT:", data);
+  $: console.log("???????????? BARPLOT flatData:", data, flatData);
   $: xMax = Math.ceil($_maxVal / 1) * 1;
 </script>
 
-<div class="chart-container">
+<div class="w-full h-96 flex-grow">
   <LayerCake
-    padding={{ bottom: 20, left: 35 }}
+    padding={{ bottom: 20, left: 45 }}
     x={xKey}
     y={yKey}
     yScale={scaleBand().paddingInner(0.2)}
     xDomain={[0, xMax]}
     {flatData}
-    data={plotData}
+    {data}
   >
     <Svg>
       <Bars />
@@ -45,7 +45,7 @@
         tickMarks={true}
         axisLabel={outputNodes[xKey].label +
           " (" +
-          outputNodes[xKey].units +
+          outputNodes[xKey].displayUnits +
           ")"}
         formatTick={formatLabelY}
       />
@@ -69,6 +69,6 @@
   */
   .chart-container {
     width: 100%;
-    height: 360px;
+    height: 100%;
   }
 </style>

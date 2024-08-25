@@ -16,12 +16,25 @@ export const inputNodes = {
   'site.wind.speed.at10m': {
     label: 'Wind speed at 10 metres',
     code: 'windSpeed10',
-    units: 'km/h',
+    units: 'm/s',
     selected: true,
     defValue: 5,
     value: [5],
     decimals: 0,
     max: 30,
+    min: 0,
+    step: 1
+  },
+
+  'site.wind.direction.source.fromNorth': {
+    label: 'Wind source direction',
+    code: 'CompassAzimuth',
+    units: 'deg',
+    selected: true,
+    defValue: 0,
+    value: [0],
+    decimals: 0,
+    max: 360,
     min: 0,
     step: 1
   },
@@ -39,6 +52,21 @@ export const inputNodes = {
     step: 0.1
   },
 
+  'site.slope.direction.aspect': {
+    geneLabel: 'site.slope.direction.aspect',
+    label: 'Terrain aspect',
+    code: 'CompassAzimuth',
+    units: 'deg',
+    selected: true,
+    defValue: 180,
+    value: [180],
+    decimals: 0,
+    max: 360,
+    min: 0,
+    step: 1,
+    description: 'Slope steepness is the maximum steepness of the slope on which a fire is burning.'
+  },
+
   'site.slope.steepness.degrees': {
     geneLabel: 'site.slope.steepness.degrees',
     label: 'Terrain slope',
@@ -48,7 +76,7 @@ export const inputNodes = {
     defValue: 5,
     value: [5],
     decimals: 0,
-    max: 40,
+    max: 90,
     min: 0,
     step: 1,
     description: 'Slope steepness is the maximum steepness of the slope on which a fire is burning.'
@@ -175,13 +203,56 @@ export const inputNodes = {
     units: 'oC',
     selected: true,
     defValue: 20,
-    value: [50],
+    value: [20],
     decimals: 0,
     max: 45,
     min: 0,
     step: 1,
     description: 'Air temeperature in degrees Celsius'
   },
+
+  'site.temperature.relativeHumidity': {
+    label: 'Relative humidity',
+    code: 'RelativeHumidity',
+    units: '%',
+    selected: true,
+    defValue: 60,
+    value: [60],
+    decimals: 0,
+    max: 100,
+    min: 0,
+    step: 1,
+    description: 'Relative humidity'
+  },
+
+  'site.temperature.shading': {
+    label: 'Shading fraction ',
+    code: 'ShadingFraction',
+    units: '%',
+    selected: true,
+    defValue: 0,
+    value: [0],
+    decimals: 0,
+    max: 100,
+    min: 0,
+    step: 1,
+    description: 'Fuel % covered by canopy'
+  },
+
+  'site.canopy.cover': {
+    label: 'Canopy cover ',
+    code: 'FuelCoverFraction',
+    units: '%',
+    selected: true,
+    defValue: 0,
+    value: [0],
+    decimals: 0,
+    max: 100,
+    min: 0,
+    step: 1,
+    description: 'Fuel % covered by canopy'
+  },
+
 
   'site.canopy.fuel.shading': {
     label: 'Canopy shading ',
@@ -196,6 +267,47 @@ export const inputNodes = {
     step: 1,
     description: 'Fuel % covered by canopy'
   },
+
+  'site.date.month': {
+    label: 'Month',
+    code: 'DateMonth',
+    selected: true,
+    defValue: 1,
+    value: [1],
+    decimals: 0,
+    max: 12,
+    min: 1,
+    step: 1,
+    description: 'Month'
+  },
+
+  'site.time.hour': {
+    label: 'Hour',
+    code: 'TimeHour',
+    selected: true,
+    defValue: 12,
+    value: [12],
+    decimals: 0,
+    max: 24,
+    min: 1,
+    step: 1,
+    description: 'Hour'
+  },
+
+  'site.location.elevation.diff': {
+    label: 'Elevation difference',
+    code: 'ElevationDiff',
+    units: 'm',
+    selected: true,
+    defValue: 0,
+    value: [0],
+    decimals: 0,
+    max: 1300,
+    min: -1300,
+    step: 10,
+    description: 'Difference in elevation between fire and location for which weather records are available'
+  },
+
 
   'site.canopy.tree.dbh': {
     label: 'Tree diameter at chest height',
@@ -230,7 +342,7 @@ export const inputNodes = {
     units: 'm',
     selected: true,
     defValue: 8,
-    value: 8,
+    value: [8],
     max: 20,
     min: 1,
     step: 1,
@@ -244,7 +356,7 @@ export const inputNodes = {
     units: 'm',
     selected: true,
     defValue: 20,
-    value: 20,
+    value: [20],
     decimals: 0,
     max: 30,
     min: 2,
@@ -258,7 +370,7 @@ export const inputNodes = {
     units: 'kg/m3',
     selected: true,
     defValue: 1,
-    value: 1,
+    value: [1],
     decimals: 1,
     max: 5,
     min: 0,
@@ -273,7 +385,7 @@ export const inputNodes = {
     units: '%',
     selected: true,
     defValue: 100,
-    value: 100,
+    value: [100],
     decimals: 0,
     max: 300,
     min: 30,

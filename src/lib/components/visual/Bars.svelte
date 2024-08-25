@@ -10,7 +10,7 @@
     getFuelsFileNames,
   } from "$lib/firebase/firebase.client";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
-  const images = import.meta.glob(["$lib/assets/bars-background/**.webp"], {
+  const images = import.meta.glob(["$lib/assets/bars_background/**.webp"], {
     eager: true,
     as: "url",
   });
@@ -32,7 +32,7 @@
       >
         <image
           xlink:href={images[
-            "/src/lib/assets/bars-background/" +
+            "/src/lib/assets/bars_background/" +
               UKFuelModels[d["surface.primary.fuel.model.catalogKey"]].photo
           ]}
           y={-$yScale.bandwidth() * 2}

@@ -5,20 +5,9 @@
   import Auth from "$lib/components/Auth.svelte";
   import UKFuels from "$lib/data/UKFuels.json";
   import {
-    selectedOutput,
     modelConfigValues,
     requiredConfig,
-    config,
-    requiredSiteInputs,
-    siteInputs,
     selectedFuels,
-    selectedInput,
-    requiredFuelInputs,
-    requiredInputs,
-    fuelInputs,
-    _inputs,
-    _output,
-    // displayDataset,
   } from "$lib/shared/stores/modelStore.js";
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
@@ -45,11 +34,6 @@
     return options;
   }
 
-  $: console.log("output", $_output);
-  // $_output[$selectedFuels[0]].get($selectedOutputs[0])
-  // );
-  // $: console.log("fuel inputs", $fuelInputs);
-  //
   const generator = randomInt(50, 100);
   $: console.log("rand into, ", generator(100));
 </script>

@@ -42,7 +42,6 @@
       $fuelInputs[fuel][key] = [fuelNodes[key].min, fuelNodes[key].max];
     }
   };
-  $: console.log("fuel inputs : ", $fuelInputs);
 </script>
 
 <div class="flex flex-col p-4">

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # range of Heat per Unit Area values in Kj/m2
-x = np.linspace(0, 30000, 1000)
+x = np.linspace(0, 34000, 1000)
 # range of ROS values in m/min
 y = np.linspace(0, 60, 1000)
 xv, yv = np.meshgrid(x, y)

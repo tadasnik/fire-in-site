@@ -38,17 +38,17 @@
 
   export let data;
 
-  /** @type {Number} [r=5] – The circle's radius. */
-  export let r = 5;
+  // /** @type {Number} [r=5] – The circle's radius. */
+  // export let r = 5;
 
-  /** @type {String} [fill='#0cf'] – The circle's fill color. */
-  export let fill = "#0cf";
+  // /** @type {String} [fill='#0cf'] – The circle's fill color. */
+  // export let fill = "#0cf";
 
-  /** @type {String} [stroke='#000'] – The circle's stroke color. */
-  export let stroke = "#000";
+  // /** @type {String} [stroke='#000'] – The circle's stroke color. */
+  // export let stroke = "#000";
 
-  /** @type {Number} [strokeWidth=0] – The circle's stroke width. */
-  export let strokeWidth = 0;
+  // /** @type {Number} [strokeWidth=0] – The circle's stroke width. */
+  // export let strokeWidth = 0;
 
   const fuels = ["sh4", "sh6"];
   const myColor = scaleOrdinal(schemeCategory10); //.domain(fuels).range(schemeCategory10);
@@ -69,12 +69,12 @@
   //   data[0].values.map((d) => $x(d))
   // );
 
-  $: contours = contourDensity()
-    .x($xGet)
-    .y($yGet)
-    .size([$width, $height])
-    .bandwidth(10)
-    .thresholds(5)(data);
+  // $: contours = contourDensity()
+  //   .x($xGet)
+  //   .y($yGet)
+  //   .size([$width, $height])
+  //   .bandwidth(10)
+  //   .thresholds(5)(data);
 </script>
 
 <g class="">

@@ -33,7 +33,6 @@
   $: yGetter = y === "y" ? $yGet : $xGet;
 
   function executeClick(e) {
-    console.log("click", e);
     if ($timeMode === "current") {
       $timeMode = "user";
     }
@@ -49,7 +48,6 @@
     found = finder.find(evt[xLayerKey], evt[yLayerKey], searchRadius) || {};
     visible = Object.keys(found).length > 0;
     timeSel = found.time;
-    console.log("evt", found);
   }
 
   $: finder = quadtree()

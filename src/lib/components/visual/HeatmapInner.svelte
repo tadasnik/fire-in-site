@@ -16,9 +16,9 @@
     interpolateInferno,
     interpolateRdYlGn,
   } from "d3-scale-chromatic";
-  import { formatDate } from "svelty-picker";
   import { selectedOutput } from "$lib/shared/stores/modelStore";
   import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
+  import MultiSelect from "../ui/MultiSelect.svelte";
 
   const { data, z, zGet } = getContext("LayerCake");
 
@@ -31,6 +31,7 @@
   export let gapSize;
   export let forecastData;
   export let weatherProps;
+  export let modelOutputProps;
   export let halfPoint;
 
   $: isSelectedClass = (x) => {
@@ -41,7 +42,7 @@
 
   const formatValues = (d) => (d < 10 ? d.toFixed(1) : Math.round(d));
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
-  console.log("haetmap innner", weatherProps, forecastData);
+  console.log("haetmap innner DATA", $data);
 </script>
 
 {#each Object.entries(weatherProps) as [prop, values], i}
@@ -72,17 +73,6 @@
   {/if}
 {/each}
 
-<!-- {#each Object.values(commonOutputProps) as prop, i} -->
-<!--   {#each commonOutputs as object, x} -->
-<!--     <rect -->
-<!--       width={cellSize} -->
-<!--       height={cellSize} -->
-<!--       x={x * cellSize} -->
-<!--       y={(datasetsProps[0] + gapSize * 2 + i) * cellSize} -->
-<!--       style="fill:{prop[2](object[prop[0]])};stroke-width:.2;stroke:grey" -->
-<!--     /> -->
-<!--   {/each} -->
-<!-- {/each} -->
 {#each $data as fuelObject, i}
   {#each fuelObject.values as object, x}
     <rect
@@ -90,17 +80,22 @@
       height={cellSize}
       x={x * cellSize}
       y={(datasetsProps[0] + gapSize + i) * cellSize}
-      style="fill:{$zGet(object)};stroke-width:.2;stroke:grey"
+      style="fill:{modelOutputProps[$selectedOutput][0](
+        object[$selectedOutput]
+      )}
+        ;stroke-width:.2;stroke:grey"
     />
-    {#if $z(object) > 0.05}
+    {#if (!modelOutputProps[$selectedOutput][3] && $z(object) > 0.05) || modelOutputProps[$selectedOutput][3]}
       <text
         x={x * cellSize + cellSize / 2}
         y={(datasetsProps[0] + gapSize + i) * cellSize + cellSize / 2}
         class={isSelectedClass(x)}
         text-anchor="middle"
         dominant-baseline="middle"
-        style="fill:{Math.round($z(object)) < halfPoint ? 'grey' : 'white'}"
-        >{formatValues($z(object))}</text
+        style="fill:{$z(object) >= modelOutputProps[$selectedOutput][2][0] &&
+        object[$selectedOutput] < modelOutputProps[$selectedOutput][2][1]
+          ? 'grey'
+          : 'white'}">{formatValues($z(object))}</text
       >
     {/if}
   {/each}

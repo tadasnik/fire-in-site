@@ -4,7 +4,7 @@ import { fuelNodes } from '$lib/data/fuelNodes.js'
 import { outputNodes } from "$lib/data/outputNodes.js";
 import { fuelMoisture } from "$lib/data/fuelMoisture";
 import { modelConfigOptions } from '$lib/data/configuration';
-import { dateTime, getMonth, getHour, month } from "$lib/shared/stores/timeStore";
+import { dateTime, getMonth, getHour, month, currentDateTime } from "$lib/shared/stores/timeStore";
 import { currentWeather, elevationDiff, forecastTimeIndex, forecastOpenMeteo } from "$lib/shared/stores/forecastStore";
 import { currentLocation } from "$lib/shared/stores/locationStore";
 import UKFuelModels from '$lib/data/UKFuelModels.json'
@@ -50,6 +50,8 @@ export const selectedFuels = writable(['cl1', 'cl2', 'cl3', 'cl4', 'mh1', 'mh2',
 export const selectedFuel = writable('cl1')
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
+export const forecastMode = writable('forecast')
+export const forecastModes = writable(['forecast', 'history'])
 // export const _outputForecast = writable(new Map())
 
 export const siteInputs = writable(inputNodes)//, forecast], ([$inputNodesStore, $forecast]) => {
@@ -75,7 +77,7 @@ for (const [f_key, f_values] of Object.entries(UKFuelModels)) {
 }
 
 export function getOutputsForecast(inputsForecast) {
-  console.log("_outputForecast start")
+  // console.log("_outputForecast start")
   const resultForecast = new Map()
   inputsForecast.forEach((forecast, time) => {
     const output = []
@@ -378,7 +380,7 @@ export const requiredFuelInputs = derived(
 export const _inputsForecast = derived(
   [requiredFuelInputs, requiredSiteInputsForecastOpen],
   ([$requiredFuelInputs, $requiredSiteInputsForecastOpen]) => {
-    console.log('_inputsForecast start')
+    // console.log('_inputsForecast start')
 
     const inputsForecast = new Map()
     $requiredSiteInputsForecastOpen.forEach((forecast, time) => {
@@ -388,8 +390,8 @@ export const _inputsForecast = derived(
       })
       inputsForecast.set(time, inputsTime)
     })
-    console.log('_inputsForecast end :')
-    console.log('inputsForecast :', inputsForecast)
+    // console.log('_inputsForecast end :')
+    // console.log('inputsForecast :', inputsForecast)
     return inputsForecast
   }
 )
@@ -404,34 +406,40 @@ export const _inputsForecast = derived(
 //   }
 // )
 //
-// export const _output = derived([_inputs, advancedMode], ([$_inputs, $advancedMode]) => {
-//   const output = []
-//   // console.log('inputs :', $_inputs)
-//   Object.keys($_inputs).forEach((fuel) => {
-//     let result = {};
-//     if ($advancedMode) {
-//       result = fireSim.runWithRandom($_inputs[fuel])
-//     } else {
-//       result = fireSim.runBasic($_inputs[fuel])
-//       // console.log(" $$$$$$$ node :", fireSim.dag.get('site.temperature.shading'))
-//     }
-//     result[0]["surface.primary.fuel.model.catalogKey"] = fuel
-//     output.push({
-//       "surface.primary.fuel.model.catalogKey": fuel,
-//       values: result
-//     });
-//   })
-//   return output
-// })
+export const _selectedTimeOutput = derived([requiredSiteInputsForecastOpen, currentDateTime, advancedMode], ([$_requiredSiteInputsForecastOpen, $currentDateTime, $advancedMode]) => {
+  const output = []
+  // console.log('inputs :', $_inputs)
+  Object.keys($_inputs).forEach((fuel) => {
+    let result = {};
+    if ($advancedMode) {
+      result = fireSim.runWithRandom($_inputs[fuel])
+    } else {
+      result = fireSim.runBasic($_inputs[fuel])
+      // console.log(" $$$$$$$ node :", fireSim.dag.get('site.temperature.shading'))
+    }
+    result[0]["surface.primary.fuel.model.catalogKey"] = fuel
+    output.push({
+      "surface.primary.fuel.model.catalogKey": fuel,
+      values: result
+    });
+  })
+  return output
+})
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
-  console.log("_outputForecast start")
+  // console.log("_outputForecast start")
+  const convertUnits = ["surface.weighted.fire.heatPerUnitArea", "surface.weighted.fire.firelineIntensity"]
   const resultForecast = new Map()
   $_inputsForecast.forEach((forecast, time) => {
     const output = []
     Object.keys(forecast).forEach((fuel) => {
       const result = fireSim.runBasic(forecast[fuel])
       result[0]["surface.primary.fuel.model.catalogKey"] = fuel
+      convertUnits.forEach((item) => {
+        result.forEach((res) => {
+          res[item] = res[item] * 10 ** -6
+        })
+      })
       output.push({
         "surface.primary.fuel.model.catalogKey": fuel,
         values: result
@@ -440,13 +448,12 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
     resultForecast.set(time, output)
   })
 
-  console.log("_outputForecast end")
+  // console.log("_outputForecast end")
   return resultForecast
 })
 
 export const _outputForecastArray = derived([_outputForecast, commonOutputs, selectedOutput],
   ([$_outputForecast, $commonOutputs, $selectedOutput]) => {
-    const convertUnits = ["surface.weighted.fire.heatPerUnitArea", "surface.weighted.fire.firelineIntensity"]
     const outputArray = []
     $_outputForecast.forEach((forecast, time) => {
       const timeObject = {}
@@ -454,17 +461,12 @@ export const _outputForecastArray = derived([_outputForecast, commonOutputs, sel
         timeObject['All fuels'] = forecast[0].values[0][$selectedOutput]
       } else {
         forecast.forEach((item) => {
-          if (convertUnits.includes($selectedOutput)) {
-            timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput] * 10 ** -6
-          } else {
-            timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput]
-          }
+          timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[0][$selectedOutput]
         })
       }
       timeObject["time"] = time
       outputArray.push(timeObject)
     })
-    console.log("outputArray :", outputArray)
     return outputArray
   })
 

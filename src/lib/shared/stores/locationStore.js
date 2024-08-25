@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store'
 
-export const locations = writable({ 'currentLocation': { 'latitude': null, 'longitude': null } })
+export const currentLocation = writable({ 'userLocation': false, distanceFromPrevious: null, 'latitude': 53, 'longitude': 0, 'elevation': 0, 'slope': 0, 'aspect': 0 })
 
 export async function getLocation() {
   try {
@@ -8,8 +8,7 @@ export async function getLocation() {
     const response = await fetch("https://ipinfo.io/json?token=c0de8aff3465a1")
     if (response.ok) {
       const jsonResponse = await response.json()
-      console.log(jsonResponse, locations)
-      locations.update(current => ({ ...current, currentLocation: { 'latitude': jsonResponse.loc.split(',')[0], 'longitude': jsonResponse.loc.split(',')[1] } }))
+      return [parseFloat(jsonResponse.loc.split(',')[0]), parseFloat(jsonResponse.loc.split(',')[1])]
     }
     else {
       const text = response.text();
@@ -19,7 +18,6 @@ export async function getLocation() {
 
     throw new Error(error);
   }
-  return
 }
 // var promise1 = new Promise(function(resolve, reject) {
 //   navigator.geolocation.getCurrentPosition(function(pos) {

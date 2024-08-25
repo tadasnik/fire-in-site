@@ -1,6 +1,22 @@
 export const fuelMoisture = {
 
-  'mxh1': {
+  'mh1': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -32,7 +48,23 @@ export const fuelMoisture = {
       "heatwave": 98,
     }
   },
-  'mxh2': {
+  'mh2': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -65,6 +97,22 @@ export const fuelMoisture = {
     }
   },
   'eg1': {
+    "site.moisture.live.category": {
+      1: 140,
+      2: 140,
+      3: 140,
+      4: 95,
+      5: 140,
+      6: 190,
+      7: 190,
+      8: 140,
+      9: 140,
+      10: 140,
+      11: 140,
+      12: 140,
+      "heatwave": 90,
+    },
+
     "site.moisture.live.stem": {
       1: 140,
       2: 140,
@@ -97,6 +145,22 @@ export const fuelMoisture = {
     }
   },
   'eg2': {
+    "site.moisture.live.category": {
+      1: 140,
+      2: 140,
+      3: 140,
+      4: 95,
+      5: 140,
+      6: 190,
+      7: 190,
+      8: 140,
+      9: 140,
+      10: 140,
+      11: 140,
+      12: 140,
+      "heatwave": 90,
+    },
+
     "site.moisture.live.stem": {
       1: 140,
       2: 140,
@@ -130,6 +194,22 @@ export const fuelMoisture = {
   },
 
   'eg3': {
+    "site.moisture.live.category": {
+      1: 140,
+      2: 140,
+      3: 140,
+      4: 95,
+      5: 140,
+      6: 190,
+      7: 190,
+      8: 140,
+      9: 140,
+      10: 140,
+      11: 140,
+      12: 140,
+      "heatwave": 90,
+    },
+
     "site.moisture.live.stem": {
       1: 140,
       2: 140,
@@ -162,6 +242,22 @@ export const fuelMoisture = {
     }
   },
   'cl1': {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
+
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -195,6 +291,21 @@ export const fuelMoisture = {
   },
 
   'cl2': {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -229,6 +340,22 @@ export const fuelMoisture = {
 
 
   'cl3': {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
+
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -261,7 +388,23 @@ export const fuelMoisture = {
     }
   },
 
-  'cld': {
+  'cl4': {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
+
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -294,7 +437,23 @@ export const fuelMoisture = {
     }
   },
   'bll': {
-    "site.moisture.live.herb": {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 90,
+      4: 90,
+      5: 90,
+      6: 90,
+      7: 90,
+      8: 90,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 90,
+    },
+
+    "site.moisture.live.stem": {
       1: 90,
       2: 90,
       3: 90,
@@ -327,7 +486,24 @@ export const fuelMoisture = {
   },
 
   'snl': {
-    "site.moisture.live.herb": {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 90,
+      4: 90,
+      5: 90,
+      6: 90,
+      7: 90,
+      8: 90,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 90,
+    },
+
+
+    "site.moisture.live.stem": {
       1: 90,
       2: 90,
       3: 90,
@@ -360,7 +536,24 @@ export const fuelMoisture = {
   },
 
   'lnl': {
-    "site.moisture.live.herb": {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 90,
+      4: 90,
+      5: 90,
+      6: 90,
+      7: 90,
+      8: 90,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 90,
+    },
+
+
+    "site.moisture.live.stem": {
       1: 90,
       2: 90,
       3: 90,
@@ -393,6 +586,22 @@ export const fuelMoisture = {
   },
 
   'gr1': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -426,6 +635,23 @@ export const fuelMoisture = {
     },
   },
   'gr2': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+
+
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -459,6 +685,23 @@ export const fuelMoisture = {
     },
   },
   'gr3': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+
+
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -479,9 +722,9 @@ export const fuelMoisture = {
       2: 30,
       3: 40,
       4: 120,
-      5: 190,
-      6: 280,
-      7: 280,
+      5: 98,
+      6: 98,
+      7: 98,
       8: 280,
       9: 150,
       10: 120,

@@ -94,7 +94,6 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
     }
   }
   const url = forecastMode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
-  console.log("open meteo params", url, forecastMode, fillParams())
   const responses = await fetchWeatherApi(url, fillParams())
 
   // Helper function to form time ranges
@@ -112,7 +111,6 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
   const forecastLongitude = response.longitude();
   const forecastLocationId = response.locationId();
   const forecastModel = response.model();
-  console.log("Location ", forecastLatitude, forecastLongitude, forecastLocationId, forecastModel);
 
   const hourly = response.hourly();
 

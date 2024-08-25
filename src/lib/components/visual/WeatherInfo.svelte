@@ -140,8 +140,7 @@
     <!--   <div class="text-2xl">Fire Location:</div> -->
     <!--   {fireLocation.latitude.toFixed(3)}<i -->
     <!--     class="text-xl wi wi-degrees" -->
-    <!--   />{fireLocation.latitude >= 0 ? "N" : "S"}, {fireLocation.longitude.toFixed( -->
-    <!--     3 -->
+    <!--   />{fireLocation.latitude >= 0 ? "N" : "S"}, {fireLocation.longitude.toFixed(3 -->
     <!--   )}<i class="text-xl wi wi-degrees" />{fireLocation.longitude >= 0 -->
     <!--     ? "E" -->
     <!--     : "W"}, {fireLocation.elevation.toFixed(0)}m asl, slope: {fireLocation.slope.toFixed( -->

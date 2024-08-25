@@ -3,24 +3,24 @@
   Generates a tooltip that works on multiseries datasets, like multiline charts. It creates a tooltip showing the name of the series and the current value. It finds the nearest data point using the [QuadTree.html.svelte](https://layercake.graphics/components/QuadTree.html.svelte) component.
  -->
 <script>
-  import { getContext } from 'svelte';
-  import { format } from 'd3-format';
+  import { getContext } from "svelte";
+  import { format } from "d3-format";
 
-  import QuadTree from './QuadTree.html.svelte';
+  import QuadTree from "./QuadTree.html.svelte";
 
-  const { data, width, yScale, config } = getContext('LayerCake');
+  const { data, width, yScale, config } = getContext("LayerCake");
 
-  const commas = format(',');
-  const titleCase = d => d.replace(/^\w/, w => w.toUpperCase());
+  const commas = format(",");
+  const titleCase = (d) => d.replace(/^\w/, (w) => w.toUpperCase());
 
   /** @type {Function} [formatTitle=d => d] - A function to format the tooltip title, which is `$config.x`. */
-  export let formatTitle = d => d;
+  export let formatTitle = (d) => d;
 
   /** @type {Function} [formatValue=d => isNaN(+d) ? d : commas(d)] - A function to format the value. */
-  export let formatValue = d => isNaN(+d) ? d : commas(d);
+  export let formatValue = (d) => format(".2f")(d);
 
   /** @type {Function} [formatKey=d => titleCase(d)] - A function to format the series name. */
-  export let formatKey = d => titleCase(d);
+  export let formatKey = (d) => titleCase(d);
 
   /** @type {Number} [offset=-20] - A y-offset from the hover point, in pixels. */
   export let offset = -20;
@@ -36,16 +36,50 @@
    */
   function sortResult(result) {
     if (Object.keys(result).length === 0) return [];
-    const rows = Object.keys(result).filter(d => d !== $config.x).map(key => {
-      return {
-        key,
-        value: result[key]
-      };
-    }).sort((a, b) => b.value - a.value);
+    const rows = Object.keys(result)
+      .filter((d) => d !== $config.x)
+      .map((key) => {
+        return {
+          key,
+          value: result[key],
+        };
+      })
+      .sort((a, b) => b.value - a.value);
 
     return rows;
   }
 </script>
+
+<QuadTree
+  dataset={dataset || $data}
+  y="x"
+  let:x
+  let:y
+  let:visible
+  let:found
+  let:e
+>
+  {@const foundSorted = sortResult(found)}
+  {#if visible === true}
+    <div style="left:{x}px;" class="line" />
+    <div
+      class="tooltip"
+      style="
+        width:{w}px;
+        display: {visible ? 'block' : 'none'};
+        top:{$yScale(foundSorted[0].value) + offset}px;
+        left:{Math.min(Math.max(w2, x), $width - w2)}px;"
+    >
+      <div class="title">{formatTitle(found[$config.x])}</div>
+      {#each foundSorted as row}
+        <div class="row">
+          <span class="key">{formatKey(row.key)}:</span>
+          {formatValue(row.value)}
+        </div>
+      {/each}
+    </div>
+  {/if}
+</QuadTree>
 
 <style>
   .tooltip {
@@ -78,33 +112,3 @@
     color: #999;
   }
 </style>
-
-<QuadTree
-  dataset={dataset || $data}
-  y='x'
-  let:x
-  let:y
-  let:visible
-  let:found
-  let:e
->
-  {@const foundSorted = sortResult(found)}
-  {#if visible === true}
-    <div
-      style="left:{x}px;"
-      class="line"></div>
-    <div
-      class="tooltip"
-      style="
-        width:{w}px;
-        display: { visible ? 'block' : 'none' };
-        top:{$yScale(foundSorted[0].value) + offset}px;
-        left:{Math.min(Math.max(w2, x), $width - w2)}px;"
-      >
-        <div class="title">{formatTitle(found[$config.x])}</div>
-        {#each foundSorted as row}
-          <div class="row"><span class="key">{formatKey(row.key)}:</span> {formatValue(row.value)}</div>
-        {/each}
-    </div>
-  {/if}
-</QuadTree>

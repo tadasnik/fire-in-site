@@ -21,7 +21,7 @@ const rainfallFactors = {
 const rainInd = (rainfall) => rainfall <= 0 ? 0. : rainfall > 3.31 ? 3.5 : roundToNearest(rainfall, 0.25)
 
 export function getRainfallFactor(rainfall) {
-  console.log("rainInd :", rainInd(rainfall))
+  // console.log("rainInd :", rainInd(rainfall))
   return rainfallFactors[rainInd(rainfall)]
 }
 

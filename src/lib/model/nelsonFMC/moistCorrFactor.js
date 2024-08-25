@@ -1,11 +1,9 @@
-import { WindBeaufort0 } from "svelte-weather"
-
 export function getMoistureCorrectionFactor(initMoisture, eqMoistContent, fuelTemp, relHum) {
   const tempInd = xSorptionTempInd(fuelTemp)
   const humInd = xSorptionHumInd(relHum)
   const xSorptionProp = (initMoisture, eqMoistContent) => initMoisture < eqMoistContent ? `${initMoisture}% Adsorption` : `${initMoisture}% Desorption`
-  console.log("xSorptionProp :", initMoisture, eqMoistContent, xSorptionProp(initMoisture, eqMoistContent), fuelTemp, relHum, tempInd, humInd)
-  console.log("mCF :", xSorption[xSorptionProp(initMoisture, eqMoistContent)][tempInd][humInd])
+  // console.log("xSorptionProp :", initMoisture, eqMoistContent, xSorptionProp(initMoisture, eqMoistContent), fuelTemp, relHum, tempInd, humInd)
+  // console.log("mCF :", xSorption[xSorptionProp(initMoisture, eqMoistContent)][tempInd][humInd])
   return xSorption[xSorptionProp(initMoisture, eqMoistContent)][tempInd][humInd]
 }
 

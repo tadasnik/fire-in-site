@@ -7,7 +7,8 @@
   import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     siteInputs,
-    requiredSiteInputs,
+    // requiredSiteInputs,
+    requiredSiteInputsForecast,
     scenarios,
     selectedScenario,
   } from "$lib/shared/stores/modelStore.js";
@@ -74,7 +75,7 @@
     }, 100);
   }
 
-  function valuesDisplay(key) {
+  function valuesDisplayScenario(key) {
     if ($selectedScenario[key].length > 1) {
       return $selectedScenario[key].join("-");
     } else {
@@ -82,8 +83,15 @@
     }
   }
 
+  function valuesDisplay(key) {
+    if ($siteInputs[key].value.length > 1) {
+      return $siteInputs[key].value.join("-");
+    } else {
+      return $siteInputs[key].value;
+    }
+  }
   function prepareScenario() {
-    Object.keys($requiredSiteInputs).forEach((key) => {
+    Object.keys($requiredSiteInputsForecast).forEach((key) => {
       currScenario[key] = $siteInputs[key].value;
     });
     console.log("currScenario ", currScenario);
@@ -105,14 +113,14 @@
     }
   };
   // $: console.log("authStore ", $authStore)
-  // $: console.log("siteInputs ", $siteInputs);
+  // $: console.log("requiredSiteInputsForecast ", $requiredSiteInputsForecast);
   // $: console.log("defaultModal ", defaultModal);
 </script>
 
 <div class="flex flex-col p-4">
   <h3 class="h3 font-bold">Site inputs:</h3>
   <Accordion multiple>
-    {#each Object.keys($requiredSiteInputs) as key}
+    {#each Object.keys($requiredSiteInputsForecast) as key}
       <AccordionItem id={key}>
         <span
           slot="header"
@@ -208,7 +216,7 @@
         </div>
 
         <!-- {#each Object.keys(currScenario) as key} -->
-        {#each Object.keys($requiredSiteInputs) as key}
+        {#each Object.keys($requiredSiteInputsForecast) as key}
           <div>
             {#if currScenario[key].length === 1}
               <Label class="mb-2"

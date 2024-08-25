@@ -1,7 +1,7 @@
 export const modelConfigOptions = {
   'configure.fuel.primary': {
     options: ['catalog', 'behave', 'chaparral', 'palmettoGallberry', 'westernAspen'],
-    value: 'catalog',
+    value: 'behave',
     active: false,
     description: `Primary surface fuels are specified by entering
 
@@ -45,7 +45,7 @@ export const modelConfigOptions = {
   },
   'configure.fuel.moisture': {
     options: ['individual', 'liveCategory', 'fosberg', 'category'],
-    value: 'fosberg',
+    value: 'individual',
     active: false,
     description: `When required as input, fuel moisture is entered for
     'individual': the 3 dead and 2 live fuel moisture classes
@@ -67,7 +67,7 @@ export const modelConfigOptions = {
   },
   'configure.wind.direction': {
     options: ['sourceFromNorth', 'headingFromUpslope', 'upslope'],
-    value: 'upslope',
+    value: 'sourceFromNorth',
     active: false,
     description: `When required as input, wind direction is
 
@@ -157,5 +157,16 @@ export const modelConfigOptions = {
     'input': entered directly
     'estimated': estimated from chaparral depth
   `,
+  },
+  'configure.temperature.humidity': {
+    options: ['humidity', 'wetBulb', 'dewPoint'],
+    value: 'humidity',
+    active: false,
+    description: `When relative humidity or dew point are required, prefer to:
+    'humidity': enter dry bulb and relative humidity and calculate dew point
+    'wetBulb': enter dry bulb, wet bulb, and elev and calculate dew point, relative humidity
+    'dewPoint': enter dry bulb and dew point and calculate relative humidity
+`,
   }
+
 }

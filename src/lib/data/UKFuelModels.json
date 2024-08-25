@@ -1,9 +1,9 @@
 {
-  "mxh1": {
+  "mh1": {
     "domain": "UKFDRS",
     "label": "Mixed heath low herbaceous",
     "displayLabel": "Mixed heath low herbaceous load",
-    "code": "mxh1",
+    "code": "mh1",
     "depth": 0.45,
     "deadMext": 30,
     "dead1Load": 0.25,
@@ -42,17 +42,17 @@
       "11": 22022,
       "12": 22022
     },
-    "photo": "mixed_heath_small.jpg",
+    "photo": "mixed_heath_small.webp",
     "description": "Mixed heath dominated by dwarf schrub fuels with relativelly low load of herbaceous vegetation",
-    "thumbnail": "mixed_heath_small.jpg",
+    "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
-  "mxh2": {
+  "mh2": {
     "domain": "UKFDRS",
     "label": "Mixed heath high herbaceous",
     "displayLabel": "Mixed heath high herbaceous load",
-    "code": "mxh2",
+    "code": "mh2",
     "depth": 0.45,
     "deadMext": 30,
     "dead1Load": 0.25,
@@ -91,9 +91,9 @@
       "11": 22022,
       "12": 22022
     },
-    "photo": "mixed_heath_small.jpg",
+    "photo": "mixed_heath_small.webp",
     "description": "Mixed heath dominated by dwarf schrub fuels with relativelly high load of herbaceous vegetation",
-    "thumbnail": "mixed_heath_small.jpg",
+    "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -140,9 +140,9 @@
       "11": 22044,
       "12": 22044
     },
-    "photo": "gorse_small.jpg",
+    "photo": "gorse_small.webp",
     "description": "Low load shrub dominated by European Gorse.",
-    "thumbnail": "mixed_heath_small.jpg",
+    "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -189,9 +189,9 @@
       "11": 22044,
       "12": 22044
     },
-    "photo": "gorse_small.jpg",
+    "photo": "gorse_small.webp",
     "description": "Low load shrub dominated by European Gorse.",
-    "thumbnail": "mixed_heath_small.jpg",
+    "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -238,9 +238,9 @@
       "11": 22044,
       "12": 22044
     },
-    "photo": "gorse_small.jpg",
+    "photo": "gorse_small.webp",
     "description": "High load European Gorse.",
-    "thumbnail": "mixed_heath_small.jpg",
+    "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -287,9 +287,9 @@
       "11": 20000,
       "12": 19500
     },
-    "photo": "calluna_res.jpg",
+    "photo": "calluna_small.webp",
     "description": "Calluna vulgaris dominated fuels, low load - pioneer phase ",
-    "thumbnail": "heather_small.jpg",
+    "thumbnail": "heather_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -336,9 +336,9 @@
       "11": 20000,
       "12": 19500
     },
-    "photo": "calluna_res.jpg",
+    "photo": "calluna_small.webp",
     "description": "Calluna vulgaris dominated fuels, medium load - building phase ",
-    "thumbnail": "heather_small.jpg",
+    "thumbnail": "heather_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -385,17 +385,17 @@
       "11": 20000,
       "12": 19500
     },
-    "photo": "heather_deg_small.jpg",
+    "photo": "calluna_small.webp",
     "description": "Calluna vulgaris dominated fuels, high load - mature phase ",
-    "thumbnail": "heather_deg_small.jpg",
+    "thumbnail": "heather_deg_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
   "cl4": {
     "domain": "UKFDRS",
     "label": "Calluna medium load - degenerate phase",
-    "displayLabel": "Calluna high load",
-    "code": "cl3",
+    "displayLabel": "Calluna medium load",
+    "code": "cl4",
     "depth": 0.35,
     "deadMext": 40,
     "dead1Load": 0.223,
@@ -434,9 +434,9 @@
       "11": 20000,
       "12": 19500
     },
-    "photo": "heather_deg_small.jpg",
+    "photo": "calluna_small.webp",
     "description": "Calluna vulgaris dominated fuels, high load - degenarate phase ",
-    "thumbnail": "heather_deg_small.jpg",
+    "thumbnail": "heather_deg_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -483,9 +483,9 @@
       "11": 19695,
       "12": 19695
     },
-    "photo": "grass_small.jpg",
-    "description": "Continious coarse grass. Grass and herb fuel load is low, comparable to that of mxh2. Fuel bed depth up to about 0.6 metre. Shrubs are not present in significant quantity to affect fire behaviour. Characteristic vegetation ...",
-    "thumbnail": "grass_small.jpg",
+    "photo": "grass_small.webp",
+    "description": "Continious coarse grass. Grass and herb fuel load is low, comparable to that of mh2. Fuel bed depth up to about 0.6 metre. Shrubs are not present in significant quantity to affect fire behaviour. Characteristic vegetation ...",
+    "thumbnail": "grass_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -532,9 +532,9 @@
       "11": 19695,
       "12": 19695
     },
-    "photo": "grass_small.jpg",
-    "description": "Continious grass. Grass and herb fuel load is higher compared to that of mxh2. Fuel bed depth up to about 0.9 metre. Shrubs are not present in significant quantity to affect fire behaviour. Characteristic vegetation Mollinia grass. Dead herbaceous material from previous seasons present.",
-    "thumbnail": "grass_small.jpg",
+    "photo": "grass_small.webp",
+    "description": "Continious grass. Grass and herb fuel load is higher compared to that of mh2. Fuel bed depth up to about 0.9 metre. Shrubs are not present in significant quantity to affect fire behaviour. Characteristic vegetation Mollinia grass. Dead herbaceous material from previous seasons present.",
+    "thumbnail": "grass_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -581,9 +581,9 @@
       "11": 19695,
       "12": 19695
     },
-    "photo": "grass_small.jpg",
+    "photo": "grass_small.webp",
     "description": "High grass and herb fuel load. Fuel bed depth up to about a metre. Shrubs are not present in significant quantity to affect fire behaviour. Characteristic vegetation Mollinia grass. Dead herbaceous material from previous seasons present.",
-    "thumbnail": "grass_small.jpg",
+    "thumbnail": "grass_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -630,9 +630,9 @@
       "11": 16440,
       "12": 16440
     },
-    "photo": "con_litter_small.jpg",
+    "photo": "con_litter_small.webp",
     "description": "Broad leaf woodland litter.",
-    "thumbnail": "con_litter_small.jpg",
+    "thumbnail": "con_litter_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -679,9 +679,9 @@
       "11": 17306,
       "12": 17306
     },
-    "photo": "con_litter_small.jpg",
+    "photo": "con_litter_small.webp",
     "description": "Short needle woodland litter.",
-    "thumbnail": "con_litter_small.jpg",
+    "thumbnail": "con_litter_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
@@ -728,9 +728,9 @@
       "11": 17221,
       "12": 17221
     },
-    "photo": "con_litter_small.jpg",
+    "photo": "con_litter_small.webp",
     "description": "Long needle woodland litter. High 1-h dead fuel load.",
-    "thumbnail": "con_litter_small.jpg",
+    "thumbnail": "con_litter_small.webp",
     "curedHerbFrac": null,
     "selected": true
   }

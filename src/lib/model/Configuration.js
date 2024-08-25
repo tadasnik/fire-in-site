@@ -41,7 +41,7 @@ export const modelConfigOptions = {
     `,
   },
   'configure.fuel.moisture': {
-    options: ['individual', 'liveCategory', 'category', 'catalog'],
+    options: ['individual', 'liveCategory', 'fosberg', 'category'],
     value: 'category',
     description: `When required as input, fuel moisture is entered for
 

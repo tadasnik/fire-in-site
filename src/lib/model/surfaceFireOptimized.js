@@ -56,7 +56,8 @@ export default class FireSim {
     for (const [key, values] of Object.entries(nodeProps)) {
       this.dag.get(key)._variant.setDisplayUnits(values.units)
     }
-    // console.log(this.dag.get('surface.weighted.fire.primaryCover'))
+    // console.log(this.dag.get('surface.primary.fuel.model.behave.parms.dead.tl1h.surfaceAreaToVolumeRatio'))
+    // console.log(this.dag.get('site.temperature.shading'))
   }
 
   selectOutputs(outputs) {
@@ -90,7 +91,7 @@ export default class FireSim {
       }
       resultsArray.push(this.dag.input(inputsArray).run()[0])
     }
-    console.log(resultsArray)
+    // console.log(resultsArray)
     return resultsArray
   }
 
@@ -98,11 +99,9 @@ export default class FireSim {
     this.dag.setRunLimit(1000)
     this.dag.setUpdateClass(new UpdateOrthogonalStack(this.dag))
     const inputsArray = []
-
     for (const [key, values] of Object.entries(inputs)) {
       inputsArray.push([key, this.arrayToNative(key, values)])
     }
-    console.log(" inputs in run ", inputs)
     this.dag.input(inputsArray)
     this.dag.run()
     return this.store._resultsArray
@@ -113,7 +112,7 @@ export default class FireSim {
     this.dag.setUpdateClass(new UpdateRandomOrthogonalStack(this.dag))
     // this.dag.run()
     // dag.run can be replaced by the below:
-    console.log('inputs during run: ', inputs)
+    // console.log('inputs during run: ', inputs)
     this.dag._sortedNodes.forEach(node => {
       if (node._is._required && node._is._input) {
         if ((!this.dag._input.has(node)) || this.dag._input.get(node) === []) {
@@ -149,7 +148,6 @@ export default class FireSim {
       }
       inputsArray.push([key, this.arrayToNative(key, valuesMod)])
     }
-    console.log(" inputs in run ", inputs)
     this.dag.input(inputsArray)
     //this.dag.run(inputsArray)
     let elapsed = Date.now() // start the elapsed timer
@@ -159,9 +157,9 @@ export default class FireSim {
     const calls = results.calls
     const runs = results.runs
     const rps = (runs / (0.001 * elapsed)).toFixed(0)
-    console.log(
-      header(`Optimized: ${runs} runs and ${calls} calls required ${elapsed} ms (${rps} runs/s): ${results.message}`)
-    )
+    // console.log(
+    //   header(`Optimized: ${runs} runs and ${calls} calls required ${elapsed} ms (${rps} runs/s): ${results.message}`)
+    // )
     return this.store._resultsArray
   };
 
