@@ -25,15 +25,6 @@
     }
   });
 
-  // onMount(async () => {
-  //   console.log("MOdal mounted");
-  //   // imageNames = await getFuelModelsFileNames($selectedFuel);
-  //   // images = await getFuelModelImages($selectedFuel, imageNames);
-  //   // urls = await getFuelModelsUrls($selectedFuel);
-  // });
-  // onDestroy(() => {
-  //   console.log("Date Component removed");
-  // });
   $: console.log("clickOutsideModal", clickOutsideModal);
   Object.keys(fuelsImages).forEach((key) => {
     console.log("key", key.split("/")[5]);
@@ -50,30 +41,6 @@
   {#if images.length !== 0}
     <Gallery class="grid grid-cols-2 gap-2" items={images} />
   {/if}
-  <!-- {#each Object.entries(fuelsImages) as [_path, module]} -->
-  <!--   <p>{_path}</p> -->
-  <!--   <enhanced:img src={module.default} alt="some alt text" /> -->
-  <!-- {/each} -->
-  <!-- {#await images then data} -->
-  <!--   <p>data item {data}</p> -->
-  <!--   <Gallery class="gap-4 grid-cols-3" items={data} let:item> -->
-  <!--     {#each data as dd, i} -->
-  <!--       <p>data item {dd.src}</p> -->
-  <!--       {#await dd.src then url} -->
-  <!--         <img src={url.src} alt={"sstrs"} class="h-auto max-w-full" /> -->
-  <!--       {/await} -->
-  <!--     {/each} -->
-  <!--   </Gallery> -->
-  <!-- {/await} -->
-  <!-- <Gallery items={images} class="gap-4 grid-cols-2 md:grid-cols-3" /> -->
-  <!-- {#each images as image} -->
-  <!--   <p>aostn {image}</p> -->
-  <!--   {#await image then src} -->
-  <!--     <p>aostn {src}</p> -->
-  <!--   {/await} -->
-  <!-- {/each} -->
-  <!-- <p>{images}</p> -->
-
   <div class="container text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
     <div class="content pt-2">
