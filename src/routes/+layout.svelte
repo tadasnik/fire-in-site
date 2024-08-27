@@ -38,6 +38,8 @@
     fuelMoistureModel,
     selectedOutput,
     selectedOutputs,
+    modelConfigValues,
+    advancedMode,
   } from "$lib/shared/stores/modelStore";
   import {
     getForecastOpenMeteo,
@@ -50,10 +52,7 @@
     getLocation,
     currentLocation,
   } from "$lib/shared/stores/locationStore";
-  import {
-    currentDateTime,
-    timeMode,
-  } from "$lib/shared/stores/timeStore";
+  import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
@@ -65,7 +64,7 @@
       $fuelMoistureModel = "Fosberg";
       console.log(
         "modelConfigValues ",
-        $modelConfigValues["configure.fuel.moisture"]
+        $modelConfigValues["configure.fuel.moisture"],
       );
       $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
       console.log("Fuel moisture model changed to ", value);
@@ -123,7 +122,7 @@
         console.log(
           " NOOO current User ",
           $authStore.currentUser,
-          $authStore.isLoading
+          $authStore.isLoading,
         );
         const [latitude, longitude] = await getLocation();
         console.log(" GOT longitude", longitude, "GOT latitude", latitude);
@@ -146,7 +145,7 @@
               email: user.email,
               displayName: user.displayName,
             },
-            { merge: true }
+            { merge: true },
           );
         } else {
           const defLocationRef = doc(
@@ -154,7 +153,7 @@
             "users",
             user.uid,
             "Locations",
-            "default"
+            "default",
           );
           getDoc(defLocationRef)
             .then((defLoc) => {

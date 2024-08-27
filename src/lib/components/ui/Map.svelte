@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Map, Marker } from "mapbox-gl";
+  import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import "$lib/styles/mapbox-gl.css";
@@ -57,7 +57,7 @@
     let currentLoc = {};
     let prevLoc = new LatLon(
       $currentLocation.latitude,
-      $currentLocation.longitude
+      $currentLocation.longitude,
     );
     let newLoc = new LatLon(latitude, longitude);
     let distanceFromPrevious = prevLoc.distanceTo(newLoc);
@@ -102,7 +102,7 @@
     Object.keys(points).forEach((key) => {
       points[key].coordinates = p1.destinationPoint(
         distance,
-        points[key].bearing
+        points[key].bearing,
       );
     });
     return points;
@@ -135,10 +135,10 @@
       "Map onMount",
       $currentLocation.longitude,
       $currentLocation.latitude,
-      $currentLocation.userLocation
+      $currentLocation.userLocation,
     );
 
-    map = new Map({
+    map = new mapboxgl.Map({
       container: mapContainer,
       accessToken: import.meta.env.VITE_MAPBOX_GL_TOKEN,
 
@@ -179,14 +179,14 @@
         map,
         $currentLocation.longitude,
         $currentLocation.latitude,
-        50
+        50,
       );
       setCurrentLocation(
         $currentLocation.longitude,
         $currentLocation.latitude,
         elevation,
         slope,
-        aspect
+        aspect,
       );
       // map.off("sourcedata");
     });
@@ -203,17 +203,17 @@
         map,
         coordinates.lng,
         coordinates.lat,
-        50
+        50,
       );
       setCurrentLocation(
         coordinates.lng,
         coordinates.lat,
         elevation,
         slope,
-        aspect
+        aspect,
       );
     });
-    locMarker = new Marker()
+    locMarker = new mapboxgl.Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
       .addTo(map);
   });
@@ -230,11 +230,11 @@
   {$currentLocation.latitude.toFixed(3)}<i
     class="text-xl wi wi-degrees"
   />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
-    3
+    3,
   )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0
     ? "E"
     : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
-    0
+    0,
   )}%, aspect:
   <i
     class="text-2xl wi wi-wind
