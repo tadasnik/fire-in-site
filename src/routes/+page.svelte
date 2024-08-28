@@ -3,12 +3,7 @@
 </script>
 
 <script>
-  import {
-    Select,
-    Button,
-    Popover,
-    Label,
-  } from "flowbite-svelte";
+  import { Select, Button, Popover, Label } from "flowbite-svelte";
   import Map from "$lib/components/ui/Map.svelte";
   import Auth from "$lib/components/Auth.svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
@@ -71,7 +66,7 @@
   $: daysInHistoryMonth = new Date(
     $historicalYear,
     $historicalMonth,
-    0
+    0,
   ).getDate();
   $: console.log("daysInHistoryMonth", daysInHistoryMonth);
 
@@ -92,7 +87,7 @@
       $historicalYear,
       $historicalMonth - 1,
       $historicalDay,
-      12
+      12,
     );
     getForecastOpenMeteo();
   }
@@ -113,8 +108,8 @@
   }
 </script>
 
-<div class="flex justify-center max-w-screen-xl flex-col mx-auto">
-  <div class="container w-full">
+<div class="flex justify-center max-w-screen-2xl flex-col">
+  <div class="justify-center p-4 items-center">
     <WeatherInfo
       data={$forecastOpenMeteo}
       forecastLocation={$forecastLocation.name}
@@ -122,8 +117,8 @@
     />
   </div>
 
-  <div class="flex flex-col md:flex-row items-center">
-    <div class="grow w-full md:w-1/2 min-w-96 p-2">
+  <div class="flex flex-col p-6 md:flex-row items-center">
+    <div class="grow w-full p-4 md:w-1/2 min-w-96 p-2">
       <div class="aspect-square" bind:clientWidth={w}>
         {#if $currentLocation.userLocation}
           <Map />
@@ -162,7 +157,7 @@
             <div class="text-center text-2xl">All fuels</div>
             <div class="text-center text-9xl">
               {Math.round(
-                $_outputForecast.get($dateTime)[0].values[0][$selectedOutput]
+                $_outputForecast.get($dateTime)[0].values[0][$selectedOutput],
               )}%
             </div>
           </div>
@@ -219,16 +214,14 @@
   {/if}
 
   {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast === false}
-    <div class="container justify-center p-2 pt-45 mt-25">
-      <div class="flex w-full overflow-x-auto justify-center">
-        <Heatmap
-          fireBehaviourData={$_outputForecastArray}
-          forecastData={$forecastOpenMeteo}
-          xKey="time"
-          zKey={$selectedOutput}
-          yKey="surface.primary.fuel.model.catalogKey"
-        />
-      </div>
+    <div class="flex w-full overflow-x-auto justify-center">
+      <Heatmap
+        fireBehaviourData={$_outputForecastArray}
+        forecastData={$forecastOpenMeteo}
+        xKey="time"
+        zKey={$selectedOutput}
+        yKey="surface.primary.fuel.model.catalogKey"
+      />
     </div>
   {/if}
   <!-- <div class="container mx-auto p-8"> -->
