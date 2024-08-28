@@ -91,68 +91,46 @@
   console.log("wEatheaInfo data ", data, fireLocation);
 </script>
 
-<div class="container mx-auto">
+<div class="">
   {#if data}
     <!-- <div class="sm:w-full md:w-1/2 p-4 min-w-80 bg-gray-100"> -->
-    <div class="w-full p-4 min-w-80">
-      <div class="flex flex-wrap flex-row justify-center space-x-2 text-2xl">
-        <div>Fire Behaviour prediction for</div>
-        <div>
-          <strong>{dateFormat(new Date($currentDateTime))}</strong>
-        </div>
-      </div>
-
-      <div class="flex align-middle justify-center items-end space-x-2">
-        <div>Weather :</div>
-
-        <div class="">
-          <i
-            class="text-2xl {metOfficeWeatherTypes[
-              data.significantWeatherCode
-            ]}"
-          />
-        </div>
-
-        <div class="space-x-0">
-          <span class="">{data.temperature2m[0].toFixed(0)}</span><i
-            class="text-xl wi wi-degrees"
-          /><span class="font-bold">C</span>
-        </div>
-        <div>
-          <span class="pl-0">{data.relativeHumidity2m[0].toFixed(0)}</span>
-          <i class="wi wi-humidity" />
-        </div>
-        <div>
-          <i
-            class="text-xl wi wi-wind
-        wi-from-{getWindCardinalDirection(data.windDirection10m[0])}"
-          />
-
-          <span class="pl-0"> {data.windSpeed10m[0].toFixed(0)}</span><span
-            class="font-bold pl-1"
-          >
-            m/s</span
-          >
-        </div>
+    <div class="flex flex-wrap flex-row justify-center space-x-2 text-2xl">
+      <div>Fire Behaviour prediction for</div>
+      <div>
+        <strong>{dateFormat(new Date($currentDateTime))}</strong>
       </div>
     </div>
-    <!-- <div class="sm:w-full md:w-1/2 p-4 min-w-80"> -->
-    <!--   <div class="text-2xl">Fire Location:</div> -->
-    <!--   {fireLocation.latitude.toFixed(3)}<i -->
-    <!--     class="text-xl wi wi-degrees" -->
-    <!--   />{fireLocation.latitude >= 0 ? "N" : "S"}, {fireLocation.longitude.toFixed(3 -->
-    <!--   )}<i class="text-xl wi wi-degrees" />{fireLocation.longitude >= 0 -->
-    <!--     ? "E" -->
-    <!--     : "W"}, {fireLocation.elevation.toFixed(0)}m asl, slope: {fireLocation.slope.toFixed( -->
-    <!--     0 -->
-    <!--   )}%, aspect: -->
-    <!--   <i -->
-    <!--     class="text-2xl wi wi-wind -->
-    <!--     wi-towards-{getWindCardinalDirection(fireLocation.aspect)}" -->
-    <!--   /> -->
-    <!--   <strong -->
-    <!--     >({cardinalDirections[Math.floor(fireLocation.aspect / 11.25)]})</strong -->
-    <!--   > -->
-    <!-- </div> -->
+
+    <div class="flex align-middle justify-center items-end space-x-2">
+      <div>Weather :</div>
+
+      <div class="">
+        <i
+          class="text-2xl {metOfficeWeatherTypes[data.significantWeatherCode]}"
+        />
+      </div>
+
+      <div class="space-x-0">
+        <span class="">{data.temperature2m[0].toFixed(0)}</span><i
+          class="text-xl wi wi-degrees"
+        /><span class="font-bold">C</span>
+      </div>
+      <div>
+        <span class="pl-0">{data.relativeHumidity2m[0].toFixed(0)}</span>
+        <i class="wi wi-humidity" />
+      </div>
+      <div>
+        <i
+          class="text-xl wi wi-wind
+        wi-from-{getWindCardinalDirection(data.windDirection10m[0])}"
+        />
+
+        <span class="pl-0"> {data.windSpeed10m[0].toFixed(0)}</span><span
+          class="font-bold pl-1"
+        >
+          m/s</span
+        >
+      </div>
+    </div>
   {/if}
 </div>
