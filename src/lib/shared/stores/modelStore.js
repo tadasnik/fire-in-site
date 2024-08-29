@@ -354,6 +354,13 @@ export const requiredFuelInputs = derived(
           // console.log("live moisture input :", input, fuelMoisture[fuel][input][$month])
           requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
         } else if (
+          splitKey[7] === 'herb' &&
+          splitKey[8] === 'fraction'
+        ) {
+          // console.log("live moisture input :", input, fuelMoisture[fuel][input][$month])
+          requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
+
+        } else if (
           splitKey[0] === 'surface' &&
           splitKey[1] === 'secondary' &&
           splitKey.at(-1) === 'catalogKey'

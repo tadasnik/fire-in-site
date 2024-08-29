@@ -35,7 +35,7 @@ export const modelConfigOptions = {
   },
   'configure.fuel.curedHerbFraction': {
     options: ['input', 'estimated'],
-    value: 'estimated',
+    value: 'input',
     active: false,
     description: `The cured herb fraction for BehavePlus fuel models is
 

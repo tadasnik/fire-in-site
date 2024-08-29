@@ -214,7 +214,7 @@
   {/if}
 
   {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast === false}
-    <div class="flex w-full overflow-x-auto justify-center">
+    <div class="flex w-full overflow-x-auto xl:justify-center">
       <Heatmap
         fireBehaviourData={$_outputForecastArray}
         forecastData={$forecastOpenMeteo}
