@@ -4,7 +4,6 @@
 
 <script>
   import "../app.postcss";
-
   import { onMount } from "svelte";
   import { sineIn } from "svelte/easing";
   import { auth, db } from "$lib/firebase/firebase.client";
@@ -364,7 +363,6 @@
     <!-- <AuthReset /> -->
     <slot />
   {:else if !$authStore.isLoading && $forecastOpenMeteo.time.length > 1}
-    <div><p>{$currentLocation.longitude}</p></div>
     <slot />
   {:else}
     <h1>Loading....</h1>
