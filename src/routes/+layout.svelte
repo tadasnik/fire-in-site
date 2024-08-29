@@ -303,13 +303,12 @@
           href="/">Log out</NavLi
         >
       {/if}
+      <div class="flex items-center ml-auto">
+        <Toggle size="small" bind:checked={$advancedMode}
+          >Fire Characteristics</Toggle
+        >
+      </div>
     </NavUl>
-
-    <div class="flex items-center ml-auto">
-      <Toggle size="small" bind:checked={$advancedMode}
-        >Fire Characteristics</Toggle
-      >
-    </div>
   </Navbar>
 </header>
 {#if activeUrl === "/"}
@@ -370,13 +369,17 @@
 </main>
 <Footer footerType="logo">
   <hr class="my-6 border-gray-200 mx-auto dark:border-gray-700" />
-  <div class="flex items-center justify-between px-10">
+  <div class="flex items-center text-center justify-between px-10">
     <p>
       Fire behaviour predictions leverage BehavePlus fire behaviour model, fuel
-      models representative of UK vegetation and MetOffice forecasts.
-      Implementation: Tadas Nikonovas, Centre for Wildfire Research, Swansea
-      University. Scientific data: Toward a UK Fire Danger Rating System project
-      team.
+      models representative of UK vegetation and open-meteo forecasts and
+      historical weather. Authors: Tadas Nikonovas, Claire M Belcher, Kerryn
+      Little and the rest of Toward a UK Fire Danger Rating System (UKFDRS)
+      project team. Implementation: Tadas Nikonovas, Centre for Wildfire
+      Research, Swansea University. Supported by Higher Education Funding
+      Council for Wales Impact Fellowship grant (RIG1062-117) and NERC grant
+      UK-FDRS ‘Toward a UK fire danger rating system: Understanding fuels, fire
+      behaviour and impacts’ (NE/T003553/1)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">

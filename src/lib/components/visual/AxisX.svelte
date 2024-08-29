@@ -39,11 +39,11 @@
   $: tickVals = Array.isArray(ticks)
     ? ticks
     : isBandwidth
-    ? $xScale.domain()
-    : typeof ticks === "function"
-    ? ticks($xScale.ticks())
-    : $xScale.ticks(ticks);
-  // $: console.log("tickVals Xaxis  :", tickVals);
+      ? $xScale.domain()
+      : typeof ticks === "function"
+        ? ticks($xScale.ticks())
+        : $xScale.ticks(ticks);
+  $: console.log("tickVals Xaxis  :", tickVals);
 
   function textAnchor(i) {
     if (snapTicks === true) {

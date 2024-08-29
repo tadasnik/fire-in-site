@@ -118,7 +118,7 @@
   </div>
 
   <div class="flex flex-col p-6 md:flex-row items-center">
-    <div class="grow w-full p-4 md:w-1/2 min-w-96 p-2">
+    <div class="grow w-full p-4 md:w-1/2 min-w-80">
       <div class="aspect-square" bind:clientWidth={w}>
         {#if $currentLocation.userLocation}
           <Map />
@@ -126,7 +126,7 @@
       </div>
     </div>
 
-    <div class="grow w-full md:w-1/2 aspect-square min-w-96 p-2">
+    <div class="grow w-full md:w-1/2 aspect-square min-w-80 p-2">
       {#if $advancedMode}
         <FireCharacteristics
           parentWidth={w}
@@ -138,7 +138,7 @@
       {:else if $_outputForecast.get($dateTime)}
         <Label>
           Select Model output
-          <Select id="select" class="mb-6" bind:value={$selectedOutput}>
+          <Select id="select" class="mb-6 pl-3" bind:value={$selectedOutput}>
             {#each $selectedOutputs as output}
               <option value={output}>{outputNodes[output].label}</option>
             {/each}

@@ -10,7 +10,7 @@
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import Bars from "$lib/components/visual/Bars.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";
-  import { _maxVal } from "$lib/shared/stores/modelStore";
+  import { _maxVal, selectedFuels } from "$lib/shared/stores/modelStore";
 
   export let data;
   export let time;
@@ -21,7 +21,6 @@
   $: flatData = flatten(data, "values");
   const formatLabelY = (d) => format(`.1f`)(d);
 
-  $: console.log("???????????? BARPLOT flatData:", data, flatData);
   $: xMax = Math.ceil($_maxVal / 1) * 1;
 </script>
 
@@ -53,6 +52,7 @@
         gridlines={false}
         snapTicks={true}
         tickMarks={true}
+        ticks={$selectedFuels}
         baseLine
         axisLabel={outputNodes[yKey].label}
       />

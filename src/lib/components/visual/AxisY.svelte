@@ -42,22 +42,23 @@
   $: tickVals = Array.isArray(ticks)
     ? ticks
     : isBandwidth
-    ? $yScale.domain()
-    : typeof ticks === "function"
-    ? ticks($yScale.ticks())
-    : $yScale.ticks(ticks);
-  $: console.log("padding left :", $padding.left);
+      ? $yScale.domain()
+      : typeof ticks === "function"
+        ? ticks($yScale.ticks())
+        : $yScale.ticks(ticks);
 </script>
 
 <g
   class="axis y-axis"
   transform="translate({isBandwidth ? -$padding.left : 0} , 0)"
 >
-  {#each tickVals as tick (tick)}
+  {#each tickVals as tickVal, nr}
     <g
-      class="tick tick-{tick}"
+      class="tick tick-{tickVal}"
       transform="translate({$xRange[0] +
-        (isBandwidth ? $padding.left : 0)}, {$yScale(tick)})"
+        (isBandwidth ? $padding.left : 0)}, {isBandwidth
+        ? $yScale.step() * nr
+        : $yScale(tickVal)})"
     >
       {#if gridlines !== false}
         <line
@@ -81,15 +82,14 @@
         y={isBandwidth ? $yScale.bandwidth() / 2 + yTick : yTick}
         dx={isBandwidth ? -9 : dxTick}
         dy={isBandwidth ? 4 : dyTick}
-        style="text-anchor:{isBandwidth ? 'end' : textAnchor};"
-        >{formatTick(tick)}</text
+        style="text-anchor:{isBandwidth ? 'end' : textAnchor};">{tickVal}</text
       >
     </g>
   {/each}
   <g class="tick">
     <text
       text-anchor="middle"
-      y={-0}
+      y={isBandwidth ? 0 : -$padding.left}
       x={-$height / 2}
       dy=".75em"
       transform="rotate(-90)">{axisLabel}</text

@@ -1,6 +1,6 @@
 export const fuelMoisture = {
 
-  'mh1': {
+  'mhl': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
@@ -63,7 +63,7 @@ export const fuelMoisture = {
     },
 
   },
-  'mh2': {
+  'mhh': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
@@ -126,7 +126,7 @@ export const fuelMoisture = {
     },
 
   },
-  'eg1': {
+  'gl': {
     "site.moisture.live.category": {
       1: 140,
       2: 140,
@@ -189,7 +189,7 @@ export const fuelMoisture = {
     },
 
   },
-  'eg2': {
+  'gm': {
     "site.moisture.live.category": {
       1: 140,
       2: 140,
@@ -253,7 +253,7 @@ export const fuelMoisture = {
 
   },
 
-  'eg3': {
+  'gh': {
     "site.moisture.live.category": {
       1: 140,
       2: 140,
@@ -316,7 +316,70 @@ export const fuelMoisture = {
     },
 
   },
-  'cl1': {
+
+  'gt': {
+    "site.moisture.live.category": {
+      1: 140,
+      2: 140,
+      3: 140,
+      4: 95,
+      5: 140,
+      6: 190,
+      7: 190,
+      8: 140,
+      9: 140,
+      10: 140,
+      11: 140,
+      12: 140,
+      "heatwave": 90,
+    },
+    "site.moisture.live.stem": {
+      1: 140,
+      2: 140,
+      3: 140,
+      4: 95,
+      5: 140,
+      6: 190,
+      7: 190,
+      8: 140,
+      9: 140,
+      10: 140,
+      11: 140,
+      12: 140,
+      "heatwave": 90,
+    },
+    "site.moisture.live.herb": {
+      1: 30,
+      2: 30,
+      3: 40,
+      4: 120,
+      5: 190,
+      6: 280,
+      7: 280,
+      8: 280,
+      9: 150,
+      10: 120,
+      11: 40,
+      12: 30,
+      "heatwave": 98,
+    },
+    "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
+      1: 100,
+      2: 100,
+      3: 95,
+      4: 60,
+      5: 20,
+      6: 20,
+      7: 30,
+      8: 40,
+      9: 60,
+      10: 80,
+      11: 90,
+      12: 95
+    },
+  },
+
+  'cll': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -377,10 +440,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
 
-  'cl2': {
+  'clm': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -440,75 +502,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
 
-
-  'cl3': {
-    "site.moisture.live.category": {
-      1: 90,
-      2: 90,
-      3: 75,
-      4: 75,
-      5: 110,
-      6: 110,
-      7: 110,
-      8: 110,
-      9: 90,
-      10: 90,
-      11: 90,
-      12: 90,
-      "heatwave": 75,
-    },
-
-    "site.moisture.live.stem": {
-      1: 90,
-      2: 90,
-      3: 75,
-      4: 75,
-      5: 110,
-      6: 110,
-      7: 110,
-      8: 110,
-      9: 90,
-      10: 90,
-      11: 90,
-      12: 90,
-      "heatwave": 75,
-    },
-    "site.moisture.live.herb": {
-      1: 30,
-      2: 30,
-      3: 40,
-      4: 120,
-      5: 190,
-      6: 280,
-      7: 280,
-      8: 280,
-      9: 150,
-      10: 120,
-      11: 40,
-      12: 30,
-      "heatwave": 98,
-    },
-    "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
-      1: 100,
-      2: 100,
-      3: 95,
-      4: 60,
-      5: 20,
-      6: 20,
-      7: 30,
-      8: 40,
-      9: 60,
-      10: 80,
-      11: 90,
-      12: 95
-    },
-
-  },
-
-  'cl4': {
+  'clh': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -569,9 +565,72 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
-  'bll': {
+
+  'cld': {
+    "site.moisture.live.category": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
+
+    "site.moisture.live.stem": {
+      1: 90,
+      2: 90,
+      3: 75,
+      4: 75,
+      5: 110,
+      6: 110,
+      7: 110,
+      8: 110,
+      9: 90,
+      10: 90,
+      11: 90,
+      12: 90,
+      "heatwave": 75,
+    },
+    "site.moisture.live.herb": {
+      1: 30,
+      2: 30,
+      3: 40,
+      4: 120,
+      5: 190,
+      6: 280,
+      7: 280,
+      8: 280,
+      9: 150,
+      10: 120,
+      11: 40,
+      12: 30,
+      "heatwave": 98,
+    },
+    "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
+      1: 100,
+      2: 100,
+      3: 95,
+      4: 60,
+      5: 20,
+      6: 20,
+      7: 30,
+      8: 40,
+      9: 60,
+      10: 80,
+      11: 90,
+      12: 95
+    },
+  },
+
+  'bl': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -632,10 +691,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
 
-  'snl': {
+  'sn': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -651,8 +709,6 @@ export const fuelMoisture = {
       12: 90,
       "heatwave": 90,
     },
-
-
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -697,10 +753,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
 
-  'lnl': {
+  'ln': {
     "site.moisture.live.category": {
       1: 90,
       2: 90,
@@ -716,8 +771,6 @@ export const fuelMoisture = {
       12: 90,
       "heatwave": 90,
     },
-
-
     "site.moisture.live.stem": {
       1: 90,
       2: 90,
@@ -748,7 +801,6 @@ export const fuelMoisture = {
       12: 30,
       "heatwave": 98,
     },
-
     "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
       1: 100,
       2: 100,
@@ -763,10 +815,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
 
-  'gr1': {
+  'grl': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
@@ -828,9 +879,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
-  'gr2': {
+
+  'grm': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
@@ -846,8 +897,6 @@ export const fuelMoisture = {
       12: 85,
       "heatwave": 85,
     },
-
-
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -863,7 +912,6 @@ export const fuelMoisture = {
       12: 85,
       "heatwave": 85,
     },
-
     "site.moisture.live.herb": {
       1: 30,
       2: 30,
@@ -893,9 +941,9 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
   },
-  'gr3': {
+
+  'grh': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
@@ -911,8 +959,6 @@ export const fuelMoisture = {
       12: 85,
       "heatwave": 85,
     },
-
-
     "site.moisture.live.stem": {
       1: 85,
       2: 85,
@@ -957,6 +1003,67 @@ export const fuelMoisture = {
       11: 90,
       12: 95
     },
-
+  },
+  'fn': {
+    "site.moisture.live.category": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+    "site.moisture.live.stem": {
+      1: 85,
+      2: 85,
+      3: 85,
+      4: 85,
+      5: 135,
+      6: 135,
+      7: 135,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 85,
+      12: 85,
+      "heatwave": 85,
+    },
+    "site.moisture.live.herb": {
+      1: 30,
+      2: 30,
+      3: 40,
+      4: 120,
+      5: 98,
+      6: 98,
+      7: 98,
+      8: 280,
+      9: 150,
+      10: 120,
+      11: 40,
+      12: 30,
+      "heatwave": 98,
+    },
+    "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
+      1: 100,
+      2: 100,
+      3: 95,
+      4: 60,
+      5: 20,
+      6: 10,
+      7: 30,
+      8: 40,
+      9: 60,
+      10: 80,
+      11: 90,
+      12: 95
+    },
   }
+
 }

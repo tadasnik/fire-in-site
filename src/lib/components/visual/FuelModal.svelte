@@ -18,16 +18,12 @@
   export let clickOutsideModal;
 
   let images = [];
+
   Object.entries(fuelsImages).forEach(([key, value]) => {
     if (key.split("/")[5] === $selectedFuel) {
       console.log("key", key);
       images.push({ src: key, alt: $selectedFuel });
     }
-  });
-
-  $: console.log("clickOutsideModal", clickOutsideModal);
-  Object.keys(fuelsImages).forEach((key) => {
-    console.log("key", key.split("/")[5]);
   });
 </script>
 

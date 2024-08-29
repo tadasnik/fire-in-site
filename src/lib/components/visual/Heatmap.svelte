@@ -19,8 +19,6 @@
 
   import Heatmap from "$lib/components/visual/HeatmapInner.svelte";
   import HeatmapAnotate from "$lib/components/visual/HeatmapAnotate.html.svelte";
-  import AxisX from "$lib/components/visual/AxisX.svelte";
-  import AxisY from "$lib/components/visual/AxisY.svelte";
   import AxisXTop from "$lib/components/visual/AxisXTop.html.svelte";
   import GroupLabels from "./GroupLabels.html.svelte";
   import HeatmapWindDir from "$lib/components/visual/HeatmapWindDir.html.svelte";
@@ -197,11 +195,6 @@
       flatData={flatten(groupedData, "values")}
     >
       <Svg>
-        <!-- <AxisX -->
-        <!--   gridlines={false} -->
-        <!--   tickMarks={true} -->
-        <!--   formatTick={formatTickXLong} -->
-        <!-- /> -->
         <Heatmap
           {cellSize}
           {gapSize}

@@ -1,15 +1,15 @@
 {
-  "mh1": {
+  "mhl": {
     "domain": "UKFDRS",
     "label": "Mixed heath low herbaceous",
     "displayLabel": "Mixed heath low herbaceous load",
-    "code": "mh1",
+    "code": "mhl",
     "depth": 0.45,
     "deadMext": 30,
     "dead1Load": 0.25,
     "dead10Load": 0,
     "dead100Load": 0,
-    "totalHerbLoad": 0.3,
+    "totalHerbLoad": 0.0,
     "liveStemLoad": 0.56,
     "dead1Savr": 9560,
     "liveHerbSavr": 5906,
@@ -43,22 +43,22 @@
       "12": 22022
     },
     "photo": "mixed_heath_small.webp",
-    "description": "Mixed heath dominated by dwarf schrub fuels with relativelly low load of herbaceous vegetation",
+    "description": "Mixed heath dominated by dwarf schrub fuels with low load of herbaceous vegetation that does not affect fire beheaviour.",
     "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
-  "mh2": {
+  "mhh": {
     "domain": "UKFDRS",
     "label": "Mixed heath high herbaceous",
     "displayLabel": "Mixed heath high herbaceous load",
-    "code": "mh2",
+    "code": "mhh",
     "depth": 0.45,
     "deadMext": 30,
     "dead1Load": 0.25,
     "dead10Load": 0,
     "dead100Load": 0,
-    "totalHerbLoad": 0.6,
+    "totalHerbLoad": 0.15,
     "liveStemLoad": 0.56,
     "dead1Savr": 9560,
     "liveHerbSavr": 5906,
@@ -97,11 +97,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "eg1": {
+  "gl": {
     "domain": "UKFDRS",
     "label": "European gorse low load",
     "displayLabel": "European gorse low load",
-    "code": "eg1",
+    "code": "gl",
     "depth": 0.55,
     "deadMext": 40,
     "dead1Load": 0.783,
@@ -146,11 +146,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "eg2": {
+  "gm": {
     "domain": "UKFDRS",
     "label": "European gorse medium load",
     "displayLabel": "European gorse medium load",
-    "code": "eg2",
+    "code": "gm",
     "depth": 1.15,
     "deadMext": 40,
     "dead1Load": 0.82,
@@ -190,16 +190,16 @@
       "12": 22044
     },
     "photo": "gorse_small.webp",
-    "description": "Low load shrub dominated by European Gorse.",
+    "description": "Medium fuel load shrub dominated by European Gorse.",
     "thumbnail": "mixed_heath_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
-  "eg3": {
+  "gh": {
     "domain": "UKFDRS",
     "label": "European gorse high load",
     "displayLabel": "European gorse high load",
-    "code": "eg3",
+    "code": "gh",
     "depth": 1.75,
     "deadMext": 40,
     "dead1Load": 0.857,
@@ -244,11 +244,60 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "cl1": {
+  "gt": {
+    "domain": "UKFDRS",
+    "label": "European gorse tall",
+    "displayLabel": "European gorse very tall",
+    "code": "gt",
+    "depth": 2.5,
+    "deadMext": 40,
+    "dead1Load": 0.857,
+    "dead10Load": 1.366,
+    "dead100Load": 0,
+    "totalHerbLoad": 0,
+    "liveStemLoad": 1.323,
+    "dead1Savr": 7377,
+    "liveHerbSavr": 5906,
+    "liveStemSavr": 4921,
+    "deadHeat": {
+      "1": 22044,
+      "2": 22044,
+      "3": 22044,
+      "4": 22044,
+      "5": 19685,
+      "6": 22044,
+      "7": 22044,
+      "8": 21265,
+      "9": 22044,
+      "10": 22044,
+      "11": 22044,
+      "12": 22044
+    },
+    "liveHeat": {
+      "1": 22044,
+      "2": 22044,
+      "3": 22044,
+      "4": 22044,
+      "5": 19685,
+      "6": 22044,
+      "7": 22044,
+      "8": 21265,
+      "9": 22044,
+      "10": 22044,
+      "11": 22044,
+      "12": 22044
+    },
+    "photo": "gorse_small.webp",
+    "description": "Very tall European Gorse.",
+    "thumbnail": "mixed_heath_small.webp",
+    "curedHerbFrac": null,
+    "selected": true
+  },
+  "cll": {
     "domain": "UKFDRS",
     "label": "Calluna low load - pioneer",
     "displayLabel": "Calluna low load",
-    "code": "cl1",
+    "code": "cll",
     "depth": 0.173,
     "deadMext": 40,
     "dead1Load": 0.177,
@@ -293,7 +342,7 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "cl2": {
+  "clm": {
     "domain": "UKFDRS",
     "label": "Calluna medium load - building",
     "displayLabel": "Calluna medium load",
@@ -342,11 +391,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "cl3": {
+  "clh": {
     "domain": "UKFDRS",
     "label": "Calluna high load - mature phase",
     "displayLabel": "Calluna high load",
-    "code": "cl3",
+    "code": "clh",
     "depth": 0.35,
     "deadMext": 40,
     "dead1Load": 0.223,
@@ -391,10 +440,10 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "cl4": {
+  "cld": {
     "domain": "UKFDRS",
     "label": "Calluna medium load - degenerate phase",
-    "displayLabel": "Calluna medium load",
+    "displayLabel": "Calluna degenerate phase",
     "code": "cl4",
     "depth": 0.35,
     "deadMext": 40,
@@ -435,16 +484,16 @@
       "12": 19500
     },
     "photo": "calluna_small.webp",
-    "description": "Calluna vulgaris dominated fuels, high load - degenarate phase ",
+    "description": "Calluna vulgaris dominated fuels, high to medium load - degenarate phase ",
     "thumbnail": "heather_deg_small.webp",
     "curedHerbFrac": null,
     "selected": true
   },
-  "gr1": {
+  "grl": {
     "domain": "UKFDRS",
     "label": "Low load grass",
     "displayLabel": "Low load grass",
-    "code": "gr1",
+    "code": "grl",
     "depth": 0.6,
     "deadMext": 40,
     "dead1Load": 0.02,
@@ -489,11 +538,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "gr2": {
+  "grm": {
     "domain": "UKFDRS",
     "label": "Medium load grass",
     "displayLabel": "Medium load grass",
-    "code": "gr2",
+    "code": "grm",
     "depth": 0.8,
     "deadMext": 40,
     "dead1Load": 0.02,
@@ -538,11 +587,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "gr3": {
+  "grh": {
     "domain": "UKFDRS",
     "label": "High load grass",
     "displayLabel": "High load grass",
-    "code": "gr3",
+    "code": "grh",
     "depth": 1,
     "deadMext": 40,
     "dead1Load": 0.02,
@@ -587,11 +636,60 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "bll": {
+  "fn": {
+    "domain": "UKFDRS",
+    "label": "Fern vegetation",
+    "displayLabel": "High load fern",
+    "code": "fn",
+    "depth": 1.2,
+    "deadMext": 40,
+    "dead1Load": 0,
+    "dead10Load": 0,
+    "dead100Load": 0,
+    "totalHerbLoad": 1.4,
+    "liveStemLoad": 0,
+    "dead1Savr": 5741,
+    "liveHerbSavr": 4921,
+    "liveStemSavr": 4921,
+    "deadHeat": {
+      "1": 14180,
+      "2": 14180,
+      "3": 14180,
+      "4": 14180,
+      "5": 14180,
+      "6": 14180,
+      "7": 14180,
+      "8": 14180,
+      "9": 14180,
+      "10": 14180,
+      "11": 14180,
+      "12": 14180
+    },
+    "liveHeat": {
+      "1": 14180,
+      "2": 14180,
+      "3": 14180,
+      "4": 14180,
+      "5": 14180,
+      "6": 14180,
+      "7": 14180,
+      "8": 14180,
+      "9": 14180,
+      "10": 14180,
+      "11": 14180,
+      "12": 14180
+    },
+    "photo": "grass_small.webp",
+    "description": "Fern vegetation dominated by braken ferns. Very high herbaceous load, Fuel bed depth over one metre.",
+    "thumbnail": "grass_small.webp",
+    "curedHerbFrac": null,
+    "selected": true
+  },
+  "bl": {
     "domain": "UKFDRS",
     "label": "Broad leaf litter",
     "displayLabel": "Broad leaf litter",
-    "code": "bll",
+    "code": "bl",
     "depth": 0.05,
     "deadMext": 25,
     "dead1Load": 0.314,
@@ -636,11 +734,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "snl": {
+  "sn": {
     "domain": "UKFDRS",
     "label": "Short needle litter",
     "displayLabel": "Short needle litter",
-    "code": "snl",
+    "code": "sn",
     "depth": 0.05,
     "deadMext": 30,
     "dead1Load": 0.224,
@@ -685,11 +783,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "lnl": {
+  "ln": {
     "domain": "UKFDRS",
     "label": "Long needle litter",
     "displayLabel": "Long needle litter",
-    "code": "lnl",
+    "code": "ln",
     "depth": 0.05,
     "deadMext": 35,
     "dead1Load": 1.3,

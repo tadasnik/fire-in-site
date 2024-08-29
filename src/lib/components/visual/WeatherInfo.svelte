@@ -3,7 +3,8 @@
   import "$lib/styles/weather-icons.css";
   import "$lib/styles/weather-icons-wind.css";
   import FireCharAnotations from "./FireCharAnotations.svelte";
-  import { currentDateTime } from "$lib/shared/stores/timeStore";
+  import { currentDateTime, dateTime } from "$lib/shared/stores/timeStore";
+  import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
 
   export let data;
   export let forecastLocation;
@@ -88,7 +89,6 @@
     "Wind Speed at 10m": ["windSpeed10m", 0, "wi wi-strong-wind"],
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
-  console.log("wEatheaInfo data ", data, fireLocation);
 </script>
 
 <div class="">
@@ -111,25 +111,26 @@
       </div>
 
       <div class="space-x-0">
-        <span class="">{data.temperature2m[0].toFixed(0)}</span><i
-          class="text-xl wi wi-degrees"
-        /><span class="font-bold">C</span>
+        <span class="">{data.temperature2m[$currentTimeIndex].toFixed(0)}</span
+        ><i class="text-xl wi wi-degrees" /><span class="font-bold">C</span>
       </div>
       <div>
-        <span class="pl-0">{data.relativeHumidity2m[0].toFixed(0)}</span>
+        <span class="pl-0"
+          >{data.relativeHumidity2m[$currentTimeIndex].toFixed(0)}</span
+        >
         <i class="wi wi-humidity" />
       </div>
       <div>
         <i
           class="text-xl wi wi-wind
-        wi-from-{getWindCardinalDirection(data.windDirection10m[0])}"
+        wi-from-{getWindCardinalDirection(
+            data.windDirection10m[$currentTimeIndex],
+          )}"
         />
 
-        <span class="pl-0"> {data.windSpeed10m[0].toFixed(0)}</span><span
-          class="font-bold pl-1"
-        >
-          m/s</span
-        >
+        <span class="pl-0">
+          {data.windSpeed10m[$currentTimeIndex].toFixed(0)}</span
+        ><span class="font-bold pl-1"> m/s</span>
       </div>
     </div>
   {/if}

@@ -46,7 +46,7 @@ export const selectedScenario = writable({
 })
 
 export const modelConfigValues = writable(modelConfigOptions)
-export const selectedFuels = writable(['cl1', 'cl2', 'cl3', 'cl4', 'mh1', 'mh2', 'gr1', 'gr2', 'gr3', 'eg1', 'eg2', 'eg3', 'lnl', 'snl', 'bll'])
+export const selectedFuels = writable(['cll', 'clm', 'clh', 'cld', 'mhl', 'mhh', 'gl', 'gm', 'gh', 'gt', 'grl', 'grm', 'grh', 'fn', 'sn', 'bl', 'ln'])
 export const selectedFuel = writable('cl1')
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
