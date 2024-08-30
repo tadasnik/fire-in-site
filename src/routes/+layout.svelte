@@ -12,6 +12,11 @@
   import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     Sidebar,
+    SidebarGroup,
+    SidebarItem,
+    SidebarWrapper,
+    SidebarDropdownWrapper,
+    SidebarDropdownItem,
     Drawer,
     Dropdown,
     DropdownDivider,
@@ -29,7 +34,13 @@
     Footer,
     FooterBrand,
   } from "flowbite-svelte";
-  import { ChevronDownOutline } from "flowbite-svelte-icons";
+  import {
+    ChevronDownOutline,
+    ChevronRightOutline,
+    AdjustmentsHorizontalSolid,
+    ColumnOutline,
+    HomeOutline,
+  } from "flowbite-svelte-icons";
   import { timeFormat } from "d3-time-format";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
 
@@ -38,7 +49,7 @@
     selectedOutput,
     selectedOutputs,
     modelConfigValues,
-    advancedMode,
+    chartType,
   } from "$lib/shared/stores/modelStore";
   import {
     getForecastOpenMeteo,
@@ -75,15 +86,16 @@
   }
   function handleTimeModeChange(value) {
     console.log("Time mode changed to ", value);
+    $fetchingForecast = true;
     $forecastMode = value;
     if (value === "historical") {
       if ($timeMode === "current") {
         console.log("current time mode changing to USER");
         $timeMode = "user";
-        $fetchingForecast = true;
+        console.log("fetching forecast", $fetchingForecast);
       }
     } else {
-      $fetchingForecast = true;
+      $currentDateTime = new Date();
       getForecastOpenMeteo();
     }
   }
@@ -224,18 +236,41 @@
     let:hidden
     let:toggle
   >
-    <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
     <NavBrand href="/">
-      <span class="px-4 text-xl text-primary-800">UKBehavePlus</span>
+      <span class="px-2 text-xl text-primary-800">UKBehavePlus</span>
     </NavBrand>
+    <div class="flex md:order-2">
+      <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
+      <NavUl>
+        {#if !$authStore.currentUser}
+          <NavLi href="/authenticate">Log in</NavLi>
+        {:else}
+          <NavLi
+            on:click={() => {
+              authHandlers.logout();
+            }}
+            href="/">Log out</NavLi
+          >
+        {/if}
+      </NavUl>
+    </div>
     <NavUl>
       <NavLi href="/fuelModels">Fuel Models</NavLi>
       <NavLi class="cursor-pointer">
-        Fuel Moisture {$fuelMoistureModel}<ChevronDownOutline
-          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
-        />
+        <div class="flex-col items-center">
+          <AdjustmentsHorizontalSolid
+            class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
+          />
+          Settings
+        </div>
       </NavLi>
-      <Dropdown class="w-60 p-3 space-y-1">
+
+      <Dropdown>
+        <div class="px-4 py-2">
+          <span class="block text-lg text-gray-900 dark:text-white"
+            >Dead fuel moisture model:</span
+          >
+        </div>
         <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
           <Radio
             name="fuelMoistureModel"
@@ -258,16 +293,15 @@
             >Use simple Nelson dead fuel moisture model.</Helper
           >
         </li>
-      </Dropdown>
-      <NavLi class="cursor-pointer">
-        {$forecastMode} Weather<ChevronDownOutline
-          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
-        />
-      </NavLi>
+        <DropdownDivider></DropdownDivider>
+        <div class="px-4 py-2">
+          <span class="block text-lg text-gray-900 dark:text-white"
+            >Weather mode:</span
+          >
+        </div>
 
-      <Dropdown class="w-60 p-3 space-y-1">
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          {#each forecastModes as mode}
+        {#each forecastModes as mode}
+          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
             <Radio
               bind:group={$forecastMode}
               value={mode}
@@ -275,14 +309,48 @@
             >
               {mode}
             </Radio>
-          {/each}
+            <Helper class="ps-6"
+              >Fetch {mode} weather{mode === "historical"
+                ? " for a specific date."
+                : "."}</Helper
+            >
+          </li>
+        {/each}
+
+        <DropdownDivider></DropdownDivider>
+        <div class="px-4 py-2">
+          <span class="block text-lg text-gray-900 dark:text-white"
+            >Chart type :</span
+          >
+        </div>
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          <Radio bind:group={$chartType} value={"bars"}>Bar chart</Radio>
+
+          <Helper class="ps-6">Show fire behaviour for selected time.</Helper>
         </li>
+        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+          <Radio bind:group={$chartType} value={"fireChar"}>
+            Fire Characteristics
+          </Radio>
+
+          <Helper class="ps-6">Show Fire Characteristics chart.</Helper>
+        </li>
+
+        <DropdownDivider></DropdownDivider>
+        <div class="px-4 py-2">
+          <span class="block text-lg text-gray-900 dark:text-white"
+            >Select model output:</span
+          >
+        </div>
+
+        {#each $selectedOutputs as output}
+          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+            <Radio bind:group={$selectedOutput} value={output}
+              >{outputNodes[output].label}</Radio
+            >
+          </li>
+        {/each}
       </Dropdown>
-      <NavLi class="cursor-pointer">
-        {outputNodes[$selectedOutput].label}<ChevronDownOutline
-          class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
-        />
-      </NavLi>
       <Dropdown class="w-60 p-3 space-y-1">
         <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
           {#each $selectedOutputs as output}
@@ -292,56 +360,9 @@
           {/each}
         </li>
       </Dropdown>
-
-      {#if !$authStore.currentUser}
-        <NavLi href="/authenticate">Log in</NavLi>
-      {:else}
-        <NavLi
-          on:click={() => {
-            authHandlers.logout();
-          }}
-          href="/">Log out</NavLi
-        >
-      {/if}
-      <div class="flex items-center ml-auto">
-        <Toggle size="small" bind:checked={$advancedMode}
-          >Fire Characteristics</Toggle
-        >
-      </div>
     </NavUl>
   </Navbar>
 </header>
-{#if activeUrl === "/"}
-  <!-- <Sidebar -->
-  <!--   {activeUrl} -->
-  <!--   asideClass="hidden overflow-y-auto md:block fixed inset-0 pt-20 z-30 flex-none h-full w-96 border-r border-gray-200 dark:border-gray-600" -->
-  <!-- > -->
-  <!--   <section class="p-4"> -->
-  <!--     <div class="flex mb-4"> -->
-  <!--       <InfoTable -->
-  <!--         data={$forecastTimeIndex.get($dateTime)} -->
-  <!--         title="Forecast for {dateFormat(new Date($dateTime))}" -->
-  <!--       /> -->
-  <!--     </div> -->
-  <!--   </section> -->
-  <!--   <SiteInputs /> -->
-  <!--   <h3 class="pl-4 h3 font-bold">Fuel inputs</h3> -->
-  <!---->
-  <!--   {#each $selectedFuels as fuel} -->
-  <!--     {@const key = Object.keys($requiredFuelInputs[fuel])} -->
-  <!--     <section class="space-y-1"> -->
-  <!--       <div class="pl-4 pt-2 flex flex-wrap"> -->
-  <!--         <!-- {#if key === "surface.primary.fuel.model.catalogKey" || key === "surface.secondary.fuel.model.catalogKey"} -->
-  <!--         {#if key.length === 1} -->
-  <!--           <p>{fuel}</p> -->
-  <!--         {:else} -->
-  <!--           <FuelInputs {fuel} /> -->
-  <!--         {/if} -->
-  <!--       </div> -->
-  <!--     </section> -->
-  <!--   {/each} -->
-  <!-- </Sidebar> -->
-{/if}
 <Drawer
   transitionType="fly"
   {transitionParams}
@@ -349,11 +370,93 @@
   id="sidebar1"
 >
   <CloseButton on:click={() => (hidden1 = true)} class="mb-4 dark:text-white" />
-  <div class="p-4">
-    <h1 class="h1">Sidebar</h1>
-    <p class="text-sm">This is a sidebar</p>
-  </div></Drawer
->
+  <Sidebar>
+    <SidebarWrapper
+      divClass="overflow-y-auto py-4 px-3 rounded dark:bg-gray-800"
+    >
+      <SidebarGroup>
+        <SidebarItem label="Home" href="/">
+          <svelte:fragment slot="icon">
+            <HomeOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          </svelte:fragment>
+        </SidebarItem>
+        <SidebarItem label="Fuel Models" href="/fuelModels">
+          <svelte:fragment slot="icon">
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          </svelte:fragment>
+        </SidebarItem>
+        <DropdownDivider></DropdownDivider>
+
+        <SidebarDropdownWrapper label="Settings">
+          <svelte:fragment slot="icon">
+            <AdjustmentsHorizontalSolid
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          </svelte:fragment>
+          <div class="px-4 py-2">
+            <span class="block text-lg text-gray-900 dark:text-white"
+              >Dead fuel moisture model:</span
+            >
+          </div>
+
+          <Radio
+            name="fuelMoistureModel"
+            bind:group={$fuelMoistureModel}
+            value={"Fosberg"}
+            on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
+          >
+          <Helper class="ps-6"
+            >Calculate dead fuel moisture using Fosberg model.</Helper
+          >
+          <Radio
+            name="fuelMoistureModel"
+            bind:group={$fuelMoistureModel}
+            value={"Nelson"}
+            on:change={() => handleFuelMoistureChange("Nelson")}>Nelson</Radio
+          >
+          <Helper class="ps-6">Use Nelson dead fuel moisture model.</Helper>
+
+          <div class="px-4 py-2">
+            <span class="block text-lg text-gray-900 dark:text-white"
+              >Weather mode:</span
+            >
+          </div>
+          <ul class="w-56 bg-white rounded-lg dark:bg-gray-800">
+            {#each forecastModes as mode}
+              <li class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                <Radio
+                  bind:group={$forecastMode}
+                  value={mode}
+                  on:change={() => handleTimeModeChange(mode)}
+                >
+                  {mode}
+                </Radio>
+                <Helper class="ps-6">Fetch {mode} weather.</Helper>
+              </li>
+            {/each}
+          </ul>
+          <div class="px-4 py-2">
+            <span class="block text-lg text-gray-900 dark:text-white"
+              >Select model output:</span
+            >
+          </div>
+
+          {#each $selectedOutputs as output}
+            <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Radio bind:group={$selectedOutput} value={output}
+                >{outputNodes[output].label}</Radio
+              >
+            </li>
+          {/each}
+        </SidebarDropdownWrapper>
+      </SidebarGroup>
+    </SidebarWrapper>
+  </Sidebar>
+</Drawer>
 <main class="">
   {#if !$authStore.isLoading && $authStore.currentUser}
     <!-- <heading class="p-8" tag="h1" customSize="text-3xl" -->
@@ -371,15 +474,15 @@
   <hr class="my-6 border-gray-200 mx-auto dark:border-gray-700" />
   <div class="flex items-center text-center justify-between px-10">
     <p>
-      Fire behaviour predictions leverage BehavePlus fire behaviour model, fuel
-      models representative of UK vegetation and open-meteo forecasts and
-      historical weather. Authors: Tadas Nikonovas, Claire M Belcher, Kerryn
-      Little and the rest of Toward a UK Fire Danger Rating System (UKFDRS)
-      project team. Implementation: Tadas Nikonovas, Centre for Wildfire
-      Research, Swansea University. Supported by Higher Education Funding
-      Council for Wales Impact Fellowship grant (RIG1062-117) and NERC grant
-      UK-FDRS ‘Toward a UK fire danger rating system: Understanding fuels, fire
-      behaviour and impacts’ (NE/T003553/1)
+      Fire behaviour predictions leverage BehavePlus fire behaviour modelling
+      system, fuel models representative of UK vegetation and open-meteo
+      forecasts and historical weather. Authors: Tadas Nikonovas, Claire M
+      Belcher, Kerryn Little and the rest of Toward a UK Fire Danger Rating
+      System (UKFDRS) project team. Implementation: Tadas Nikonovas, Centre for
+      Wildfire Research, Swansea University. Supported by Higher Education
+      Funding Council for Wales Impact Fellowship grant (RIG1062-117) and NERC
+      grant UK-FDRS ‘Toward a UK fire danger rating system: Understanding fuels,
+      fire behaviour and impacts’ (NE/T003553/1)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">

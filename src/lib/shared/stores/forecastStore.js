@@ -48,6 +48,7 @@ export const fetchingForecast = writable(true)
 export function getForecastOpenMeteo() {
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
     console.log("fetching forecast openMeteo")
+
     var promise = fetchForecastMeteo(
       get(currentLocation).latitude,
       get(currentLocation).longitude,
@@ -109,8 +110,9 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
   return $forecastLocation.coordinates[2] - $currentLocation.elevation
 })
 
-export const currentTimeIndex = derived([forecastOpenMeteo, dateTime], ([$forecastOpenMeteo, $dateTime]) => {
-  return $forecastOpenMeteo['time'].indexOf($dateTime)
+export const currentTimeIndex = derived([dateTime], ([$dateTime]) => {
+  const index = get(forecastOpenMeteo).time.indexOf($dateTime)
+  return index > -1 ? index : 0
 })
 // export const currentTimeIndex = derived([forecastTimeIndex, dateTime], ([$forecastTimeIndex, $dateTime]) => {
 //   return Array.from($forecastTimeIndex.keys()).indexOf($dateTime)

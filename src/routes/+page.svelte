@@ -16,6 +16,7 @@
     advancedMode,
     _outputForecast,
     _outputForecastArray,
+    chartType,
   } from "$lib/shared/stores/modelStore.js";
   import {
     forecastOpenMeteo,
@@ -82,7 +83,7 @@
   }
 
   function fetchHistoricalForecast() {
-    console.log("fetching forecast");
+    $fetchingForecast = true;
     $currentDateTime = new Date(
       $historicalYear,
       $historicalMonth - 1,
@@ -90,6 +91,7 @@
       12,
     );
     getForecastOpenMeteo();
+    console.log("currentDateTime", $currentDateTime);
   }
 
   function configOptions(configKey) {
@@ -110,15 +112,17 @@
 
 <div class="flex justify-center max-w-screen-2xl flex-col">
   <div class="justify-center p-4 items-center">
-    <WeatherInfo
-      data={$forecastOpenMeteo}
-      forecastLocation={$forecastLocation.name}
-      fireLocation={$currentLocation}
-    />
+    {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast !== true}
+      <WeatherInfo
+        data={$forecastOpenMeteo}
+        forecastLocation={$forecastLocation.name}
+        fireLocation={$currentLocation}
+      />
+    {/if}
   </div>
 
-  <div class="flex flex-col p-6 md:flex-row items-center">
-    <div class="grow w-full p-4 md:w-1/2 min-w-80">
+  <div class="flex flex-col md:flex-row items-center">
+    <div class="grow w-full sm:p-4 md:w-1/2 min-w-80">
       <div class="aspect-square" bind:clientWidth={w}>
         {#if $currentLocation.userLocation}
           <Map />
@@ -127,40 +131,48 @@
     </div>
 
     <div class="grow w-full md:w-1/2 aspect-square min-w-80 p-2">
-      {#if $advancedMode}
-        <FireCharacteristics
-          parentWidth={w}
-          data={$_outputForecast.get($dateTime)}
-          xKey="surface.weighted.fire.heatPerUnitArea"
-          yKey="surface.weighted.fire.spreadRate"
-          zKey="surface.primary.fuel.model.catalogKey"
-        />
-      {:else if $_outputForecast.get($dateTime)}
-        <Label>
-          Select Model output
-          <Select id="select" class="mb-6 pl-3" bind:value={$selectedOutput}>
-            {#each $selectedOutputs as output}
-              <option value={output}>{outputNodes[output].label}</option>
-            {/each}
-          </Select>
-        </Label>
-
-        {#if $selectedOutput !== "ignition.firebrand.probability" && $selectedOutput !== "site.moisture.dead.tl1h"}
-          <BarFigure
+      {#if $_outputForecast.get($dateTime)}
+        {#if $chartType === "fireChar"}
+          <FireCharacteristics
+            parentWidth={w}
             data={$_outputForecast.get($dateTime)}
-            time={$dateTime}
-            xKey={$selectedOutput}
-            yKey="surface.primary.fuel.model.catalogKey"
+            xKey="surface.weighted.fire.heatPerUnitArea"
+            yKey="surface.weighted.fire.spreadRate"
+            zKey="surface.primary.fuel.model.catalogKey"
           />
         {:else}
-          <div class="flex flex-col p-2 text-primary-500">
-            <div class="text-center text-2xl">All fuels</div>
-            <div class="text-center text-9xl">
-              {Math.round(
-                $_outputForecast.get($dateTime)[0].values[0][$selectedOutput],
-              )}%
-            </div>
+          <div class="m-2">
+            <Label>
+              Select Model output
+              <Select
+                id="select"
+                class="mb-6 pl-3"
+                bind:value={$selectedOutput}
+              >
+                {#each $selectedOutputs as output}
+                  <option value={output}>{outputNodes[output].label}</option>
+                {/each}
+              </Select>
+            </Label>
           </div>
+
+          {#if $selectedOutput !== "ignition.firebrand.probability" && $selectedOutput !== "site.moisture.dead.tl1h"}
+            <BarFigure
+              data={$_outputForecast.get($dateTime)}
+              time={$dateTime}
+              xKey={$selectedOutput}
+              yKey="surface.primary.fuel.model.catalogKey"
+            />
+          {:else}
+            <div class="flex flex-col p-2 text-primary-500">
+              <div class="text-center text-2xl">All fuels</div>
+              <div class="text-center text-9xl">
+                {Math.round(
+                  $_outputForecast.get($dateTime)[0].values[0][$selectedOutput],
+                )}%
+              </div>
+            </div>
+          {/if}
         {/if}
       {/if}
       <Popover

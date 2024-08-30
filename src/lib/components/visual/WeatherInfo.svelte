@@ -12,10 +12,10 @@
   // export let displayProps;
   const metOfficeWeatherTypes = {
     "-1": "wi wi-showers",
-    0: "wi wi-night-clear",
+    0: "wi wi-day-sunny",
     1: "wi wi-day-sunny",
-    2: "wi wi-night-alt-partly-cloudy",
-    3: "wi wi-day-cloudy",
+    2: "wi wi-day-claudy",
+    3: "wi wi-claudy",
     5: "wi wi-fog",
     6: "wi wi-fog",
     7: "wi wi-cloudy",
@@ -89,6 +89,7 @@
     "Wind Speed at 10m": ["windSpeed10m", 0, "wi wi-strong-wind"],
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
+  $: console.log("Weather info data", data);
 </script>
 
 <div class="">

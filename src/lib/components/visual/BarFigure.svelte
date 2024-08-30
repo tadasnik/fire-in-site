@@ -24,7 +24,7 @@
   $: xMax = Math.ceil($_maxVal / 1) * 1;
 </script>
 
-<div class="w-full h-96 flex-grow">
+<div class="w-full h-80 flex-grow">
   <LayerCake
     padding={{ bottom: 20, left: 45 }}
     x={xKey}

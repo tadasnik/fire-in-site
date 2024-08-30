@@ -225,8 +225,9 @@
   });
 </script>
 
-<div class="absolute bg-slate-600 bg-opacity-90 text-gray-50 z-10 m-4 p-2">
-  <div class="text-xl">Fire Location:</div>
+<div
+  class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
+>
   {$currentLocation.latitude.toFixed(3)}<i
     class="text-xl wi wi-degrees"
   />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
@@ -235,14 +236,11 @@
     ? "E"
     : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
     0,
-  )}%, aspect:
+  )}%,
   <i
     class="text-2xl wi wi-wind
       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
   />
-  <strong
-    >({cardinalDirections[Math.floor($currentLocation.aspect / 11.25)]})</strong
-  >
 </div>
 <div class="map z-0" bind:this={mapContainer} />
 
