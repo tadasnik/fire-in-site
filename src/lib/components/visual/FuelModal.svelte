@@ -11,10 +11,12 @@
     getFuelImage,
     getFuelModelsUrls,
   } from "$lib/firebase/firebase.client";
+
   const fuelsImages = import.meta.glob("$lib/assets/fuel_models/*/*.webp", {
     eager: true,
     as: "url",
   });
+  console.log("fuelsImages", fuelsImages);
   export let clickOutsideModal;
 
   let images = [];
@@ -22,10 +24,16 @@
   Object.entries(fuelsImages).forEach(([key, value]) => {
     if (key.split("/")[5] === $selectedFuel) {
       console.log("key", key);
-      images.push({ src: key, alt: $selectedFuel });
+      images.push({ src: value, alt: $selectedFuel });
     }
   });
-  console.log("images", images);
+  // $: images = Object.values(fuelsImages).map((imageUrl) => {
+  //   conole.log("imageUrl", imageUrl);
+  //   if (imageUrl.split("/")[5] === $selectedFuel) {
+  //     return { src: imageUrl, alt: $selectedFuel };
+  //   }
+  // });
+  console.log("images", Object.keys(fuelsImages), images);
 </script>
 
 <Modal
