@@ -397,6 +397,8 @@
               class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
             />
           </svelte:fragment>
+          <DropdownDivider></DropdownDivider>
+
           <div class="px-4 py-2">
             <span class="block text-lg text-gray-900 dark:text-white"
               >Dead fuel moisture model:</span
@@ -420,6 +422,8 @@
           >
           <Helper class="ps-6">Use Nelson dead fuel moisture model.</Helper>
 
+          <DropdownDivider></DropdownDivider>
+
           <div class="px-4 py-2">
             <span class="block text-lg text-gray-900 dark:text-white"
               >Weather mode:</span
@@ -439,6 +443,27 @@
               </li>
             {/each}
           </ul>
+          <DropdownDivider></DropdownDivider>
+
+          <div class="px-4 py-2">
+            <span class="block text-lg text-gray-900 dark:text-white"
+              >Chart type :</span
+            >
+          </div>
+          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+            <Radio bind:group={$chartType} value={"bars"}>Bar chart</Radio>
+
+            <Helper class="ps-6">Show fire behaviour for selected time.</Helper>
+          </li>
+          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+            <Radio bind:group={$chartType} value={"fireChar"}>
+              Fire Characteristics
+            </Radio>
+
+            <Helper class="ps-6">Show Fire Characteristics chart.</Helper>
+          </li>
+
+          <DropdownDivider></DropdownDivider>
           <div class="px-4 py-2">
             <span class="block text-lg text-gray-900 dark:text-white"
               >Select model output:</span

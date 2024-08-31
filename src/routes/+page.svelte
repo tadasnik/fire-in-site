@@ -122,7 +122,7 @@
   </div>
 
   <div class="flex flex-col md:flex-row items-center">
-    <div class="grow w-full sm:p-4 md:w-1/2 min-w-80">
+    <div class="grow w-full sm:p-4 sm:w-1/2 min-w-80">
       <div class="aspect-square" bind:clientWidth={w}>
         {#if $currentLocation.userLocation}
           <Map />
@@ -130,7 +130,7 @@
       </div>
     </div>
 
-    <div class="grow w-full md:w-1/2 aspect-square min-w-80 p-2">
+    <div class="grow w-full sm:w-1/2 aspect-square min-w-80 p-2">
       {#if $_outputForecast.get($dateTime)}
         {#if $chartType === "fireChar"}
           <FireCharacteristics
