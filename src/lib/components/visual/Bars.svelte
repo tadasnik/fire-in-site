@@ -10,15 +10,14 @@
     getFuelsFileNames,
   } from "$lib/firebase/firebase.client";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
+  const { data, xGet, yGet, y, xScale, yScale, xRange } =
+    getContext("LayerCake");
+
   const images = import.meta.glob(["$lib/assets/bars_background/**.webp"], {
     eager: true,
     as: "url",
   });
-  const { data, xGet, yGet, y, xScale, yScale, xRange } =
-    getContext("LayerCake");
-
-  const xDomain = [0, 100];
-  $: console.log("BARS DATA", $data, $yScale($y($data[0])));
+  $: console.log("BARS images", images);
 </script>
 
 <g class="bar-group">

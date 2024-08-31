@@ -25,6 +25,7 @@
       images.push({ src: key, alt: $selectedFuel });
     }
   });
+  console.log("images", images);
 </script>
 
 <Modal
