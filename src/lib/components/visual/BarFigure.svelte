@@ -22,9 +22,10 @@
   const formatLabelY = (d) => format(`.1f`)(d);
 
   $: xMax = Math.ceil($_maxVal / 1) * 1;
+  $: console.log("Bars data", data);
 </script>
 
-<div class="w-full h-80 flex-grow">
+<div class="w-full h-80 md:h-4/5">
   <LayerCake
     padding={{ bottom: 20, left: 45 }}
     x={xKey}

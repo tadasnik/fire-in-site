@@ -163,6 +163,20 @@
               xKey={$selectedOutput}
               yKey="surface.primary.fuel.model.catalogKey"
             />
+            {#each $_outputForecast.get($dateTime) as d, i}
+              {@const fuel = d["surface.primary.fuel.model.catalogKey"]}
+              <Popover
+                class="absolute w-64 text-sm font-light z-50 "
+                title={UKFuelModels[fuel].displayLabel}
+                triggeredBy="#rect-{i}"
+                triger="hover"
+                >{$_outputForecast
+                  .get($dateTime)
+                  [i].values[0][$selectedOutput].toFixed(3)} ({outputNodes[
+                  $selectedOutput
+                ].units})</Popover
+              >
+            {/each}
           {:else}
             <div class="flex flex-col p-2 text-primary-500">
               <div class="text-center text-2xl">All fuels</div>
@@ -220,7 +234,7 @@
   {/if}
 
   {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast === false}
-    <div class="flex w-full overflow-x-auto xl:justify-center">
+    <div class="flex pt-6 w-full overflow-x-auto xl:justify-center">
       <Heatmap
         fireBehaviourData={$_outputForecastArray}
         forecastData={$forecastOpenMeteo}
