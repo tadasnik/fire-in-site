@@ -3,6 +3,7 @@
   Generates an SVG bar chart.
  -->
 <script>
+  import { Popover } from "flowbite-svelte";
   import { onMount, getContext } from "svelte";
 
   import {
@@ -53,5 +54,12 @@
       stroke-width="1"
       stroke="grey"
     />
+    <Popover
+      class="absolute w-64 text-sm font-light z-50 "
+      title="Popover title"
+      triggeredBy="#rect-{i}"
+      triger="hover"
+      >And here's some amazing content. It's very engaging. Right?</Popover
+    >
   {/each}
 </g>

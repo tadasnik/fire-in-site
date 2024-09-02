@@ -38,7 +38,7 @@
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
   import { getLocation } from "$lib/shared/stores/locationStore";
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
-
+  let placement = "";
   let w;
   const years = [
     { value: 2017, name: "2017" },
@@ -145,7 +145,7 @@
             <Label>
               Select Model output
               <Select
-                id="select"
+                id="select-output"
                 class="mb-6 pl-3"
                 bind:value={$selectedOutput}
               >
@@ -175,12 +175,6 @@
           {/if}
         {/if}
       {/if}
-      <Popover
-        class="absolute w-64 text-sm font-light z-50 "
-        title="Popover title"
-        triggeredBy="#rect-2"
-        >And here's some amazing content. It's very engaging. Right?</Popover
-      >
     </div>
   </div>
   {#if $forecastMode === "historical"}
