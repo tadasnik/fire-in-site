@@ -79,7 +79,10 @@
   };
 
   function getWindCardinalDirection(windDir) {
-    return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
+    const integerWindDir = parseInt(windDir / 11.25);
+    return cardinalDirections[
+      Math.min(Math.max(integerWindDir, 0), 31)
+    ].toLowerCase();
   }
   const dateFormat = timeFormat("%Y-%m-%d %a %I%p");
 
