@@ -53,6 +53,7 @@
   }
 
   let clickOutsideModal = false;
+
   function handleFuelClick(fuelObject) {
     $selectedFuel = $y(fuelObject);
     // console.log("selected fuel", $selectedFuel);
@@ -120,7 +121,7 @@
         style:height={cellSize + "px"}
       >
         <div class="hover:text-primary-900">
-          {@html twoCharsBold(UKFuelModels[$y(fuelObject)].code)}
+          {$y(fuelObject)}
         </div>
       </div>
       <!-- <Popover -->
