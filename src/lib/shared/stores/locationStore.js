@@ -5,18 +5,24 @@ export const currentLocation = writable({ 'userLocation': false, distanceFromPre
 export async function getLocation() {
   try {
     // 5. Dispatch the request for the users
-    const response = await fetch("https://ipinfo.io/json?token=c0de8aff3465a1")
+    var requestOptions = {
+      method: "GET",
+    };
+
+    const response = await fetch(
+      "https://api.geoapify.com/v1/ipinfo?apiKey=a9a12ccc820342c78776d16e77cb83fb",
+      requestOptions,
+    )
     if (response.ok) {
       const jsonResponse = await response.json()
-      return [parseFloat(jsonResponse.loc.split(',')[0]), parseFloat(jsonResponse.loc.split(',')[1])]
+      return [parseFloat(jsonResponse.location.latitude), parseFloat(jsonResponse.location.longitude)]
     }
     else {
       const text = response.text();
-      throw new Error(text);
     }
   } catch (error) {
-
     throw new Error(error);
+
   }
 }
 // var promise1 = new Promise(function(resolve, reject) {
