@@ -10,7 +10,7 @@ export async function getLocation() {
     };
 
     const response = await fetch(
-      "https://api.geoapify.com/v1/ipinfo?apiKey=a9a12ccc820342c78776d16e77cb83fb",
+      "https://api.geoapify.com/v1/ipinfo?apiKey=" + import.meta.env.VITE_GEOAPIFY_TOKEN,
       requestOptions,
     )
     if (response.ok) {
