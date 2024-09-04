@@ -18,7 +18,7 @@
     eager: true,
     as: "url",
   });
-  $: console.log("BARS images", images);
+  // $: console.log("BARS images", images);
 </script>
 
 <g class="bar-group">
@@ -54,12 +54,5 @@
       stroke-width="1"
       stroke="grey"
     />
-    <Popover
-      class="absolute w-64 text-sm font-light z-50 "
-      title="Popover title"
-      triggeredBy="#rect-{i}"
-      triger="hover"
-      >And here's some amazing content. It's very engaging. Right?</Popover
-    >
   {/each}
 </g>

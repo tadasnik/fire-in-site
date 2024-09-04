@@ -69,13 +69,8 @@
   import AuthReset from "$lib/components/AuthReset.svelte";
 
   function handleFuelMoistureChange(value) {
-    console.log("Fuel moisture model changed to ", value);
     if (value === "Fosberg") {
       $fuelMoistureModel = "Fosberg";
-      console.log(
-        "modelConfigValues ",
-        $modelConfigValues["configure.fuel.moisture"],
-      );
       $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
       console.log("Fuel moisture model changed to ", value);
     } else {
@@ -85,14 +80,11 @@
     }
   }
   function handleTimeModeChange(value) {
-    console.log("Time mode changed to ", value);
     $fetchingForecast = true;
     $forecastMode = value;
     if (value === "historical") {
       if ($timeMode === "current") {
-        console.log("current time mode changing to USER");
         $timeMode = "user";
-        console.log("fetching forecast", $fetchingForecast);
       }
     } else {
       $currentDateTime = new Date();
@@ -108,10 +100,8 @@
   onMount(() => {
     const interval = setInterval(() => {
       if ($timeMode === "current") {
-        console.log("current time mode");
         $currentDateTime = new Date();
       } else {
-        console.log("user time mode");
       }
     }, 10000);
 
@@ -130,13 +120,10 @@
         // window.location.pathname !== "/"
       ) {
         // window.location.href = "/";
-        console.log(
-          " NOOO current User ",
-          $authStore.currentUser,
-          $authStore.isLoading,
-        );
+
         const [latitude, longitude] = await getLocation();
-        console.log(" GOT longitude", longitude, "GOT latitude", latitude);
+        // const [latitude, longitude] = [51.514463, -0.159742];
+
         currentLocation.update((current) => ({
           ...current,
           userLocation: true,
@@ -145,7 +132,6 @@
           longitude: longitude,
         }));
       } else if (browser && $authStore.currentUser) {
-        console.log(" ++++++++++++current User ", $authStore.currentUser);
         const userDocRef = doc(db, "users", user.uid);
         const userDocContent = await getDoc(userDocRef);
         if (!userDocContent.exists()) {
@@ -179,7 +165,6 @@
                 }));
               } else {
                 console.log("No default location for user!");
-                getLocation();
               }
             })
 

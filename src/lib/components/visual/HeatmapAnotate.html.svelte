@@ -42,13 +42,23 @@
   /** @type {number} topMargin - annotation (y axis) element width in px. */
   export let topMargin;
 
+  function twoCharsBold(textToBold) {
+    const chars = textToBold.split("");
+    let bold = `<b>${chars[0]}${chars[1]}</b>`;
+    if (chars.length > 2) {
+      bold += chars.slice(2).join("");
+    }
+    console.log("bold", bold);
+    return bold;
+  }
+
   let clickOutsideModal = false;
   function handleFuelClick(fuelObject) {
     $selectedFuel = $y(fuelObject);
-    console.log("selected fuel", $selectedFuel);
-    console.log("clickOutsideModal parrent was", clickOutsideModal);
+    // console.log("selected fuel", $selectedFuel);
+    // console.log("clickOutsideModal parrent was", clickOutsideModal);
     clickOutsideModal = !clickOutsideModal;
-    console.log("clickOutsideModal parrent", clickOutsideModal);
+    // console.log("clickOutsideModal parrent", clickOutsideModal);
   }
 </script>
 
@@ -110,7 +120,7 @@
         style:height={cellSize + "px"}
       >
         <div class="hover:text-primary-900">
-          {$y(fuelObject)}
+          {@html twoCharsBold(UKFuelModels[$y(fuelObject)].code)}
         </div>
       </div>
       <!-- <Popover -->

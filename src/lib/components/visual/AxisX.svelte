@@ -43,7 +43,6 @@
       : typeof ticks === "function"
         ? ticks($xScale.ticks())
         : $xScale.ticks(ticks);
-  $: console.log("tickVals Xaxis  :", tickVals);
 
   function textAnchor(i) {
     if (snapTicks === true) {

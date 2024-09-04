@@ -99,7 +99,6 @@
   };
 
   function isCommonOutput(output) {
-    console.log("output", output);
     return Object.values(commonOutputProps)
       .map((values) => values[0])
       .includes(output);
@@ -109,7 +108,7 @@
   // return d == $dateTime ? "font-bold text-primary-500" : "";
   // };
 
-  $: console.log("Selected output", $selectedOutput);
+  // $: console.log("Selected output", $selectedOutput);
   $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
   $: groupedData = groupLonger(fireBehaviourData, seriesNames, {
     groupTo: yKey,

@@ -22,7 +22,7 @@
   const formatLabelY = (d) => format(`.1f`)(d);
 
   $: xMax = Math.ceil($_maxVal / 1) * 1;
-  $: console.log("Bars data", data);
+  // $: console.log("Bars data", data);
 </script>
 
 <div class="w-full h-80 md:h-4/5">
