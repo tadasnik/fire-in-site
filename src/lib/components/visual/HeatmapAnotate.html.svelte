@@ -12,6 +12,7 @@
   } from "$lib/shared/stores/modelStore.js";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
+  import { Html } from "layercake";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
 
   /** @type {Array} annotations - A list of annotation objects. */
@@ -121,7 +122,11 @@
         style:height={cellSize + "px"}
       >
         <div class="hover:text-primary-900">
-          {$y(fuelObject)}
+          {#if $y(fuelObject) !== "All fuels"}
+            {@html twoCharsBold($y(fuelObject))}
+          {:else}
+            {$y(fuelObject)}
+          {/if}
         </div>
       </div>
       <!-- <Popover -->
