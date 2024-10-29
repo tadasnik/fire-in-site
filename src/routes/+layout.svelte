@@ -17,6 +17,7 @@
     SidebarWrapper,
     SidebarDropdownWrapper,
     SidebarDropdownItem,
+    Spinner,
     Drawer,
     Dropdown,
     DropdownDivider,
@@ -42,6 +43,7 @@
     HomeOutline,
   } from "flowbite-svelte-icons";
   import { timeFormat } from "d3-time-format";
+  import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
 
   import {
@@ -66,7 +68,6 @@
   import { outputNodes } from "$lib/data/outputNodes.js";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
-  import AuthReset from "$lib/components/AuthReset.svelte";
 
   function handleFuelMoistureChange(value) {
     if (value === "Fosberg") {
@@ -103,7 +104,7 @@
         $currentDateTime = new Date();
       } else {
       }
-    }, 10000);
+    }, 1.8e9);
 
     // differenceHours($dateTime - Date($forecast.timeSeries[0].time));
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
@@ -111,7 +112,7 @@
       authStore.update((curr) => {
         return { ...curr, currentUser: user };
       });
-      console.log("user changed", user);
+      console.log("user changed");
       if (
         // if browser and no user
         browser &&
@@ -222,19 +223,20 @@
     let:toggle
   >
     <NavBrand href="/">
-      <span class="px-2 text-xl text-primary-800">UKBehavePlus</span>
+      <img src={FireInSiteLogo} class="me-3 h-6 sm:h-9" alt="fireInSite Logo" />
     </NavBrand>
+
     <div class="flex md:order-2">
       <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
       <NavUl>
         {#if !$authStore.currentUser}
-          <NavLi href="/authenticate">Log in</NavLi>
+          <NavLi href="/authenticate">Sign in</NavLi>
         {:else}
           <NavLi
             on:click={() => {
               authHandlers.logout();
             }}
-            href="/">Log out</NavLi
+            href="/">Sign out</NavLi
           >
         {/if}
       </NavUl>
@@ -244,7 +246,7 @@
       <NavLi class="cursor-pointer">
         <div class="flex-col items-center">
           <AdjustmentsHorizontalSolid
-            class="w-4 h-4 ms-2 text-primary-800 dark:text-white inline"
+            class="w-4 h-4 ms-2 text-primary-900 dark:text-white inline"
           />
           Settings
         </div>
@@ -272,7 +274,8 @@
             name="fuelMoistureModel"
             bind:group={$fuelMoistureModel}
             value={"Nelson"}
-            on:change={() => handleFuelMoistureChange("Nelson")}>Nelson</Radio
+            on:change={() => handleFuelMoistureChange("Nelson")}
+            >SimpleFFMC</Radio
           >
           <Helper class="ps-6"
             >Use simple Nelson dead fuel moisture model.</Helper
@@ -345,6 +348,7 @@
           {/each}
         </li>
       </Dropdown>
+      <NavLi href="/about">About</NavLi>
     </NavUl>
   </Navbar>
 </header>
@@ -477,7 +481,9 @@
   {:else if !$authStore.isLoading && $forecastOpenMeteo.time.length > 1}
     <slot />
   {:else}
-    <h1>Loading....</h1>
+    <div class="flex items-center justify-center h-screen">
+      <Spinner size={8} />
+    </div>
   {/if}
 </main>
 <Footer footerType="logo">
