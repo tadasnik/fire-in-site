@@ -66,6 +66,7 @@
   } from "$lib/shared/stores/locationStore";
   import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
+  import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
@@ -242,7 +243,6 @@
       </NavUl>
     </div>
     <NavUl>
-      <NavLi href="/fuelModels">Fuel Models</NavLi>
       <NavLi class="cursor-pointer">
         <div class="flex-col items-center">
           <AdjustmentsHorizontalSolid
@@ -251,103 +251,10 @@
           Settings
         </div>
       </NavLi>
-
       <Dropdown>
-        <div class="px-4 py-2">
-          <span class="block text-lg text-gray-900 dark:text-white"
-            >Dead fuel moisture model:</span
-          >
-        </div>
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          <Radio
-            name="fuelMoistureModel"
-            bind:group={$fuelMoistureModel}
-            value={"Fosberg"}
-            on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
-          >
-          <Helper class="ps-6"
-            >Calculate dead fuel mosture using Fosberg model.</Helper
-          >
-        </li>
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          <Radio
-            name="fuelMoistureModel"
-            bind:group={$fuelMoistureModel}
-            value={"Nelson"}
-            on:change={() => handleFuelMoistureChange("Nelson")}
-            >SimpleFFMC</Radio
-          >
-          <Helper class="ps-6"
-            >Use simple Nelson dead fuel moisture model.</Helper
-          >
-        </li>
-        <DropdownDivider></DropdownDivider>
-        <div class="px-4 py-2">
-          <span class="block text-lg text-gray-900 dark:text-white"
-            >Weather mode:</span
-          >
-        </div>
-
-        {#each forecastModes as mode}
-          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-            <Radio
-              bind:group={$forecastMode}
-              value={mode}
-              on:change={() => handleTimeModeChange(mode)}
-            >
-              {mode}
-            </Radio>
-            <Helper class="ps-6"
-              >Fetch {mode} weather{mode === "historical"
-                ? " for a specific date."
-                : "."}</Helper
-            >
-          </li>
-        {/each}
-
-        <DropdownDivider></DropdownDivider>
-        <div class="px-4 py-2">
-          <span class="block text-lg text-gray-900 dark:text-white"
-            >Chart type :</span
-          >
-        </div>
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          <Radio bind:group={$chartType} value={"bars"}>Bar chart</Radio>
-
-          <Helper class="ps-6">Show fire behaviour for selected time.</Helper>
-        </li>
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          <Radio bind:group={$chartType} value={"fireChar"}>
-            Fire Characteristics
-          </Radio>
-
-          <Helper class="ps-6">Show Fire Characteristics chart.</Helper>
-        </li>
-
-        <DropdownDivider></DropdownDivider>
-        <div class="px-4 py-2">
-          <span class="block text-lg text-gray-900 dark:text-white"
-            >Select model output:</span
-          >
-        </div>
-
-        {#each $selectedOutputs as output}
-          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-            <Radio bind:group={$selectedOutput} value={output}
-              >{outputNodes[output].label}</Radio
-            >
-          </li>
-        {/each}
+        <SettingsDropdown />
       </Dropdown>
-      <Dropdown class="w-60 p-3 space-y-1">
-        <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-          {#each $selectedOutputs as output}
-            <Radio bind:group={$selectedOutput} value={output}
-              >{outputNodes[output].label}</Radio
-            >
-          {/each}
-        </li>
-      </Dropdown>
+      <NavLi href="/fuelModels">Fuel Models</NavLi>
       <NavLi href="/about">About</NavLi>
     </NavUl>
   </Navbar>
@@ -378,7 +285,13 @@
             />
           </svelte:fragment>
         </SidebarItem>
-        <DropdownDivider></DropdownDivider>
+        <SidebarItem label="About" href="/about">
+          <svelte:fragment slot="icon">
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          </svelte:fragment>
+        </SidebarItem>
 
         <SidebarDropdownWrapper label="Settings">
           <svelte:fragment slot="icon">
@@ -388,84 +301,7 @@
           </svelte:fragment>
           <DropdownDivider></DropdownDivider>
 
-          <div class="px-4 py-2">
-            <span class="block text-lg text-gray-900 dark:text-white"
-              >Dead fuel moisture model:</span
-            >
-          </div>
-
-          <Radio
-            name="fuelMoistureModel"
-            bind:group={$fuelMoistureModel}
-            value={"Fosberg"}
-            on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
-          >
-          <Helper class="ps-6"
-            >Calculate dead fuel moisture using Fosberg model.</Helper
-          >
-          <Radio
-            name="fuelMoistureModel"
-            bind:group={$fuelMoistureModel}
-            value={"Nelson"}
-            on:change={() => handleFuelMoistureChange("Nelson")}>Nelson</Radio
-          >
-          <Helper class="ps-6">Use Nelson dead fuel moisture model.</Helper>
-
-          <DropdownDivider></DropdownDivider>
-
-          <div class="px-4 py-2">
-            <span class="block text-lg text-gray-900 dark:text-white"
-              >Weather mode:</span
-            >
-          </div>
-          <ul class="w-56 bg-white rounded-lg dark:bg-gray-800">
-            {#each forecastModes as mode}
-              <li class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                <Radio
-                  bind:group={$forecastMode}
-                  value={mode}
-                  on:change={() => handleTimeModeChange(mode)}
-                >
-                  {mode}
-                </Radio>
-                <Helper class="ps-6">Fetch {mode} weather.</Helper>
-              </li>
-            {/each}
-          </ul>
-          <DropdownDivider></DropdownDivider>
-
-          <div class="px-4 py-2">
-            <span class="block text-lg text-gray-900 dark:text-white"
-              >Chart type :</span
-            >
-          </div>
-          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-            <Radio bind:group={$chartType} value={"bars"}>Bar chart</Radio>
-
-            <Helper class="ps-6">Show fire behaviour for selected time.</Helper>
-          </li>
-          <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-            <Radio bind:group={$chartType} value={"fireChar"}>
-              Fire Characteristics
-            </Radio>
-
-            <Helper class="ps-6">Show Fire Characteristics chart.</Helper>
-          </li>
-
-          <DropdownDivider></DropdownDivider>
-          <div class="px-4 py-2">
-            <span class="block text-lg text-gray-900 dark:text-white"
-              >Select model output:</span
-            >
-          </div>
-
-          {#each $selectedOutputs as output}
-            <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-              <Radio bind:group={$selectedOutput} value={output}
-                >{outputNodes[output].label}</Radio
-              >
-            </li>
-          {/each}
+          <SettingsDropdown></SettingsDropdown>
         </SidebarDropdownWrapper>
       </SidebarGroup>
     </SidebarWrapper>
@@ -488,17 +324,17 @@
 </main>
 <Footer footerType="logo">
   <hr class="my-6 border-gray-200 mx-auto dark:border-gray-700" />
-  <div class="flex items-center text-center justify-between px-10">
+  <div class="flex items-center text-center text-xs justify-between px-10">
     <p>
-      Fire behaviour predictions leverage BehavePlus fire behaviour modelling
-      system, fuel models representative of UK vegetation and open-meteo
-      forecasts and historical weather. Authors: Tadas Nikonovas, Claire M
-      Belcher, Kerryn Little and the rest of Toward a UK Fire Danger Rating
-      System (UKFDRS) project team. Implementation: Tadas Nikonovas, Centre for
-      Wildfire Research, Swansea University. Supported by Higher Education
-      Funding Council for Wales Impact Fellowship grant (RIG1062-117) and NERC
-      grant UK-FDRS ‘Toward a UK fire danger rating system: Understanding fuels,
-      fire behaviour and impacts’ (NE/T003553/1)
+      FireInSite fire behaviour predictions leverage BehavePlus fire behaviour
+      modelling system, fuel models representative of UK vegetation and
+      open-meteo forecasts and historical weather. Authors: Tadas Nikonovas,
+      Claire M Belcher, Kerryn Little and the rest of Toward a UK Fire Danger
+      Rating System (UKFDRS) project team. Implementation: Tadas Nikonovas,
+      Centre for Wildfire Research, Swansea University. Supported by Higher
+      Education Funding Council for Wales Impact Fellowship grant (RIG1062-117)
+      and NERC grant UK-FDRS ‘Toward a UK fire danger rating system:
+      Understanding fuels, fire behaviour and impacts’ (NE/T003553/1)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">
