@@ -5,6 +5,7 @@
   import FireCharAnotations from "./FireCharAnotations.svelte";
   import { currentDateTime, dateTime } from "$lib/shared/stores/timeStore";
   import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
+  import { Spinner } from "flowbite-svelte";
 
   export let data;
   export let forecastLocation;
@@ -92,10 +93,10 @@
     "Wind Speed at 10m": ["windSpeed10m", 0, "wi wi-strong-wind"],
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
-  $: console.log("Weather info data", data);
+  // $: console.log("Weather info data", data);
 </script>
 
-<div class="">
+<div class="min-h-20">
   {#if data}
     <!-- <div class="sm:w-full md:w-1/2 p-4 min-w-80 bg-gray-100"> -->
     <div class="flex flex-wrap flex-row justify-center space-x-2 text-2xl">
@@ -136,6 +137,10 @@
           {data.windSpeed10m[$currentTimeIndex].toFixed(0)}</span
         ><span class="font-bold pl-1"> m/s</span>
       </div>
+    </div>
+  {:else}
+    <div class="flex justify-center">
+      <Spinner></Spinner>
     </div>
   {/if}
 </div>
