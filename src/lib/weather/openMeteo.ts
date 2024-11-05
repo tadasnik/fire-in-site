@@ -1,75 +1,24 @@
 import { fetchWeatherApi } from 'openmeteo';
+import { get } from 'svelte/store';
+import { forecastDays, forecastDaysPast } from '$lib/shared/stores/forecastStore';
+import { getDateString } from '$lib/shared/stores/timeStore';
 
-
-export async function fetchHistoryMeteo(latitude: Number, longitude: Number) {
-  const params = {
-    "latitude": latitude,
-    "longitude": longitude,
-    "start_date": "2020-07-19",
-    "end_date": "2020-07-19",
-    "hourly": ["temperature_2m", "relative_humidity_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m"],
-    "wind_speed_unit": "ms"
-  };
-  const url = "https://historical-forecast-api.open-meteo.com/v1/forecast";
-  const responses = await fetchWeatherApi(url, params);
-
-  // Helper function to form time ranges
-  const range = (start: number, stop: number, step: number) =>
-    Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
-
-  // Process first location. Add a for-loop for multiple locations or weather models
-  const response = responses[0];
-
-  // Attributes for timezone and location
-  const utcOffsetSeconds = response.utcOffsetSeconds();
-  const timezone = response.timezone();
-  const timezoneAbbreviation = response.timezoneAbbreviation();
-  const forecastLatitude = response.latitude();
-  const forecastLongitude = response.longitude();
-
-  const hourly = response.hourly()!;
-
-
-  // Note: The order of weather variables in the URL query and the indices below need to match!
-  const weatherData = {
-
-    hourly: {
-      time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
-        (t) => new Date((t + utcOffsetSeconds) * 1000)
-      ),
-      temperature2m: hourly.variables(0)!.valuesArray()!,
-      relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
-      rain: hourly.variables(2)!.valuesArray()!,
-      weatherCode: hourly.variables(3)!.valuesArray()!,
-      cloudCover: hourly.variables(4)!.valuesArray()!,
-      windSpeed10m: hourly.variables(5)!.valuesArray()!,
-      windDirection10m: hourly.variables(6)!.valuesArray()!,
-      windGusts10m: hourly.variables(7)!.valuesArray()!,
-    },
-
-  };
-
-  // // `weatherData` now contains a simple structure with arrays for datetime and weather data
-  // for (let i = 0; i < weatherData.hourly.time.length; i++) {
-  //   console.log(
-  //     weatherData.hourly.time[i].toISOString(),
-  //     weatherData.hourly.temperature2m[i],
-  //     weatherData.hourly.relativeHumidity2m[i],
-  //     weatherData.hourly.rain[i],
-  //     weatherData.hourly.weatherCode[i],
-  //     weatherData.hourly.cloudCover[i],
-  //     weatherData.hourly.windSpeed10m[i],
-  //     weatherData.hourly.windDirection10m[i],
-  //     weatherData.hourly.windGusts10m[i]
-  //   );
-  // }
+Date.prototype.subtractDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() - days);
+  return date;
 }
+
+
 export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, date: string) {
+  console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, date)
   function fillParams() {
-    const past_days = 0;
-    const forecast_days = 2;
-    const start_date = date;
-    const end_date = date;
+    const past_days = get(forecastDaysPast);
+    const forecast_days = get(forecastDays);
+    const start_date = getDateString(date.subtractDays(past_days))
+    const end_date = getDateString(date);
+    console.log("start_date", start_date)
+    console.log("end_date", end_date)
     const baseParams = {
       "latitude": latitude,
       "longitude": longitude,
@@ -81,7 +30,9 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
         "wind_speed_10m",
         "wind_direction_10m",
         "wind_gusts_10m",
-        "global_tilted_irradiance"],
+        "global_tilted_irradiance",
+        "vapour_pressure_deficit",
+      ],
       "wind_speed_unit": "ms",
       "tilt": slope,
       "azimuth": aspect - 180,
@@ -105,16 +56,17 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
 
   // Attributes for timezone and location
   const utcOffsetSeconds = response.utcOffsetSeconds();
-  const timezone = response.timezone();
-  const timezoneAbbreviation = response.timezoneAbbreviation();
-  const forecastLatitude = response.latitude();
-  const forecastLongitude = response.longitude();
-  const forecastLocationId = response.locationId();
-  const forecastModel = response.model();
+  // const timezone = response.timezone();
+  // const timezoneAbbreviation = response.timezoneAbbreviation();
+  // const forecastLatitude = response.latitude();
+  // const forecastLongitude = response.longitude();
+  // const forecastLocationId = response.locationId();
+  // const forecastModel = response.model();
 
   const hourly = response.hourly();
 
   // Note: The order of weather variables in the URL query and the indices below need to match!
+  console.log("hourly", new Date(Number(hourly.time())), new Date(Number(hourly.timeEnd())))
   const weatherData = {
 
     time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
@@ -129,20 +81,61 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
     windDirection10m: hourly.variables(6)!.valuesArray()!,
     windGusts10m: hourly.variables(7)!.valuesArray()!,
     globalTiltedIrradiance: hourly.variables(8)!.valuesArray()!,
+    vapourPressureDeficit: hourly.variables(9)!.valuesArray()!,
 
   };
   return weatherData;
-
-  // `weatherData` now contains a simple structure with arrays for datetime and weather data
-  // for (let i = 0; i < weatherData.hourly.time.length; i++) {
-  //   console.log(
-  //     weatherData.hourly.time[i].toISOString(),
-  //     weatherData.hourly.temperature2m[i],
-  //     weatherData.hourly.relativeHumidity2m[i],
-  //     weatherData.hourly.rain[i],
-  //     weatherData.hourly.cloudCover[i],
-  //     weatherData.hourly.uvIndex[i]
-  //   );
-  // }
 }
+
+// export async function fetchHistoryMeteo(latitude: Number, longitude: Number) {
+//   const params = {
+//     "latitude": latitude,
+//     "longitude": longitude,
+//     "start_date": "2020-07-19",
+//     "end_date": "2020-07-19",
+//     "hourly": ["temperature_2m", "relative_humidity_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m"],
+//     "wind_speed_unit": "ms"
+//   };
+//   const url = "https://historical-forecast-api.open-meteo.com/v1/forecast";
+//   const responses = await fetchWeatherApi(url, params);
+//
+//   // Helper function to form time ranges
+//   const range = (start: number, stop: number, step: number) =>
+//     Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+//
+//   // Process first location. Add a for-loop for multiple locations or weather models
+//   const response = responses[0];
+//
+//   // Attributes for timezone and location
+//   const utcOffsetSeconds = response.utcOffsetSeconds();
+//   // const timezone = response.timezone();
+//   // const timezoneAbbreviation = response.timezoneAbbreviation();
+//   // const forecastLatitude = response.latitude();
+//   // const forecastLongitude = response.longitude();
+//
+//   const hourly = response.hourly()!;
+//
+//
+//   // Note: The order of weather variables in the URL query and the indices below need to match!
+//   const weatherData = {
+//
+//     hourly: {
+//       time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
+//         (t) => new Date((t + utcOffsetSeconds) * 1000)
+//       ),
+//       temperature2m: hourly.variables(0)!.valuesArray()!,
+//       relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
+//       rain: hourly.variables(2)!.valuesArray()!,
+//       weatherCode: hourly.variables(3)!.valuesArray()!,
+//       cloudCover: hourly.variables(4)!.valuesArray()!,
+//       windSpeed10m: hourly.variables(5)!.valuesArray()!,
+//       windDirection10m: hourly.variables(6)!.valuesArray()!,
+//       windGusts10m: hourly.variables(7)!.valuesArray()!,
+//     },
+//
+//   };
+//
+// }
+//
+
 
