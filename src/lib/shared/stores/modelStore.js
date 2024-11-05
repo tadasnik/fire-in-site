@@ -5,11 +5,12 @@ import { outputNodes } from "$lib/data/outputNodes.js";
 import { fuelMoisture } from "$lib/data/fuelMoisture";
 import { modelConfigOptions } from '$lib/data/configuration';
 import { dateTime, getMonth, getHour, month, currentDateTime } from "$lib/shared/stores/timeStore";
-import { currentWeather, elevationDiff, forecastTimeIndex, forecastOpenMeteo } from "$lib/shared/stores/forecastStore";
+import { currentWeather, elevationDiff, forecastTimeIndex, forecastOpenMeteo, forecastDaysPast } from "$lib/shared/stores/forecastStore";
 import { currentLocation } from "$lib/shared/stores/locationStore";
 import UKFuelModels from '$lib/data/UKFuelModels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
-import { simpleNelsonFuelMoisture } from '$lib/model/nelsonFMC/simpleNelson';
+import { browser } from "$app/environment";
+import { deadFFMC } from '$lib/model/fireInSiteFFMC';
 
 export const inputNodesStore = writable(inputNodes)
 export const fireSim = new FireSim({ ...inputNodes, ...fuelNodes, ...outputNodes })
@@ -20,11 +21,10 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'site.moisture.dead.tl1h',
   'ignition.firebrand.probability'
 ])
-export const commonOutputs = readable(['site.moisture.dead.tl1h', 'ignition.firebrand.probability'])
+export const commonOutputs = readable(['ignition.firebrand.probability'])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.spreadRate')
-export const fuelMoistureModel = writable('Nelson')
-export const fuelMoistureModelOptions = readable(['Fosberg', 'Nelson', 'User input'])
+export const fuelMoistureModel = writable('fireInSite')
 export const scenarios = writable([])
 export const selectedScenario = writable({
   "site.moisture.dead.category": [
@@ -65,7 +65,6 @@ export const siteInputs = writable(inputNodes)//, forecast], ([$inputNodesStore,
 //   console.log('model store forecast :', $forecast.location)
 //   return $inputNodesStore
 // })
-
 const fuelProps = {}
 for (const [f_key, f_values] of Object.entries(UKFuelModels)) {
   fuelProps[f_key] = {}
@@ -213,11 +212,12 @@ export const requiredSiteInputsCurrenWeather = derived(
   }
 )
 
+
 export const requiredSiteInputsForecastOpen = derived(
   [requiredInputs, siteInputs, forecastOpenMeteo, currentLocation, fuelMoistureModel],
   ([$requiredInputs, $siteInputs, $forecastOpenMeteo, $currentLocation, $fuelMoistureModel]) => {
+    // console.log("requiredSiteInputsForecastOpen forecastOpenMeteo", $forecastOpenMeteo)
     let deadFMC = null
-    // console.log("requiredSiteInputsCurrentForecast", $requiredInputs, $forecastTimeIndex)
     const requiredSiteInputs = new Map()
     const forecastInputs = {
       "site.temperature.air": "temperature2m",
@@ -232,101 +232,46 @@ export const requiredSiteInputsForecastOpen = derived(
 
     }
     const deadMoistureCategories = { "site.moisture.dead.tl1h": 0, "site.moisture.dead.tl10h": 2, "site.moisture.dead.tl100h": 4 }
+    // Do not run for past days
+    const ffmcInputs = []
+    const ffmcInputTimes = []
     $forecastOpenMeteo.time.forEach((time, nr) => {
       let requiredSiteI = {}
-      let timeInputs = { "site.date.month": getMonth(new Date(time)), "site.time.hour": getHour(new Date(time)) }
-      if ($fuelMoistureModel == "Nelson") {
-        deadFMC = simpleNelsonFuelMoisture(deadFMC, $forecastOpenMeteo["temperature2m"][nr], $forecastOpenMeteo["globalTiltedIrradiance"][nr], $forecastOpenMeteo["relativeHumidity2m"][nr], $forecastOpenMeteo["precipitation"][nr])
-      }
-
-      $requiredInputs.forEach((input) => {
-        const splitKey = input.split('.')
-        if (Object.keys(forecastInputs).includes(input)) {
-          requiredSiteI[input] = [$forecastOpenMeteo[forecastInputs[input]][nr]]
-        } else if (input == "site.temperature.shading") {
-          requiredSiteI[input] = [$forecastOpenMeteo["cloudCover"]]
-        } else if (Object.keys(timeInputs).includes(input)) {
-          requiredSiteI[input] = [timeInputs[input]]
-        } else if (Object.keys(locationInputs).includes(input)) {
-          requiredSiteI[input] = [locationInputs[input]]
-        } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
-
-          requiredSiteI[input] = [deadFMC + deadMoistureCategories[input]]
-        } else {
-          // console.log('required inputs non - forecast :', input)
-          if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
-            // console.log("site input :", input, $siteInputs[input].value)
-            requiredSiteI[input] = $siteInputs[input].value
-          } else if (
-            splitKey[0] === 'surface' &&
-            splitKey[1] === 'weighted' &&
-            splitKey.at(-1) === 'primaryCover'
-          ) {
-            requiredSiteI[input] = $siteInputs[input].value
+      if (nr < get(forecastDaysPast) * 24) {
+        requiredSiteInputs.set(time, requiredSiteI)
+      } else {
+        let timeInputs = { "site.date.month": getMonth(new Date(time)), "site.time.hour": getHour(new Date(time)) }
+        $requiredInputs.forEach((input) => {
+          const splitKey = input.split('.')
+          if (Object.keys(forecastInputs).includes(input)) {
+            requiredSiteI[input] = [$forecastOpenMeteo[forecastInputs[input]][nr]]
+          } else if (input == "site.temperature.shading") {
+            requiredSiteI[input] = [$forecastOpenMeteo["cloudCover"]]
+          } else if (Object.keys(timeInputs).includes(input)) {
+            requiredSiteI[input] = [timeInputs[input]]
+          } else if (Object.keys(locationInputs).includes(input)) {
+            requiredSiteI[input] = [locationInputs[input]]
+          } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
+            // console.log("deadMoistureCategories", nr, input, deadMoistureCategories[input], $forecastOpenMeteo["ffmc_nelson"][nr])
+            requiredSiteI[input] = [$forecastOpenMeteo["ffmc_nelson"][nr] + deadMoistureCategories[input]]
+          } else {
+            // console.log('required inputs non - forecast :', input)
+            if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
+              // console.log("site input :", input, $siteInputs[input].value)
+              requiredSiteI[input] = $siteInputs[input].value
+            } else if (
+              splitKey[0] === 'surface' &&
+              splitKey[1] === 'weighted' &&
+              splitKey.at(-1) === 'primaryCover'
+            ) {
+              requiredSiteI[input] = $siteInputs[input].value
+            }
           }
-        }
-      })
-      requiredSiteInputs.set(time, requiredSiteI)
-    })
-    return requiredSiteInputs
-  }
-)
-export const requiredSiteInputsForecast = derived(
-  [requiredInputs, siteInputs, forecastTimeIndex, currentLocation, fuelMoistureModel],
-  ([$requiredInputs, $siteInputs, $forecastTimeIndex, $currentLocation, $fuelMoistureModel]) => {
-    let deadFMC = null
-    // console.log("requiredSiteInputsCurrentForecast", $requiredInputs, $forecastTimeIndex)
-    const requiredSiteInputs = new Map()
-    const forecastInputs = {
-      "site.temperature.air": "screenTemperature",
-      "site.temperature.relativeHumidity": "screenRelativeHumidity",
-      "site.wind.speed.at10m": "windSpeed10m",
-      "site.wind.direction.source.fromNorth": "windDirectionFrom10m",
-    }
-    const locationInputs = {
-      "site.slope.direction.aspect": $currentLocation.aspect,
-      "site.slope.steepness.degrees": $currentLocation.slope,
-      "site.location.elevation.diff": get(elevationDiff)
-
-    }
-    const deadMoistureCategories = { "site.moisture.dead.tl1h": 0, "site.moisture.dead.tl10h": 2, "site.moisture.dead.tl100h": 4 }
-    $forecastTimeIndex.forEach((forecast, time) => {
-      let requiredSiteI = {}
-      let timeInputs = { "site.date.month": getMonth(new Date(time)), "site.time.hour": getHour(new Date(time)) }
-      if ($fuelMoistureModel == "Nelson") {
-        deadFMC = simpleNelsonFuelMoisture(deadFMC, forecast["screenTemperature"], forecast["uvIndex"] * 100, forecast["screenRelativeHumidity"], forecast["totalPrecipAmount"])
+        })
+        requiredSiteInputs.set(time, requiredSiteI)
       }
-
-      $requiredInputs.forEach((input) => {
-        const splitKey = input.split('.')
-        if (Object.keys(forecastInputs).includes(input)) {
-          requiredSiteI[input] = [forecast[forecastInputs[input]]]
-        } else if (input == "site.temperature.shading") {
-          requiredSiteI[input] = [fuelShadingMetoffice(forecast)]
-          // console.log(time, requiredSiteI[input], forecast["uvIndex"], forecast["significantWeatherCode"], inputNodes[input])
-        } else if (Object.keys(timeInputs).includes(input)) {
-          requiredSiteI[input] = [timeInputs[input]]
-        } else if (Object.keys(locationInputs).includes(input)) {
-          requiredSiteI[input] = [locationInputs[input]]
-        } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
-
-          requiredSiteI[input] = [deadFMC + deadMoistureCategories[input]]
-        } else {
-          // console.log('required inputs non - forecast :', input)
-          if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
-            // console.log("site input :", input, $siteInputs[input].value)
-            requiredSiteI[input] = $siteInputs[input].value
-          } else if (
-            splitKey[0] === 'surface' &&
-            splitKey[1] === 'weighted' &&
-            splitKey.at(-1) === 'primaryCover'
-          ) {
-            requiredSiteI[input] = $siteInputs[input].value
-          }
-        }
-      })
-      requiredSiteInputs.set(time, requiredSiteI)
     })
+    // console.log("requiredSiteInputsForecastOpen", requiredSiteInputs)
     return requiredSiteInputs
   }
 )
@@ -335,8 +280,6 @@ export const requiredSiteInputsForecast = derived(
 export const requiredFuelInputs = derived(
   [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
   ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
-
-    // console.log("requiredFuelInputs", $requiredInputs)
     const requiredFuelI = {}
     $selectedFuels.forEach((fuel) => {
       requiredFuelI[fuel] = {}
@@ -389,15 +332,36 @@ export const requiredFuelInputs = derived(
 export const _inputsForecast = derived(
   [requiredFuelInputs, requiredSiteInputsForecastOpen],
   ([$requiredFuelInputs, $requiredSiteInputsForecastOpen]) => {
-    // console.log('_inputsForecast start')
-
+    // const grassFuels = {'grl': 'ffmc_grass', 'grm': 'ffmc_grass', 'grl': 'ffmc_grass', 'cll': 'ffmc_heather', 'clm': 'ffmc_heather', 'clh': 'ffmc_heather', 'cld': 'ffmc_heather', 'mhl': '}
+    // console.log('requiredFuelInputs in _inputsForecast :', $requiredFuelInputs)
+    // console.log('requiredSiteInputsForecastOpen in _inputsForecast :', $requiredSiteInputsForecastOpen)
     const inputsForecast = new Map()
+    const forecastOpenMeteoFFMC = get(forecastOpenMeteo)
+    // console.log('forecastOpenMeteoFFMC :', forecastOpenMeteoFFMC)
+    let i = 0;
     $requiredSiteInputsForecastOpen.forEach((forecast, time) => {
+      // console.log('time :', time)
       let inputsTime = {}
       Object.keys($requiredFuelInputs).forEach((fuel) => {
         inputsTime[fuel] = { ...$requiredFuelInputs[fuel], ...forecast }
+        if (get(fuelMoistureModel) === "fireInSite") {
+          if (fuel.substring(0, 2) == 'gr') {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_grass[i]]
+          } else if (fuel.substring(0, 1) == 'g') {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_gorse[i]]
+          } else if (fuel.substring(0, 1) == 'm') {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [(forecastOpenMeteoFFMC.ffmc_heather[i] + forecastOpenMeteoFFMC.ffmc_grass[i]) / 2]
+          } else if (fuel.substring(0, 1) == 'c') {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_heather[i]]
+          } else if (fuel.substring(0, 1) == 'f') {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_bracken[i]]
+          } else {
+            inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_bracken[i]]
+          }
+        }
       })
       inputsForecast.set(time, inputsTime)
+      i++
     })
     // console.log('_inputsForecast end :')
     // console.log('inputsForecast :', inputsForecast)
@@ -437,6 +401,8 @@ export const _selectedTimeOutput = derived([requiredSiteInputsForecastOpen, curr
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
   // console.log("_outputForecast start")
+  // console.log('requiredSiteInputsForecastOpen in _outputForecast:', $_inputsForecast)
+
   const convertUnits = ["surface.weighted.fire.heatPerUnitArea", "surface.weighted.fire.firelineIntensity"]
   const resultForecast = new Map()
   $_inputsForecast.forEach((forecast, time) => {
@@ -458,6 +424,8 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
   })
 
   // console.log("_outputForecast end")
+  // console.log('requiredSiteInputsForecastOpen in end _outputForecast:', resultForecast)
+
   return resultForecast
 })
 
@@ -476,6 +444,7 @@ export const _outputForecastArray = derived([_outputForecast, commonOutputs, sel
       timeObject["time"] = time
       outputArray.push(timeObject)
     })
+    // console.log('outputArray :', outputArray)
     return outputArray
   })
 

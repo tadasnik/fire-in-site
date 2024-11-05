@@ -1,8 +1,9 @@
 import { writable, derived, get } from 'svelte/store'
 import { currentLocation } from '$lib/shared/stores/locationStore'
-import { dateTime, currentDateTime, differenceHours, dateString } from '$lib/shared/stores/timeStore'
+import { dateTime, currentDateTime, differenceHours, getMonth, dateString, focusDay } from '$lib/shared/stores/timeStore'
 import fetchForecastJSON from "$lib/weather/metoffice";
-import { fetchForecastMeteo, fetchHistoryMeteo } from "$lib/weather/openMeteo.ts";
+import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
+import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
 
 export const forecastOpenMeteo = writable({
   time: [1403984000],
@@ -40,32 +41,74 @@ export const forecastTimeSeries = writable([{
 }])
 
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
-
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
 export const fetchingForecast = writable(true)
+export const forecastDays = writable(5)
+export const forecastDaysPast = writable(1)
 
-export function getForecastOpenMeteo() {
+Date.prototype.addDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+Date.prototype.subtractDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() - days);
+  return date;
+}
+
+export async function getForecastOpenMeteo(dateTime) {
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
     console.log("fetching forecast openMeteo")
+    try {
+      // First promise
+      const result = await fetchForecastMeteo(
+        get(currentLocation).latitude,
+        get(currentLocation).longitude,
+        get(currentLocation).slope,
+        get(currentLocation).aspect,
+        get(forecastMode),
+        dateTime,
+      );
 
-    var promise = fetchForecastMeteo(
-      get(currentLocation).latitude,
-      get(currentLocation).longitude,
-      get(currentLocation).slope,
-      get(currentLocation).aspect,
-      get(forecastMode),
-      get(dateString),
-    );
-    promise.then(function (result) {
-      console.log("setting OpenMeteo result", result)
-      forecastOpenMeteo.set(result)
-    })
-    fetchingForecast.set(false)
+      // Second promise
+      const resultMoist = await fuelMoistureCalcs(
+        result,
+        5,
+        get(currentLocation).slope,
+        get(currentLocation).aspect,
+        get(currentLocation).elevation,
+      );
+
+      // Update stores
+      forecastOpenMeteo.set(resultMoist);
+      fetchingForecast.set(false);
+      currentDateTime.set(new Date(dateTime));
+      console.log("forecastOpenMeteo in getForecastOpenMeteo", get(forecastOpenMeteo))
+    } catch (error) {
+      console.error("Error fetching forecast:", error);
+      fetchingForecast.set(false);
+    }
   }
 }
+export function getIndexOf(dateObject) {
+  return get(forecastOpenMeteo).time.indexOf(dateObject.getTime())
+}
+
+export const daysInForecast = derived([forecastOpenMeteo], ([$forecastOpenMeteo]) => {
+  let days = []
+  // skiping past days
+  days.push((new Date($forecastOpenMeteo.time[0]).addDays(get(forecastDaysPast)).valueOf()))
+  for (let i = 1; i < get(forecastDays); i++) {
+    days.push((new Date(days[i - 1]).addDays(1)).valueOf())
+  }
+  // console.log("daysInForecast", days)
+  return days
+})
+
 export function getForecast() {
-  // console.log("checking forecast conditions, currentLocation : ", get(currentLocation))
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
     console.log("fetching forecast")
     var promise = fetchForecastJSON(
@@ -73,15 +116,10 @@ export function getForecast() {
       get(currentLocation).longitude,
     );
     promise.then(function (result) {
-      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentWeather', result)
-      // const indexCurrent = differenceHours(new Date(get(dateTime)), new Date(result.features[0].properties.timeSeries[0].time))
-      // currentWeather.set(result.features[0].properties.timeSeries[indexCurrent])
-
       console.log("setting forecast location")
       forecastLocation.set({ coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name })
       console.log("setting forecast timeSerie")
       forecastTimeSeries.set(result.features[0].properties.timeSeries)
-      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentWeather, done')
     })
   }
 }
@@ -111,73 +149,20 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
 })
 
 export const currentTimeIndex = derived([dateTime], ([$dateTime]) => {
+  console.log("dateTime", $dateTime)
   const index = get(forecastOpenMeteo).time.indexOf($dateTime)
   return index > -1 ? index : 0
 })
-// export const currentTimeIndex = derived([forecastTimeIndex, dateTime], ([$forecastTimeIndex, $dateTime]) => {
-//   return Array.from($forecastTimeIndex.keys()).indexOf($dateTime)
+
+export const focusDayIndex = derived([focusDay], ([$focusDay]) => {
+  const timeIndex = get(forecastOpenMeteo).time
+  const indexMin = timeIndex.indexOf($focusDay.valueOf())
+  const indexMax = timeIndex.indexOf($focusDay.valueOf() + 86400000);
+  console.log("time index calc", indexMin, indexMax, new Date($focusDay), new Date(timeIndex[0]), new Date(timeIndex[23]), new Date(timeIndex[-1]))
+  return [indexMin, indexMax]
+})
+// export const currentDayTimeIndex = derived([dateTime], ([$dateTime]) => {
+//   console.log("dateTime", $dateTime)
+//   const index = get(forecastOpenMeteo).time.indexOf($dateTime)
+//   return index > -1 ? index : 0
 // })
-
-
-// export const currentWeather = derived([currentWeatherInit, locations, dateTime], ([$currentWeatherInit, $locations, $dateTime]) => {
-//   if ($locations.currentLocation.latitude) {
-//     console.log('!!!!!!!!!!!!!!!!!!!!!!!!calling fetchForecastJSON with location : ', $locations['currentLocation'])
-//     var promise = fetchForecastJSON(
-//       $locations['currentLocation'].latitude,
-//       $locations['currentLocation'].longitude,
-//     );
-//     promise.then(function(result) {
-//       console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentW')
-//       const indexCurrent = differenceHours(new Date($dateTime), new Date(result.features[0].properties.timeSeries[0].time))
-//       $currentWeatherInit = result.features[0].properties.timeSeries[indexCurrent]
-//       forecastLocation = { coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name }
-//       console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting currentW, done :  ', currentW)
-//     })
-//   }
-//   return currentW
-// })
-//
-// const forecast = derived([forecastInit, locations, dateTime], ([$forecastInit, $locations, $dateTime]) => {
-//   let forecastObject = {}
-//   if ($locations.currentLocation.latitude) {
-//     console.log('!!!!!!!!!!!!!!!!!!!!!!!!calling fetchForecastJSON with location : ', $locations['currentLocation'])
-//     var promise = fetchForecastJSON(
-//       $locations['currentLocation'].latitude,
-//       $locations['currentLocation'].longitude,
-//     );
-//     promise.then(function(result) {
-//       console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting forecastObject')
-//       forecastObject.timeSeries = result.features[0].properties.timeSeries
-//       const indexCurrent = differenceHours(new Date($dateTime), new Date(forecastObject.timeSeries[0].time))
-//       forecastObject.currentWeather = result.features[0].properties.timeSeries[indexCurrent]
-//       forecastObject.location = { coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name }
-//       forecastObject = forecastObject
-//       console.log('!!!!!!!!!!!!!!!!!!!!!!!!setting forecastObject, done :  ', forecastObject)
-//     })
-//   }
-//   return forecastObject
-//
-// })
-// export const forecast = writable({})
-// export async function fetchForecast() {
-//   locations.subscribe((value) => {
-//     console.log('value ', value)
-//     if (value.currentLocation.latitude) {
-//       var promise = fetchForecastJSON(
-//         value['currentLocation'].latitude,
-//         value['currentLocation'].longitude,
-//       );
-//       promise.then(function(result) {
-//         forecast.timeSeries = result.features[0].properties.timeSeries
-//         const indexCurrent = differenceHours(get(dateTime), new Date(forecast.timeSeries[0].time))
-//         forecast.currentWeather = result.features[0].properties.timeSeries[indexCurrent]
-//         forecast.location = { coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name }
-
-
-
-//     })
-//   }
-// });
-// });
-// }
-
