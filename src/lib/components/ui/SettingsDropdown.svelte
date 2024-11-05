@@ -26,12 +26,14 @@
     if (value === "Fosberg") {
       $fuelMoistureModel = "Fosberg";
       $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
-      console.log("Fuel moisture model changed to ", value);
-    } else {
+    } else if (value === "Nelson") {
       $fuelMoistureModel = "Nelson";
       $modelConfigValues["configure.fuel.moisture"].value = "individual";
-      console.log("Fuel moisture model changed to ", value);
+    } else {
+      $fuelMoistureModel = "fireInSite";
+      $modelConfigValues["configure.fuel.moisture"].value = "individual";
     }
+    console.log("Fuel moisture model changed to ", value);
   }
 
   function handleTimeModeChange(value) {
@@ -42,8 +44,9 @@
         $timeMode = "user";
       }
     } else {
-      $currentDateTime = new Date();
-      getForecastOpenMeteo();
+      console.log("setting currentDateTime to now, fetching forecast");
+      let dateTime = new Date();
+      getForecastOpenMeteo(dateTime);
     }
   }
 </script>
@@ -58,13 +61,12 @@
     <Radio
       name="fuelMoistureModel"
       bind:group={$fuelMoistureModel}
-      value={"Fosberg"}
-      on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
+      value={"fireInSite"}
+      on:change={() => handleFuelMoistureChange("fireInSite")}>fireInSite</Radio
     >
-    <Helper class="ps-6"
-      >Calculate dead fuel mosture using Fosberg model.</Helper
-    >
+    <Helper class="ps-6">fireInSite dead fuel moisture model.</Helper>
   </li>
+
   <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
     <Radio
       name="fuelMoistureModel"
@@ -74,6 +76,18 @@
     >
     <Helper class="ps-6">Use simple Nelson dead fuel moisture model.</Helper>
   </li>
+  <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+    <Radio
+      name="fuelMoistureModel"
+      bind:group={$fuelMoistureModel}
+      value={"Fosberg"}
+      on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
+    >
+    <Helper class="ps-6"
+      >Calculate dead fuel mosture using Fosberg model.</Helper
+    >
+  </li>
+
   <DropdownDivider></DropdownDivider>
   <div class="px-4 py-2">
     <span class="block text-lg text-gray-900 dark:text-white"
