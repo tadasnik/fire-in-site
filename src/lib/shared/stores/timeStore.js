@@ -1,5 +1,22 @@
-import { writable, derived } from 'svelte/store'
+import { readable, writable, derived, get } from 'svelte/store'
 import { timeFormat } from 'd3-time-format'
+
+Date.prototype.subtractDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() - days);
+  return date;
+}
+export const currentDate = readable(new Date().subtractDays(6))
+
+export const currentYear = derived([currentDate], ([$currentDate]) => {
+  return $currentDate.getFullYear()
+})
+
+
+export const historicalYear = writable()
+export const historicalMonth = writable()
+export const historicalDay = writable()
+
 
 export function getDateString(date) {
   return timeFormat('%Y-%m-%d')(date)
@@ -61,9 +78,52 @@ export const hour = derived(
 
   })
 
-export const historicalYear = writable()
-export const historicalMonth = writable()
-export const historicalDay = writable()
+
+
+export const yearsOptions = derived([currentYear], ([$currentYear]) => {
+  let years = [];
+  for (let year = 1970; year < $currentYear + 1; year++) {
+    years.push({ value: year, name: String(year) });
+  }
+  return years;
+})
+
+export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
+  if (!$historicalYear) {
+    return false
+  } else {
+    let months = [];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    monthNames.forEach((month, i) => {
+      months.push({ value: i, name: month });
+    })
+    console.log("monthOptions months", months)
+    if ($historicalYear === get(currentYear)) {
+      return months.slice(0, get(currentDate).getMonth() + 1)
+    } else {
+      return months
+    }
+  }
+})
+
+export const dayOptions = derived([historicalYear, historicalMonth], ([$historicalYear, $historicalMonth]) => {
+  const daysInHistoryMonth = new Date(
+    $historicalYear,
+    $historicalMonth + 1,
+    0,
+  ).getDate();
+
+  const days = Array.from({ length: daysInHistoryMonth }, (_, i) => i + 1);
+  const daysOb = days.map((day) => {
+    return { value: day, name: day };
+  });
+  if ($historicalYear === get(currentYear) && $historicalMonth === get(currentDate).getMonth()) {
+    return daysOb.slice(0, get(currentDate).getDate())
+  } else {
+    return daysOb
+  }
+})
+
 
 export const historicalDate = derived([historicalYear, historicalMonth, historicalDay], ([$historicalYear, $historicalMonth, $historicalDay]) => {
   console.log("historicalDate", $historicalYear, $historicalMonth, $historicalDay)

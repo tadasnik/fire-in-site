@@ -1,7 +1,3 @@
-<script context="module">
-  export const ssr = false;
-</script>
-
 <script>
   import { Select, Button, Popover, Label } from "flowbite-svelte";
   import { timeFormat } from "d3-time-format";
@@ -37,6 +33,9 @@
     historicalDate,
     focusDay,
     timeMode,
+    yearsOptions,
+    monthOptions,
+    dayOptions,
   } from "$lib/shared/stores/timeStore.js";
   import BarFigure from "$lib/components/visual/BarFigure.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
@@ -44,56 +43,7 @@
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
   import DayPicker from "$lib/components/visual/DayPicker.svelte";
 
-  let placement = "";
-  let w;
-  const years = [
-    { value: 2010, name: "2010" },
-    { value: 2011, name: "2011" },
-    { value: 2012, name: "2012" },
-    { value: 2013, name: "2013" },
-    { value: 2014, name: "2014" },
-    { value: 2015, name: "2015" },
-    { value: 2016, name: "2016" },
-    { value: 2017, name: "2017" },
-    { value: 2018, name: "2018" },
-    { value: 2019, name: "2019" },
-    { value: 2020, name: "2020" },
-    { value: 2021, name: "2021" },
-    { value: 2022, name: "2022" },
-    { value: 2023, name: "2023" },
-    { value: 2024, name: "2024" },
-  ];
-  const months = [
-    { value: 0, name: "January" },
-    { value: 1, name: "February" },
-    { value: 2, name: "March" },
-    { value: 3, name: "April" },
-    { value: 4, name: "May" },
-    { value: 5, name: "June" },
-    { value: 6, name: "July" },
-    { value: 7, name: "August" },
-    { value: 8, name: "September" },
-    { value: 9, name: "October" },
-    { value: 10, name: "November" },
-    { value: 11, name: "December" },
-  ];
-
-  $: daysInHistoryMonth = new Date(
-    $historicalYear,
-    $historicalMonth + 1,
-    0,
-  ).getDate();
-
-  $: days = Array.from({ length: daysInHistoryMonth }, (_, i) => i + 1);
-  $: daysOb = days.map((day) => {
-    return { value: day, name: day };
-  });
-
-  const selectOptions = [];
-
-  for (const [key, value] of Object.entries(UKFuelModels)) {
-    selectOptions.push({ name: key + ": " + value.label, value: key });
-  }
+  let width;
 
   function fetchHistoricalForecast() {
     $fetchingForecast = true;
@@ -116,7 +66,10 @@
   }
 
   $: console.log("FOcUsIndex  !??????", $focusDayIndex);
-  $: console.log("_outputForecastArray  ", $_outputForecastArray);
+  $: console.log("Forecast MOde  !??????", $forecastMode);
+  $: console.log("yearsOptions", $yearsOptions);
+
+  // $: console.log("_outputForecastArray  ", $_outputForecastArray);
 
   function onChange(event) {
     // console.log("date change", event.detail); // logs currently selected date or null
@@ -127,7 +80,7 @@
 
 <div class="flex flex-col justify-center content-center w-full">
   <div class="container mx-auto justify-center p-4 items-center">
-    {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast !== true}
+    {#if $fetchingForecast !== true}
       <WeatherInfo
         data={$forecastOpenMeteo}
         forecastLocation={$forecastLocation.name}
@@ -146,7 +99,7 @@
     class="container mx-auto flex flex-col md:flex-row items-center max-w-screen-xl"
   >
     <div class="grow w-full sm:p-4 sm:w-1/2 min-w-80">
-      <div class="aspect-square" bind:clientWidth={w}>
+      <div class="aspect-square" bind:clientWidth={width}>
         {#if $currentLocation.userLocation}
           <Map />
         {/if}
@@ -157,7 +110,7 @@
       {#if $_outputForecast.get($dateTime)}
         {#if $chartType === "fireChar"}
           <FireCharacteristics
-            parentWidth={w}
+            parentWidth={width}
             data={$_outputForecast.get($dateTime)}
             xKey="surface.weighted.fire.heatPerUnitArea"
             yKey="surface.weighted.fire.spreadRate"
@@ -221,29 +174,33 @@
         <Select
           id="select-year"
           size="sm"
-          items={years}
+          items={$yearsOptions}
           bind:value={$historicalYear}
           placeholder="Select year"
         />
       </div>
-      <div>
-        <Select
-          id="select-month"
-          size="sm"
-          items={months}
-          bind:value={$historicalMonth}
-          placeholder="Select month"
-        />
-      </div>
-      <div>
-        <Select
-          id="select-day"
-          size="sm"
-          items={daysOb}
-          bind:value={$historicalDay}
-          placeholder="Select day"
-        />
-      </div>
+      {#if $historicalYear}
+        <div>
+          <Select
+            id="select-month"
+            size="sm"
+            items={$monthOptions}
+            bind:value={$historicalMonth}
+            placeholder="Select month"
+          />
+        </div>
+      {/if}
+      {#if $historicalYear && $historicalMonth}
+        <div>
+          <Select
+            id="select-day"
+            size="sm"
+            items={$dayOptions}
+            bind:value={$historicalDay}
+            placeholder="Select day"
+          />
+        </div>
+      {/if}
       <div>
         <Button
           size="sm"
@@ -259,7 +216,7 @@
     </div>
   {/if}
 
-  {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast === false}
+  {#if $fetchingForecast === false}
     <div class="flex flex-col relative items-center">
       {#if $forecastMode === "forecast"}
         <div class="container flex max-w-4xl overflow-x-auto">

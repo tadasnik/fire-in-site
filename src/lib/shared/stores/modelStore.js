@@ -50,8 +50,6 @@ export const selectedFuels = writable(['cll', 'clm', 'clh', 'cld', 'mhl', 'mhh',
 export const selectedFuel = writable('cl1')
 export const secondaryFuel = writable(['gr6'])
 export const advancedMode = writable(false)
-export const forecastMode = writable('forecast')
-export const forecastModes = writable(['forecast', 'history'])
 export const chartType = writable("bars")
 
 // export const _outputForecast = writable(new Map())

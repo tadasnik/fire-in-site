@@ -48,8 +48,6 @@
   import {
     getForecastOpenMeteo,
     forecastOpenMeteo,
-    forecastMode,
-    forecastModes,
     fetchingForecast,
   } from "$lib/shared/stores/forecastStore";
   import {
