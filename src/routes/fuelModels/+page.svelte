@@ -23,6 +23,7 @@
     eager: true,
     as: "url",
   });
+  console.log("fuelsImages = ", fuelsImages);
 
   function getFuelImages(fuel) {
     let images = [];

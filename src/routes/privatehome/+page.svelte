@@ -12,7 +12,7 @@
   import MultiLinePage from "$lib/components/visual/MultiLinePage.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
   import { authStore } from "$lib/shared/stores/authStore";
-  import AuthReset from "$lib/components/AuthReset.svelte";
+  import AuthReset from "$lib/components/auth/AuthReset.svelte";
 
   let email;
 

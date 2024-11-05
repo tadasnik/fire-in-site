@@ -4,10 +4,9 @@
 
 <script>
   import { Select, Button, Popover, Label } from "flowbite-svelte";
+  import { timeFormat } from "d3-time-format";
   import Map from "$lib/components/ui/Map.svelte";
-  import Auth from "$lib/components/Auth.svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
-  import { simpleNelsonFuelMoisture } from "$lib/model/nelsonFMC/simpleNelson.js";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import {
     selectedOutput,
@@ -24,6 +23,9 @@
     getForecastOpenMeteo,
     forecastMode,
     fetchingForecast,
+    forecastDays,
+    daysInForecast,
+    focusDayIndex,
   } from "$lib/shared/stores/forecastStore.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import {
@@ -32,12 +34,16 @@
     historicalYear,
     historicalMonth,
     historicalDay,
+    historicalDate,
+    focusDay,
+    timeMode,
   } from "$lib/shared/stores/timeStore.js";
   import BarFigure from "$lib/components/visual/BarFigure.svelte";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
-  import { getLocation } from "$lib/shared/stores/locationStore";
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
+  import DayPicker from "$lib/components/visual/DayPicker.svelte";
+
   let placement = "";
   let w;
   const years = [
@@ -58,25 +64,25 @@
     { value: 2024, name: "2024" },
   ];
   const months = [
-    { value: 1, name: "January" },
-    { value: 2, name: "February" },
-    { value: 3, name: "March" },
-    { value: 4, name: "April" },
-    { value: 5, name: "May" },
-    { value: 6, name: "June" },
-    { value: 7, name: "July" },
-    { value: 8, name: "August" },
-    { value: 9, name: "September" },
-    { value: 10, name: "October" },
-    { value: 11, name: "November" },
-    { value: 12, name: "December" },
+    { value: 0, name: "January" },
+    { value: 1, name: "February" },
+    { value: 2, name: "March" },
+    { value: 3, name: "April" },
+    { value: 4, name: "May" },
+    { value: 5, name: "June" },
+    { value: 6, name: "July" },
+    { value: 7, name: "August" },
+    { value: 8, name: "September" },
+    { value: 9, name: "October" },
+    { value: 10, name: "November" },
+    { value: 11, name: "December" },
   ];
+
   $: daysInHistoryMonth = new Date(
     $historicalYear,
-    $historicalMonth,
+    $historicalMonth + 1,
     0,
   ).getDate();
-  // $: console.log("daysInHistoryMonth", daysInHistoryMonth);
 
   $: days = Array.from({ length: daysInHistoryMonth }, (_, i) => i + 1);
   $: daysOb = days.map((day) => {
@@ -91,14 +97,14 @@
 
   function fetchHistoricalForecast() {
     $fetchingForecast = true;
-    $currentDateTime = new Date(
+    let dateTime = new Date(
       $historicalYear,
-      $historicalMonth - 1,
+      $historicalMonth,
       $historicalDay,
       12,
     );
-    getForecastOpenMeteo();
-    // console.log("currentDateTime", $currentDateTime);
+    getForecastOpenMeteo(dateTime);
+    console.log("currentDateTime", $currentDateTime, dateTime);
   }
 
   function configOptions(configKey) {
@@ -109,12 +115,14 @@
     return options;
   }
 
-  // $: console.log("forecastOpenMeteo  ", $forecastOpenMeteo);
+  $: console.log("FOcUsIndex  !??????", $focusDayIndex);
+  $: console.log("_outputForecastArray  ", $_outputForecastArray);
 
   function onChange(event) {
     // console.log("date change", event.detail); // logs currently selected date or null
     $currentDateTime = new Date(event.detail);
   }
+  $: $currentLocation, getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
 </script>
 
 <div class="flex flex-col justify-center content-center w-full">
@@ -122,6 +130,12 @@
     {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast !== true}
       <WeatherInfo
         data={$forecastOpenMeteo}
+        forecastLocation={$forecastLocation.name}
+        fireLocation={$currentLocation}
+      />
+    {:else}
+      <WeatherInfo
+        data={null}
         forecastLocation={$forecastLocation.name}
         fireLocation={$currentLocation}
       />
@@ -165,7 +179,7 @@
             </Label>
           </div>
 
-          {#if $selectedOutput !== "ignition.firebrand.probability" && $selectedOutput !== "site.moisture.dead.tl1h"}
+          {#if $selectedOutput !== "ignition.firebrand.probabiity"}
             <BarFigure
               data={$_outputForecast.get($dateTime)}
               time={$dateTime}
@@ -233,7 +247,10 @@
       <div>
         <Button
           size="sm"
-          disabled={$historicalYear && $historicalMonth && $historicalDay
+          disabled={$historicalYear &&
+          $historicalMonth &&
+          $historicalDay &&
+          $historicalDate
             ? false
             : true}
           on:click={() => fetchHistoricalForecast()}>Retrieve</Button
@@ -243,14 +260,26 @@
   {/if}
 
   {#if $forecastOpenMeteo.time.length > 1 && $fetchingForecast === false}
-    <div class="flex pt-6 w-full overflow-x-auto xl:justify-center">
-      <Heatmap
-        fireBehaviourData={$_outputForecastArray}
-        forecastData={$forecastOpenMeteo}
-        xKey="time"
-        zKey={$selectedOutput}
-        yKey="surface.primary.fuel.model.catalogKey"
-      />
+    <div class="flex flex-col relative items-center">
+      {#if $forecastMode === "forecast"}
+        <div class="container flex max-w-4xl overflow-x-auto">
+          <DayPicker />
+        </div>
+      {/if}
+      <div class="flex mx-auto w-full overflow-x-auto md:justify-center">
+        <Heatmap
+          fireBehaviourData={$_outputForecastArray.slice(
+            $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
+            $focusDayIndex[1] < 0
+              ? $_outputForecastArray.length
+              : $focusDayIndex[1],
+          )}
+          forecastData={$forecastOpenMeteo}
+          xKey="time"
+          zKey={$selectedOutput}
+          yKey="surface.primary.fuel.model.catalogKey"
+        />
+      </div>
     </div>
   {/if}
   <!-- <div class="container mx-auto p-8"> -->

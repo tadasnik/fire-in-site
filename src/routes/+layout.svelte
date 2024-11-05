@@ -16,28 +16,20 @@
     SidebarItem,
     SidebarWrapper,
     SidebarDropdownWrapper,
-    SidebarDropdownItem,
     Spinner,
     Drawer,
     Dropdown,
     DropdownDivider,
-    DropdownItem,
     Navbar,
     NavBrand,
     NavLi,
     NavUl,
     NavHamburger,
-    Toggle,
-    Button,
     CloseButton,
-    Radio,
-    Helper,
     Footer,
     FooterBrand,
   } from "flowbite-svelte";
   import {
-    ChevronDownOutline,
-    ChevronRightOutline,
     AdjustmentsHorizontalSolid,
     ColumnOutline,
     HomeOutline,
@@ -70,42 +62,18 @@
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
-  function handleFuelMoistureChange(value) {
-    if (value === "Fosberg") {
-      $fuelMoistureModel = "Fosberg";
-      $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
-      console.log("Fuel moisture model changed to ", value);
-    } else {
-      $fuelMoistureModel = "Nelson";
-      $modelConfigValues["configure.fuel.moisture"].value = "individual";
-      console.log("Fuel moisture model changed to ", value);
-    }
-  }
-  function handleTimeModeChange(value) {
-    $fetchingForecast = true;
-    $forecastMode = value;
-    if (value === "historical") {
-      if ($timeMode === "current") {
-        $timeMode = "user";
-      }
-    } else {
-      $currentDateTime = new Date();
-      getForecastOpenMeteo();
-    }
-  }
-
   let transitionParams = {
     x: -320,
     duration: 200,
     easing: sineIn,
   };
   onMount(() => {
-    const interval = setInterval(() => {
-      if ($timeMode === "current") {
-        $currentDateTime = new Date();
-      } else {
-      }
-    }, 1.8e9);
+    // const interval = setInterval(() => {
+    //   if ($timeMode === "current") {
+    //     $currentDateTime = new Date();
+    //   } else {
+    //   }
+    // }, 1.8e9);
 
     // differenceHours($dateTime - Date($forecast.timeSeries[0].time));
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
@@ -184,7 +152,7 @@
     });
     return () => {
       unsuscribe;
-      clearInterval(interval);
+      // clearInterval(interval);
     };
   });
 
@@ -193,7 +161,7 @@
   $: activeUrl = $page.url.pathname;
   $: console.log("layout activeURl", activeUrl);
 
-  $: $currentLocation, getForecastOpenMeteo(); // promise.then(fetchForecast());
+  $: $currentLocation, getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
 
   let hidden1 = true;
   const toggleDrawer = () => {
