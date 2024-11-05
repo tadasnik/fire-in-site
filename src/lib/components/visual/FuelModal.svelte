@@ -42,19 +42,17 @@
   autoclose
   outsideclose
 >
-  {#if images.length !== 0}
-    <div class="max-w-4xl">
-      <Carousel
-        class="min-h-72"
-        {images}
-        imgClass="object-cover"
-        let:Indicators
-        let:Controls
-      >
-        <Controls />
-      </Carousel>
-    </div>
-  {/if}
+  <div class="max-w-4xl">
+    <Carousel
+      class="min-h-72"
+      {images}
+      imgClass="object-cover"
+      let:Indicators
+      let:Controls
+    >
+      <Controls />
+    </Carousel>
+  </div>
   <div class="container text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
     <div class="content pt-2">
