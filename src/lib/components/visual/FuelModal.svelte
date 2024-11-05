@@ -12,27 +12,26 @@
     getFuelModelsUrls,
   } from "$lib/firebase/firebase.client";
 
-  const fuelsImages = import.meta.glob("$lib/assets/fuel_models/*/*.webp", {
+  const fuelsImages = import.meta.glob("$lib/assets/fuelModelPhotos/*.webp", {
     eager: true,
     as: "url",
   });
+
   console.log("fuelsImages", fuelsImages);
   export let clickOutsideModal;
 
-  let images = [];
+  function getFuelImages(fuel) {
+    let images = [];
+    Object.entries(fuelsImages).forEach(([key, value]) => {
+      if (key.split("/")[5].split("_")[0] === fuel.toLowerCase()) {
+        images.push({ src: value, alt: fuel });
+      }
+    });
+    return images;
+  }
 
-  Object.entries(fuelsImages).forEach(([key, value]) => {
-    if (key.split("/")[5] === $selectedFuel) {
-      console.log("key", key);
-      images.push({ src: value, alt: $selectedFuel });
-    }
-  });
-  // $: images = Object.values(fuelsImages).map((imageUrl) => {
-  //   conole.log("imageUrl", imageUrl);
-  //   if (imageUrl.split("/")[5] === $selectedFuel) {
-  //     return { src: imageUrl, alt: $selectedFuel };
-  //   }
-  // });
+  const images = getFuelImages($selectedFuel);
+
   console.log("images", Object.keys(fuelsImages), images);
 </script>
 
