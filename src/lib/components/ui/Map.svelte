@@ -85,9 +85,7 @@
 
   function processPointSlopeAspect(map, longitude, latitude, distance) {
     const points = pointsCardinalDirections(longitude, latitude, distance);
-    console.log("points", points);
     pointsElevation(points, map);
-    console.log("points", points);
     return slopeAspect(points, distance);
   }
 
@@ -162,37 +160,35 @@
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
       // if (e.source.type === "raster-dem") {
-      console.log("Map on load", map.ready());
-      console.log("sourcedata true");
-      locMarker.setLngLat([
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-      ]);
-      map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
-      let elevation = map.queryTerrainElevation([
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-      ]);
-      console.log("elevation", elevation);
+      if (map.ready()) {
+        locMarker.setLngLat([
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+        ]);
+        map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+        let elevation = map.queryTerrainElevation([
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+        ]);
 
-      let [slope, aspect] = processPointSlopeAspect(
-        map,
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        50,
-      );
-      setCurrentLocation(
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        elevation,
-        slope,
-        aspect,
-      );
-      // map.off("sourcedata");
+        let [slope, aspect] = processPointSlopeAspect(
+          map,
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+          50,
+        );
+        setCurrentLocation(
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+          elevation,
+          slope,
+          aspect,
+        );
+        // map.off("sourcedata");
+      }
     });
 
     map.on("click", function (e) {
-      console.log("click", e);
       let coordinates = e.lngLat;
       locMarker.setLngLat([coordinates.lng, coordinates.lat]);
       let elevation = map.queryTerrainElevation([
