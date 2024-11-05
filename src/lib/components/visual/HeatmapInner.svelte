@@ -19,6 +19,7 @@
   import { selectedOutput } from "$lib/shared/stores/modelStore";
   import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
   import MultiSelect from "../ui/MultiSelect.svelte";
+  import { focusDayIndex } from "$lib/shared/stores/forecastStore";
 
   const { data, z, zGet } = getContext("LayerCake");
 
@@ -32,7 +33,6 @@
   export let forecastData;
   export let weatherProps;
   export let modelOutputProps;
-  export let halfPoint;
 
   $: isSelectedClass = (x) => {
     return $currentTimeIndex == x
@@ -47,7 +47,7 @@
 
 {#each Object.entries(weatherProps) as [prop, values], i}
   {#if prop != "windDirection10m"}
-    {#each forecastData[prop] as weatherObject, x}
+    {#each forecastData[prop].slice($focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0], $focusDayIndex[1] < 0 ? forecastData.length : $focusDayIndex[1]) as weatherObject, x}
       <rect
         width={cellSize}
         height={cellSize}
@@ -81,7 +81,7 @@
       x={x * cellSize}
       y={(datasetsProps[0] + gapSize + i) * cellSize}
       style="fill:{modelOutputProps[$selectedOutput][0](
-        object[$selectedOutput]
+        object[$selectedOutput],
       )}
         ;stroke-width:.2;stroke:grey"
     />

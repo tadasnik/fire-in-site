@@ -49,7 +49,6 @@
     if (chars.length > 2) {
       bold += chars.slice(2).join("");
     }
-    console.log("bold", bold);
     return bold;
   }
 

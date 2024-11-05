@@ -136,6 +136,9 @@
   $: yCount = Object.keys(fireBehaviourData[0]).length;
   $: chartHeight = (yCountWeather + yCount) * cellSize + cellSize;
   $: heatmapWidth = fireBehaviourData.length * cellSize;
+  $: dayPickerHeight = 40;
+  $: console.log("Heatmap forecast data", forecastData);
+  $: console.log("Heatmap output data", fireBehaviourData);
 </script>
 
 <div
