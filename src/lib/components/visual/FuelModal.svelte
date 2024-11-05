@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Modal, Gallery, Button } from "flowbite-svelte";
+  import { Modal, Gallery, Carousel, Button } from "flowbite-svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { selectedFuel } from "$lib/shared/stores/modelStore.js";
   import {
@@ -43,7 +43,17 @@
   outsideclose
 >
   {#if images.length !== 0}
-    <Gallery class="grid grid-cols-2 gap-2" items={images} />
+    <div class="max-w-4xl">
+      <Carousel
+        class="min-h-72"
+        {images}
+        imgClass="object-cover"
+        let:Indicators
+        let:Controls
+      >
+        <Controls />
+      </Carousel>
+    </div>
   {/if}
   <div class="container text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
