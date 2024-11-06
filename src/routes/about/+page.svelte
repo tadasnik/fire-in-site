@@ -1,7 +1,7 @@
 <script>
   import { Card, Modal, Gallery } from "flowbite-svelte";
   import { Heading, P, A, Mark, Secondary } from "flowbite-svelte";
-  import gorseFire from "$lib/assets/fuelModelPhotos/gm_fire2.webp";
+  import gorseFire from "$lib/assets/fuelModelPhotos/gm_3.webp";
 </script>
 
 <div class="max-w-md mx-auto overflow-hidden md:max-w-2xl pt-10">
