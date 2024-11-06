@@ -22,9 +22,9 @@
 
   function getFuelImages(fuel) {
     let images = [];
-    Object.entries(fuelsImages).forEach(([key, value]) => {
+    Object.entries(fuelsImages).forEach(([key, value], index) => {
       if (key.split("/")[5].split("_")[0] === fuel.toLowerCase()) {
-        images.push({ src: value, alt: fuel });
+        images.push({ id: index, src: value, alt: fuel, title: fuel });
       }
     });
     return images;
@@ -32,7 +32,7 @@
 
   const images = getFuelImages($selectedFuel);
 
-  console.log("images", Object.keys(fuelsImages), images);
+  console.log("images", images);
 </script>
 
 <Modal
@@ -42,14 +42,8 @@
   autoclose
   outsideclose
 >
-  <div class="max-w-4xl">
-    <Carousel
-      class="min-h-72"
-      {images}
-      imgClass="object-cover"
-      let:Indicators
-      let:Controls
-    >
+  <div class="max-w-2xl">
+    <Carousel class="min-h-72" {images} imgClass="object-cover" let:Controls>
       <Controls />
     </Carousel>
   </div>
