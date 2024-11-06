@@ -33,6 +33,7 @@
   const images = getFuelImages($selectedFuel);
 
   console.log("images", images);
+  let slideControls = true;
 </script>
 
 <Modal
@@ -43,9 +44,11 @@
   outsideclose
 >
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
-    <Carousel {images}></Carousel>
+    <Carousel {images} let:Controls>
+      <Controls /></Carousel
+    >
   </div>
-  <div class="container text-left">
+  <div class="text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
     <div class="content pt-2">
       <div class="text-lg text-primary-800">Fuel model parameters</div>

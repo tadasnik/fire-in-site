@@ -115,15 +115,13 @@
     </div>
   </div>
   {#if $forecastMode === "historical"}
-    <div class="w-auto pb-4 mb-6">
+    <div class="container mx-auto w-auto p-4 mb-6">
       <HistoricalSelectDate></HistoricalSelectDate>
     </div>
   {/if}
-  <div class="flex flex-col relative items-center">
-    {#if $fetchingForecast === false}
-      <HourlyForecast></HourlyForecast>
-    {/if}
-  </div>
+  {#if $fetchingForecast === false}
+    <HourlyForecast></HourlyForecast>
+  {/if}
 </div>
 
 <style>

@@ -44,11 +44,11 @@
 
 <div class="flex flex-col relative items-center">
   {#if $forecastMode === "forecast"}
-    <div class="container flex max-w-4xl overflow-x-auto">
+    <div class="container flex max-w-xl overflow-x-auto">
       <DayPicker />
     </div>
   {/if}
-  <div class="flex mx-auto w-full overflow-x-auto md:justify-center">
+  <div class="flex mx-auto overflow-x-auto md:justify-center">
     <Heatmap
       fireBehaviourData={$_outputForecastArray.slice(
         $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
