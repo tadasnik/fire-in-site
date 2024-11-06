@@ -43,7 +43,7 @@
   outsideclose
 >
   <div class="max-w-2xl">
-    <Carousel class="min-h-72" {images} imgClass="object-cover"></Carousel>
+    <Carousel {images}></Carousel>
   </div>
   <div class="container text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
