@@ -48,7 +48,6 @@
   import {
     getForecastOpenMeteo,
     forecastOpenMeteo,
-    fetchingForecast,
   } from "$lib/shared/stores/forecastStore";
   import {
     getLocation,
@@ -90,7 +89,6 @@
         // window.location.href = "/";
 
         const [latitude, longitude] = await getLocation();
-        // const [latitude, longitude] = [51.514463, -0.159742];
 
         currentLocation.update((current) => ({
           ...current,
@@ -147,6 +145,7 @@
         console.log("curr", curr);
         return { ...curr, isLoading: false };
       });
+      getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
     });
     return () => {
       unsuscribe;
@@ -158,8 +157,6 @@
 
   $: activeUrl = $page.url.pathname;
   $: console.log("layout activeURl", activeUrl);
-
-  $: $currentLocation, getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
 
   let hidden1 = true;
   const toggleDrawer = () => {

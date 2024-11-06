@@ -53,8 +53,12 @@
       $historicalDay,
       12,
     );
+    console.log(
+      "Calling fetch forecast from handle historical, currentdateTime ",
+      $currentDateTime,
+      dateTime,
+    );
     getForecastOpenMeteo(dateTime);
-    console.log("currentDateTime", $currentDateTime, dateTime);
   }
 
   function configOptions(configKey) {
@@ -67,15 +71,6 @@
 
   $: console.log("FOcUsIndex  !??????", $focusDayIndex);
   $: console.log("Forecast MOde  !??????", $forecastMode);
-  $: console.log("yearsOptions", $yearsOptions);
-
-  // $: console.log("_outputForecastArray  ", $_outputForecastArray);
-
-  function onChange(event) {
-    // console.log("date change", event.detail); // logs currently selected date or null
-    $currentDateTime = new Date(event.detail);
-  }
-  $: $currentLocation, getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
 </script>
 
 <div class="flex flex-col justify-center content-center w-full">

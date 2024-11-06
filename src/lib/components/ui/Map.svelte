@@ -3,6 +3,8 @@
   import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
+  import { getForecastOpenMeteo } from "$lib/shared/stores/forecastStore";
+  import { currentDateTime } from "$lib/shared/stores/timeStore";
   import "$lib/styles/mapbox-gl.css";
   import Layout from "../../../routes/+layout.svelte";
 
@@ -185,6 +187,7 @@
           aspect,
         );
         // map.off("sourcedata");
+        // getForecastOpenMeteo($currentDateTime); // promise.then(fetchForecast());
       }
     });
 
