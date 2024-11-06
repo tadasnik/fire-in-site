@@ -55,7 +55,6 @@
   }
 
   function setCurrentLocation(longitude, latitude, elevation, slope, aspect) {
-    console.log("setCurrent");
     let currentLoc = {};
     let prevLoc = new LatLon(
       $currentLocation.latitude,
@@ -68,7 +67,8 @@
     currentLoc.elevation = elevation;
     currentLoc.slope = Math.round(slope);
     currentLoc.aspect = Math.round(aspect);
-    currentLoc.distanceFromPrevious = distanceFromPrevious;
+    currentLoc.distanceFromPrevious =
+      distanceFromPrevious === 0 ? 10000 : distanceFromPrevious;
     currentLoc.userLocation = true;
     $currentLocation = currentLoc;
     console.log("setCurrent currentLoc", $currentLocation);
@@ -162,33 +162,37 @@
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
       // if (e.source.type === "raster-dem") {
-      if (map.ready()) {
-        locMarker.setLngLat([
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-        ]);
-        map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
-        let elevation = map.queryTerrainElevation([
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-        ]);
+      console.log("map ready");
+      locMarker.setLngLat([
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ]);
+      map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+      let elevation = map.queryTerrainElevation([
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ]);
 
-        let [slope, aspect] = processPointSlopeAspect(
-          map,
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-          50,
-        );
-        setCurrentLocation(
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-          elevation,
-          slope,
-          aspect,
-        );
-        // map.off("sourcedata");
-        // getForecastOpenMeteo($currentDateTime); // promise.then(fetchForecast());
-      }
+      let [slope, aspect] = processPointSlopeAspect(
+        map,
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        50,
+      );
+      setCurrentLocation(
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        elevation,
+        slope,
+        aspect,
+      );
+      console.log(
+        "fetching forecast on load,",
+
+        $currentLocation,
+      );
+      getForecastOpenMeteo($currentDateTime);
+      // map.off("sourcedata");
     });
 
     map.on("click", function (e) {
@@ -211,6 +215,13 @@
         slope,
         aspect,
       );
+      if ($currentLocation.distanceFromPrevious > 2000) {
+        console.log(
+          "fetching forecast from map click, distanceFromPrevious",
+          $currentLocation.distanceFromPrevious,
+        );
+        getForecastOpenMeteo($currentDateTime);
+      }
     });
     locMarker = new mapboxgl.Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])

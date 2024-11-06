@@ -37,24 +37,11 @@
   import { timeFormat } from "d3-time-format";
   import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
-
-  import {
-    fuelMoistureModel,
-    selectedOutput,
-    selectedOutputs,
-    modelConfigValues,
-    chartType,
-  } from "$lib/shared/stores/modelStore";
-  import {
-    getForecastOpenMeteo,
-    forecastOpenMeteo,
-  } from "$lib/shared/stores/forecastStore";
   import {
     getLocation,
     currentLocation,
   } from "$lib/shared/stores/locationStore";
   import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
-  import { outputNodes } from "$lib/data/outputNodes.js";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
@@ -92,7 +79,7 @@
 
         currentLocation.update((current) => ({
           ...current,
-          userLocation: true,
+          userLocation: false,
           distanceFromPrevious: 10000,
           latitude: latitude,
           longitude: longitude,
@@ -124,7 +111,7 @@
                 console.log("Document data:", defLoc.data());
                 currentLocation.update((current) => ({
                   ...current,
-                  userLocation: true,
+                  userLocation: false,
                   distanceFromPrevious: 10000,
                   latitude: defLoc.data().latitude,
                   longitude: defLoc.data().longitude,
@@ -145,7 +132,7 @@
         console.log("curr", curr);
         return { ...curr, isLoading: false };
       });
-      getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
+      // getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
     });
     return () => {
       unsuscribe;
@@ -271,13 +258,13 @@
   </Sidebar>
 </Drawer>
 <main class="">
-  {#if !$authStore.isLoading && $authStore.currentUser}
+  {#if browser && !$authStore.isLoading && $authStore.currentUser}
     <!-- <heading class="p-8" tag="h1" customSize="text-3xl" -->
     <!--   >Private page user: {$authStore.currentUser.displayName} -->
     <!-- </heading> -->
     <!-- <AuthReset /> -->
     <slot />
-  {:else if !$authStore.isLoading && $forecastOpenMeteo.time.length > 1}
+  {:else if browser && !$authStore.isLoading}
     <slot />
   {:else}
     <div class="flex items-center justify-center h-screen">

@@ -1,10 +1,35 @@
 <script>
-  import { Card, Modal, Gallery } from "flowbite-svelte";
+  import { Card, Modal, Gallery, Carousel } from "flowbite-svelte";
   import { Heading, P, A, Mark, Secondary } from "flowbite-svelte";
+  import emblaCarouselSvelte from "embla-carousel-svelte";
   import gorseFire from "$lib/assets/fuelModelPhotos/gm_3.webp";
+
+  const fuelsImages = import.meta.glob("$lib/assets/fuelModelPhotos/*.webp", {
+    eager: true,
+    as: "url",
+  });
+
+  console.log("fuelsImages", fuelsImages);
+
+  function getFuelImages(fuel) {
+    let images = [];
+    Object.entries(fuelsImages).forEach(([key, value], index) => {
+      if (key.split("/")[5].split("_")[0] === fuel.toLowerCase()) {
+        images.push({ id: index, src: value, alt: fuel, title: fuel });
+      }
+    });
+    return images;
+  }
+
+  const images = getFuelImages("gm");
+  console.log("images", images);
 </script>
 
 <div class="max-w-md mx-auto overflow-hidden md:max-w-2xl pt-10">
+  <div id="test" class="max-w-2xl">
+    <Carousel {images}></Carousel>
+  </div>
+
   <div class="flex flex-col text-slate-500">
     <div class="md:flex">
       <div class="pt-8 md:shrink-0">

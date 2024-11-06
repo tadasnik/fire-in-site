@@ -25,7 +25,7 @@
   // $: console.log("Bars data", data);
 </script>
 
-<div class="w-full h-80 md:h-4/5">
+<div class="chart-container w-full h-80 md:h-4/5">
   <LayerCake
     padding={{ bottom: 20, left: 45 }}
     x={xKey}

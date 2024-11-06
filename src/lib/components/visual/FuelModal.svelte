@@ -42,7 +42,7 @@
   autoclose
   outsideclose
 >
-  <div class="max-w-2xl">
+  <div id="default-carousel" class="relative w-full" data-carousel="slide">
     <Carousel {images}></Carousel>
   </div>
   <div class="container text-left">

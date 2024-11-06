@@ -63,15 +63,51 @@ export async function getForecastOpenMeteo(dateTime) {
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
     console.log("fetching forecast openMeteo")
     try {
-      // First promise
-      const result = await fetchForecastMeteo(
-        get(currentLocation).latitude,
-        get(currentLocation).longitude,
-        get(currentLocation).slope,
-        get(currentLocation).aspect,
-        get(forecastMode),
-        dateTime,
-      );
+      let hourlyVars = []
+      let result = {}
+      if (get(currentLocation).distanceFromPrevious > 4000) {
+        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
+        hourlyVars = ["global_tilted_irradiance",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "precipitation",
+          "weather_code",
+          "cloud_cover",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "wind_gusts_10m",
+          "vapour_pressure_deficit",
+        ]
+        result = await fetchForecastMeteo(
+          get(currentLocation).latitude,
+          get(currentLocation).longitude,
+          get(currentLocation).slope,
+          get(currentLocation).aspect,
+          get(forecastMode),
+          hourlyVars,
+          dateTime,
+        );
+        console.log("fetch forecast result", result)
+
+      } else {
+        console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
+
+        hourlyVars = ["global_tilted_irradiance"]
+        const gti = await fetchForecastMeteo(
+          get(currentLocation).latitude,
+          get(currentLocation).longitude,
+          get(currentLocation).slope,
+          get(currentLocation).aspect,
+          get(forecastMode),
+          hourlyVars,
+          dateTime,
+        );
+
+        result = get(forecastOpenMeteo)
+        result["global_tilted_irradiance"] = gti["global_tilted_irradiance"]
+
+
+      }
 
       // Second promise
       const resultMoist = await fuelMoistureCalcs(
@@ -86,7 +122,6 @@ export async function getForecastOpenMeteo(dateTime) {
       forecastOpenMeteo.set(resultMoist);
       fetchingForecast.set(false);
       currentDateTime.set(new Date(dateTime));
-      console.log("forecastOpenMeteo in getForecastOpenMeteo", get(forecastOpenMeteo))
     } catch (error) {
       console.error("Error fetching forecast:", error);
       fetchingForecast.set(false);

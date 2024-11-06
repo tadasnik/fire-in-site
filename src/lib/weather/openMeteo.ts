@@ -10,29 +10,17 @@ Date.prototype.subtractDays = function (days) {
 }
 
 
-export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, date: string) {
-  console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, date)
+export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, hourlyVars: ArrayLike, date: string) {
+  console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, hourlyVars, date)
   function fillParams() {
     const past_days = get(forecastDaysPast);
     const forecast_days = get(forecastDays);
     const start_date = getDateString(date.subtractDays(past_days))
     const end_date = getDateString(date);
-    console.log("start_date", start_date)
-    console.log("end_date", end_date)
     const baseParams = {
       "latitude": latitude,
       "longitude": longitude,
-      "hourly": ["temperature_2m",
-        "relative_humidity_2m",
-        "precipitation",
-        "weather_code",
-        "cloud_cover",
-        "wind_speed_10m",
-        "wind_direction_10m",
-        "wind_gusts_10m",
-        "global_tilted_irradiance",
-        "vapour_pressure_deficit",
-      ],
+      "hourly": hourlyVars,
       "wind_speed_unit": "ms",
       "tilt": slope,
       "azimuth": aspect - 180,
@@ -66,24 +54,24 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
   const hourly = response.hourly();
 
   // Note: The order of weather variables in the URL query and the indices below need to match!
-  console.log("hourly", new Date(Number(hourly.time())), new Date(Number(hourly.timeEnd())))
   const weatherData = {
 
     time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
       (t) => Number(3600000 * (Math.round(Number(new Date((t + utcOffsetSeconds) * 1000)) / 3600000)))
     ),
-    temperature2m: hourly.variables(0)!.valuesArray()!,
-    relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
-    precipitation: hourly.variables(2)!.valuesArray()!,
-    weatherCode: hourly.variables(3)!.valuesArray()!,
-    cloudCover: hourly.variables(4)!.valuesArray()!,
-    windSpeed10m: hourly.variables(5)!.valuesArray()!,
-    windDirection10m: hourly.variables(6)!.valuesArray()!,
-    windGusts10m: hourly.variables(7)!.valuesArray()!,
-    globalTiltedIrradiance: hourly.variables(8)!.valuesArray()!,
+    globalTiltedIrradiance: hourly.variables(0)!.valuesArray()!,
+    temperature2m: hourly.variables(1)!.valuesArray()!,
+    relativeHumidity2m: hourly.variables(2)!.valuesArray()!,
+    precipitation: hourly.variables(3)!.valuesArray()!,
+    weatherCode: hourly.variables(4)!.valuesArray()!,
+    cloudCover: hourly.variables(5)!.valuesArray()!,
+    windSpeed10m: hourly.variables(6)!.valuesArray()!,
+    windDirection10m: hourly.variables(7)!.valuesArray()!,
+    windGusts10m: hourly.variables(8)!.valuesArray()!,
     vapourPressureDeficit: hourly.variables(9)!.valuesArray()!,
 
   };
+  console.log("weatherData", weatherData)
   return weatherData;
 }
 
