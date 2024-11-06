@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Modal, Gallery, Carousel, Button } from "flowbite-svelte";
+  import { Modal, Gallery, Carousel, Controls, Button } from "flowbite-svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { selectedFuel } from "$lib/shared/stores/modelStore.js";
   import {
