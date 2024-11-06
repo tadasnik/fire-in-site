@@ -32,7 +32,6 @@
 
   const images = getFuelImages($selectedFuel);
 
-  console.log("images", images);
   let slideControls = true;
 </script>
 
@@ -44,7 +43,7 @@
   outsideclose
 >
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
-    <Carousel {images} let:Controls>
+    <Carousel {images} imgClass="min-h-72" let:Controls>
       <Controls /></Carousel
     >
   </div>

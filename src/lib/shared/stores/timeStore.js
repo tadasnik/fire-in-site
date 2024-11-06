@@ -53,13 +53,11 @@ export const dateTime = derived(
 )
 
 export const focusDay = derived([currentDateTime], ([$currentDateTime]) => {
-  console.log("focusDay calc, currentDateTime,", $currentDateTime)
   const focusDate = new Date(
     $currentDateTime.getFullYear(),
     $currentDateTime.getMonth(),
     $currentDateTime.getDate(),
   ).setHours(0, 0, 0)
-  console.log("focusDate calc, focusDate,", new Date(focusDate))
 
   return focusDate
   // return 3600000 * (Math.round(focusDate / 3600000))
@@ -97,7 +95,6 @@ export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
     monthNames.forEach((month, i) => {
       months.push({ value: i, name: month });
     })
-    console.log("monthOptions months", months)
     if ($historicalYear === get(currentYear)) {
       return months.slice(0, get(currentDate).getMonth() + 1)
     } else {
@@ -126,17 +123,13 @@ export const dayOptions = derived([historicalYear, historicalMonth], ([$historic
 
 
 export const historicalDate = derived([historicalYear, historicalMonth, historicalDay], ([$historicalYear, $historicalMonth, $historicalDay]) => {
-  console.log("historicalDate", $historicalYear, $historicalMonth, $historicalDay)
-  console.log("historicalDate", new Date($historicalYear, $historicalMonth, $historicalDay, 12, 0))
   if (isNaN($historicalYear) || isNaN($historicalMonth) || isNaN($historicalDay)) {
     return false
   } else {
-    console.log("first else")
     const histDate = new Date($historicalYear, $historicalMonth, $historicalDay, 12, 0)
     if (histDate < new Date(1970, 1, 1, 12, 0)) {
       return false
     } else if (histDate > new Date()) {
-      console.log("second else, future date", histDate, new Date())
       return false
     } else {
       return histDate

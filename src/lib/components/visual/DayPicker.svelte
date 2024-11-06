@@ -40,7 +40,7 @@
   }
   $: isSelectedDayClass = (d) => {
     return d === $focusDay
-      ? "grow min-h-28 font-bold text-xl text-primary-900 bg-gray-50 border-slate-500 border-t-2 border-l-2 border-r-2"
+      ? "grow min-h-24 font-bold text-xl text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2"
       : "border-slate-500 border-b-2 border-l-1 border-r-1";
   };
 </script>
@@ -51,13 +51,13 @@
 >
   {#each $daysInForecast as day}
     <div
-      class="min-w-40 p-4 bg-gray-100 max-h-28 {isSelectedDayClass(day)}"
+      class="min-w-40 p-4 bg-gray-100 max-h-20 {isSelectedDayClass(day)}"
       role="button"
       on:click={() => handleDayClick(day)}
     >
       {formatDay(day)}
 
-      <img src={heli} class="me-3 h-6 sm:h-9" alt="helicopter" />
+      <!-- <img src={heli} class="me-3 h-6 sm:h-9" alt="helicopter" /> -->
     </div>
   {/each}
 </div>

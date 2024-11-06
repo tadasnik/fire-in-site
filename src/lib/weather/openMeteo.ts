@@ -11,7 +11,7 @@ Date.prototype.subtractDays = function (days) {
 
 
 export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, hourlyVars: ArrayLike, date: string) {
-  console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, hourlyVars, date)
+  // console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, hourlyVars, date)
   function fillParams() {
     const past_days = get(forecastDaysPast);
     const forecast_days = get(forecastDays);
@@ -71,7 +71,7 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
     vapourPressureDeficit: hourly.variables(9)!.valuesArray()!,
 
   };
-  console.log("weatherData", weatherData)
+  // console.log("weatherData", weatherData)
   return weatherData;
 }
 

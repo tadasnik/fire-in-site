@@ -61,7 +61,7 @@ Date.prototype.subtractDays = function (days) {
 
 export async function getForecastOpenMeteo(dateTime) {
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
-    console.log("fetching forecast openMeteo")
+    // console.log("fetching forecast openMeteo")
     try {
       let hourlyVars = []
       let result = {}
@@ -87,7 +87,7 @@ export async function getForecastOpenMeteo(dateTime) {
           hourlyVars,
           dateTime,
         );
-        console.log("fetch forecast result", result)
+        // console.log("fetch forecast result", result)
 
       } else {
         console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
@@ -143,21 +143,21 @@ export const daysInForecast = derived([forecastOpenMeteo], ([$forecastOpenMeteo]
   return days
 })
 
-export function getForecast() {
-  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
-    console.log("fetching forecast")
-    var promise = fetchForecastJSON(
-      get(currentLocation).latitude,
-      get(currentLocation).longitude,
-    );
-    promise.then(function (result) {
-      console.log("setting forecast location")
-      forecastLocation.set({ coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name })
-      console.log("setting forecast timeSerie")
-      forecastTimeSeries.set(result.features[0].properties.timeSeries)
-    })
-  }
-}
+// export function getForecast() {
+//   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation) && (get(currentLocation).distanceFromPrevious > 5000)) {
+//     // console.log("fetching forecast")
+//     var promise = fetchForecastJSON(
+//       get(currentLocation).latitude,
+//       get(currentLocation).longitude,
+//     );
+//     promise.then(function (result) {
+//       console.log("setting forecast location")
+//       forecastLocation.set({ coordinates: result.features[0].geometry.coordinates, name: result.features[0].properties.location.name })
+//       console.log("setting forecast timeSerie")
+//       forecastTimeSeries.set(result.features[0].properties.timeSeries)
+//     })
+//   }
+// }
 
 export const forecastTimeIndex = derived(forecastTimeSeries, ($forecastTimeSeries) => {
   let indexMap = new Map()
@@ -184,7 +184,7 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
 })
 
 export const currentTimeIndex = derived([dateTime], ([$dateTime]) => {
-  console.log("dateTime", $dateTime)
+  // console.log("dateTime", $dateTime)
   const index = get(forecastOpenMeteo).time.indexOf($dateTime)
   return index > -1 ? index : 0
 })
@@ -193,7 +193,7 @@ export const focusDayIndex = derived([focusDay], ([$focusDay]) => {
   const timeIndex = get(forecastOpenMeteo).time
   const indexMin = timeIndex.indexOf($focusDay.valueOf())
   const indexMax = timeIndex.indexOf($focusDay.valueOf() + 86400000);
-  console.log("time index calc", indexMin, indexMax, new Date($focusDay), new Date(timeIndex[0]), new Date(timeIndex[23]), new Date(timeIndex[-1]))
+  // console.log("time index calc", indexMin, indexMax, new Date($focusDay), new Date(timeIndex[0]), new Date(timeIndex[23]), new Date(timeIndex[-1]))
   return [indexMin, indexMax]
 })
 // export const currentDayTimeIndex = derived([dateTime], ([$dateTime]) => {

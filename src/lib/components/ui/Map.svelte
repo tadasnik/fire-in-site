@@ -71,7 +71,7 @@
       distanceFromPrevious === 0 ? 10000 : distanceFromPrevious;
     currentLoc.userLocation = true;
     $currentLocation = currentLoc;
-    console.log("setCurrent currentLoc", $currentLocation);
+    // console.log("setCurrent currentLoc", $currentLocation);
   }
 
   // Slope and aspect
@@ -118,9 +118,9 @@
   }
 
   function setMarkerLocation() {
-    console.log("setMarkerLocation");
+    // console.log("setMarkerLocation");
     if (map) {
-      console.log("setMarkerLocation map available");
+      // console.log("setMarkerLocation map available");
       map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
       locMarker.setLngLat([
         $currentLocation.longitude,
@@ -131,12 +131,12 @@
 
   onMount(() => {
     const initialState = { lng: lng, lat: lat, zoom: zoom };
-    console.log(
-      "Map onMount",
-      $currentLocation.longitude,
-      $currentLocation.latitude,
-      $currentLocation.userLocation,
-    );
+    // console.log(
+    //   "Map onMount",
+    //   $currentLocation.longitude,
+    //   $currentLocation.latitude,
+    //   $currentLocation.userLocation,
+    // );
 
     map = new mapboxgl.Map({
       container: mapContainer,
@@ -162,7 +162,7 @@
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
       // if (e.source.type === "raster-dem") {
-      console.log("map ready");
+      // console.log("map ready");
       locMarker.setLngLat([
         $currentLocation.longitude,
         $currentLocation.latitude,
@@ -186,11 +186,11 @@
         slope,
         aspect,
       );
-      console.log(
-        "fetching forecast on load,",
-
-        $currentLocation,
-      );
+      // console.log(
+      //   "fetching forecast on load,",
+      //
+      //   $currentLocation,
+      // );
       getForecastOpenMeteo($currentDateTime);
       // map.off("sourcedata");
     });
@@ -215,13 +215,7 @@
         slope,
         aspect,
       );
-      if ($currentLocation.distanceFromPrevious > 2000) {
-        console.log(
-          "fetching forecast from map click, distanceFromPrevious",
-          $currentLocation.distanceFromPrevious,
-        );
-        getForecastOpenMeteo($currentDateTime);
-      }
+      getForecastOpenMeteo($currentDateTime);
     });
     locMarker = new mapboxgl.Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])

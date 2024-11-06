@@ -150,7 +150,7 @@
     hidden1 = false;
   };
 
-  $: console.log(" $$$$$$$ currentLocation:", $currentLocation);
+  // $: console.log(" $$$$$$$ currentLocation:", $currentLocation);
   // $: console.log(" $$$$$$$ currentWeather:", $currentWeather);
   // $: console.log(" $$$$$$$ forecastTimeSeries:", $forecastTimeSeries);
   // $: console.log(" $$$$$$$ time:", $dateTime);
@@ -179,18 +179,18 @@
 
     <div class="flex md:order-2">
       <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
-      <NavUl>
-        {#if !$authStore.currentUser}
-          <NavLi href="/authenticate">Sign in</NavLi>
-        {:else}
-          <NavLi
-            on:click={() => {
-              authHandlers.logout();
-            }}
-            href="/">Sign out</NavLi
-          >
-        {/if}
-      </NavUl>
+      <!-- <NavUl> -->
+      <!--   {#if !$authStore.currentUser} -->
+      <!--     <NavLi href="/authenticate">Sign in</NavLi> -->
+      <!--   {:else} -->
+      <!--     <NavLi -->
+      <!--       on:click={() => { -->
+      <!--         authHandlers.logout(); -->
+      <!--       }} -->
+      <!--       href="/">Sign out</NavLi -->
+      <!--     > -->
+      <!--   {/if} -->
+      <!-- </NavUl> -->
     </div>
     <NavUl>
       <NavLi class="cursor-pointer">

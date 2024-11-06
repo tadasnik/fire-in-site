@@ -27,7 +27,9 @@
 
 <div class="max-w-md mx-auto overflow-hidden md:max-w-2xl pt-10">
   <div id="test" class="max-w-2xl">
-    <Carousel {images}></Carousel>
+    <Carousel {images} imgClass="min-h-72" let:Controls>
+      <Controls /></Carousel
+    >
   </div>
 
   <div class="flex flex-col text-slate-500">

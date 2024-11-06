@@ -93,7 +93,25 @@
       />
     {/if}
   </div>
-
+  <div
+    class="flex flex-row mx-auto max-h-3 w-full max-w-screen-xl justify-end items-center"
+  >
+    <!-- <div>Current</div> -->
+    <div class="m-2">
+      <Label>
+        Select Model output
+        <Select
+          id="select-output"
+          class="mb-6 pl-3"
+          bind:value={$selectedOutput}
+        >
+          {#each $selectedOutputs as output}
+            <option value={output}>{outputNodes[output].label}</option>
+          {/each}
+        </Select>
+      </Label>
+    </div>
+  </div>
   <div
     class="container mx-auto flex flex-col md:flex-row items-center max-w-screen-xl"
   >
@@ -103,7 +121,8 @@
       </div>
     </div>
     <div class="grow w-full sm:w-1/2 min-w-80 p-4">
-      <div class="aspect-square" bind:clientWidth={width}>
+      <!-- <div>{outputNodes[$selectedOutput].label}</div> -->
+      <div class="aspect-square pt-2" bind:clientWidth={width}>
         {#if browser && $fetchingForecast === false}
           <CurrentBehaviour></CurrentBehaviour>
         {:else}

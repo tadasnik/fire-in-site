@@ -42,9 +42,9 @@
   let width;
 </script>
 
-<div class="flex flex-col relative items-center">
+<div class="flex flex-col relative items-center pt-8">
   {#if $forecastMode === "forecast"}
-    <div class="container flex max-w-xl overflow-x-auto">
+    <div class="container flex max-w-4xl overflow-x-auto">
       <DayPicker />
     </div>
   {/if}
