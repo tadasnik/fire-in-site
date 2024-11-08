@@ -152,11 +152,7 @@
         with BehavePlus fire behaviour model to provide a seamless user experience.
         The system has built-in fuel models representative of dominant UK surface
         fuels and calculates dead fuel moisture content using machine learning model
-        trained on the largest field-based UK fuel moisture dataset. with BehavePlus
-        fire behaviour model to provide a seamless user experience. The system has
-        built-in fuel models representative of dominant UK surface fuels and calculates
-        dead fuel moisture content using a machine learning model with physical constraints
-        that was trained on the largest field-based UK fuel moisture dataset.
+        trained on the largest field-based UK fuel moisture dataset.
       </P>
     </div>
 
