@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { Button } from "flowbite-svelte";
   import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
@@ -50,6 +51,60 @@
     30: "NNW",
     31: "N",
   };
+
+  function geolocateForecast() {
+    geolocate().then(
+      console.log(
+        "geolocateForecast",
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+      ),
+      setMapLocation(
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        true,
+      ),
+    );
+  }
+
+  async function geolocate() {
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
+
+    function success(pos) {
+      const crd = pos.coords;
+
+      console.log("Your current position is:");
+      console.log(`Latitude : ${crd.latitude}`);
+      console.log(`Longitude: ${crd.longitude}`);
+      console.log(`More or less ${crd.accuracy} meters.`);
+      $currentLocation.longitude = crd.longitude;
+      currentLocation.latitude = crd.latitude;
+
+      // setMapLocation(crd.longitude, crd.latitude)
+    }
+
+    function error(err) {
+      console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
+
+    await navigator.geolocation.getCurrentPosition(success, error, options);
+  }
+
+  function setMapLocation(longitude, latitude, center = false) {
+    locMarker.setLngLat([longitude, latitude]);
+    if (center) {
+      map.setCenter([longitude, latitude]);
+    }
+    let elevation = map.queryTerrainElevation([longitude, latitude]);
+    let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
+    setCurrentLocation(longitude, latitude, elevation, slope, aspect);
+    getForecastOpenMeteo($currentDateTime);
+  }
+
   function getWindCardinalDirection(windDir) {
     return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
   }
@@ -128,15 +183,18 @@
       ]);
     }
   }
+  let width;
 
   onMount(() => {
     const initialState = { lng: lng, lat: lat, zoom: zoom };
+
     // console.log(
     //   "Map onMount",
     //   $currentLocation.longitude,
     //   $currentLocation.latitude,
     //   $currentLocation.userLocation,
     // );
+    // $currentLocation, setMarkerLocation();
 
     map = new mapboxgl.Map({
       container: mapContainer,
@@ -159,64 +217,21 @@
       });
       map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
     });
+
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
-      // if (e.source.type === "raster-dem") {
-      // console.log("map ready");
-      locMarker.setLngLat([
+      setMapLocation(
         $currentLocation.longitude,
         $currentLocation.latitude,
-      ]);
-      map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
-      let elevation = map.queryTerrainElevation([
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-      ]);
-
-      let [slope, aspect] = processPointSlopeAspect(
-        map,
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        50,
+        true,
       );
-      setCurrentLocation(
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        elevation,
-        slope,
-        aspect,
-      );
-      // console.log(
-      //   "fetching forecast on load,",
-      //
-      //   $currentLocation,
-      // );
-      getForecastOpenMeteo($currentDateTime);
-      // map.off("sourcedata");
     });
 
     map.on("click", function (e) {
       let coordinates = e.lngLat;
-      locMarker.setLngLat([coordinates.lng, coordinates.lat]);
-      let elevation = map.queryTerrainElevation([
-        coordinates.lng,
-        coordinates.lat,
-      ]);
-      let [slope, aspect] = processPointSlopeAspect(
-        map,
-        coordinates.lng,
-        coordinates.lat,
-        50,
-      );
-      setCurrentLocation(
-        coordinates.lng,
-        coordinates.lat,
-        elevation,
-        slope,
-        aspect,
-      );
-      getForecastOpenMeteo($currentDateTime);
+      setMapLocation(coordinates.lng, coordinates.lat, false);
     });
+
     locMarker = new mapboxgl.Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
       .addTo(map);
@@ -229,24 +244,60 @@
   });
 </script>
 
-<div
-  class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
->
-  {$currentLocation.latitude.toFixed(3)}<i
-    class="text-xl wi wi-degrees"
-  />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
-    3,
-  )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0
-    ? "E"
-    : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
-    0,
-  )}%,
-  <i
-    class="text-2xl wi wi-wind
+<div>
+  <div class="flex flex-row place-items-baseline justify-center">
+    <div class="items-baseline align-text-bottom pr-4">
+      <span class="align-bottom">Select location on the Map</span>
+    </div>
+    <div>
+      <Button outline primary-200 size="xs" on:click={geolocateForecast}
+        >Geolocate</Button
+      >
+    </div>
+  </div>
+
+  <div class="grow w-full p-2 sm:w-1/2 min-w-96">
+    <div class="aspect-square" bind:clientWidth={width}>
+      <div
+        class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
+      >
+        {$currentLocation.latitude.toFixed(3)}<i
+          class="text-xl wi wi-degrees"
+        />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
+          3,
+        )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0
+          ? "E"
+          : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
+          0,
+        )}%,
+        <i
+          class="text-2xl wi wi-wind
       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
-  />
+        />
+      </div>
+      <div class="map z-0" bind:this={mapContainer} />
+    </div>
+  </div>
 </div>
-<div class="map z-0" bind:this={mapContainer} />
+
+<!-- <div -->
+<!--   class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1" -->
+<!-- > -->
+<!--   {$currentLocation.latitude.toFixed(3)}<i -->
+<!--     class="text-xl wi wi-degrees" -->
+<!--   />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed( -->
+<!--     3, -->
+<!--   )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0 -->
+<!--     ? "E" -->
+<!--     : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed( -->
+<!--     0, -->
+<!--   )}%, -->
+<!--   <i -->
+<!--     class="text-2xl wi wi-wind -->
+<!--       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}" -->
+<!--   /> -->
+<!-- </div> -->
+<!-- <div class="map z-0" bind:this={mapContainer} /> -->
 
 <style>
   .map {
