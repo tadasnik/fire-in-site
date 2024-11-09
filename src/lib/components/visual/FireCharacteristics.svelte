@@ -29,7 +29,7 @@
 
 <div class="flex w-full h-full">
   <LayerCake
-    padding={{ top: 10, right: 10, bottom: 40, left: 40 }}
+    padding={{ top: 10, right: 10, bottom: 30, left: 40 }}
     x={xKey}
     y={yKey}
     z={zKey}
