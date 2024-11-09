@@ -243,6 +243,13 @@
             />
           </svelte:fragment>
         </SidebarItem>
+        <SidebarItem label="Tutorial" href="/tutorial">
+          <svelte:fragment slot="icon">
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          </svelte:fragment>
+        </SidebarItem>
 
         <SidebarDropdownWrapper label="Settings">
           <svelte:fragment slot="icon">
