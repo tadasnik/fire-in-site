@@ -206,6 +206,7 @@
       </Dropdown>
       <NavLi href="/fuelModels">Fuel Models</NavLi>
       <NavLi href="/about">About</NavLi>
+      <NavLi href="/tutorial">Tutorial</NavLi>
     </NavUl>
   </Navbar>
 </header>

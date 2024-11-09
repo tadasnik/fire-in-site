@@ -1,11 +1,6 @@
 <script>
-  import { Card, Modal, Gallery, Carousel } from "flowbite-svelte";
-  import { Heading, P, A, Mark, Secondary } from "flowbite-svelte";
-  import { scale } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
-  import gorseFire from "$lib/assets/fuelModelPhotos/gm_3.webp";
-
-  const scaleAnimation = (x) => scale(x, { duration: 500, easing: quintOut });
+  import { Carousel } from "flowbite-svelte";
+  import { Heading, P, A, Secondary } from "flowbite-svelte";
 
   const fieldWork = import.meta.glob("$lib/assets/fieldWorkPhotos/*.webp", {
     eager: true,
@@ -94,26 +89,6 @@
       </div>
     </div>
 
-    <!-- <div class="md:flex"> -->
-    <!--   <div class="pt-8 md:shrink-0"> -->
-    <!--     <img -->
-    <!--       class="h-48 w-full object-cover md:h-full md:w-48" -->
-    <!--       src={gorseFire} -->
-    <!--       alt="Gorse fire" -->
-    <!--     /> -->
-    <!--   </div> -->
-    <!--   <div class="p-8"> -->
-    <!--     <P class="mt-2"> -->
-    <!--       <span -->
-    <!--         class="text-lg leading-tight font-medium text-black hover:underline" -->
-    <!--         >FireInSite is a fire behaviour prediction system</span -->
-    <!--       > -->
-    <!--       in the form of a web-based application that forecasts the probability of -->
-    <!--       ignition, surface fire rate of spread, flame length and fireline intensity -->
-    <!--       for a user selected location for a set of core UK fire prone vegetation -->
-    <!--       types (fuels). -->
-    <!--     </P> -->
-    <!--   </div> -->
     <div class="p-8">
       <P class="mt-2">
         <span class="text-lg leading-tight text-primary-900 font-bold">

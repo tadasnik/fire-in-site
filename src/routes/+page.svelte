@@ -153,8 +153,10 @@
   <div
     class="container mx-auto flex flex-col md:flex-row justify-center items-center max-w-screen-xl"
   >
-    <Map></Map>
-    <div class="md:pl-8">
+    <div class="grow w-full sm:w-1/2 min-w-96 p-2 md:pl-8">
+      <Map></Map>
+    </div>
+    <div class="grow w-full sm:w-1/2 min-w-96 p-2 md:pl-8">
       <div class="flex flex-row place-items-baseline justify-center">
         <div class="items-baseline align-text-bottom pr-4">
           <span class="align-bottom">Select model output</span>
@@ -163,22 +165,23 @@
         <div>
           <Select id="select-output" class="" bind:value={$selectedOutput}>
             {#each $selectedOutputs as output}
-              <option value={output}>{outputNodes[output].label}</option>
+              <option value={output}
+                >{outputNodes[output].label}
+                ({outputNodes[output].units})</option
+              >
             {/each}
           </Select>
         </div>
       </div>
 
-      <div class="grow w-full sm:w-1/2 min-w-96 p-2">
-        <div class="aspect-square pt-2" bind:clientWidth={width}>
-          {#if browser && $fetchingForecast === false}
-            <CurrentBehaviour></CurrentBehaviour>
-          {:else}
-            <div class="flex justify-center">
-              <Spinner></Spinner>
-            </div>
-          {/if}
-        </div>
+      <div class="aspect-square pt-2" bind:clientWidth={width}>
+        {#if browser && $fetchingForecast === false}
+          <CurrentBehaviour></CurrentBehaviour>
+        {:else}
+          <div class="flex justify-center">
+            <Spinner></Spinner>
+          </div>
+        {/if}
       </div>
     </div>
   </div>
