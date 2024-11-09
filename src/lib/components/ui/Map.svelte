@@ -53,18 +53,7 @@
   };
 
   function geolocateForecast() {
-    geolocate().then(
-      console.log(
-        "geolocateForecast",
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-      ),
-      setMapLocation(
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        true,
-      ),
-    );
+    geolocate();
   }
 
   async function geolocate() {
@@ -82,9 +71,12 @@
       console.log(`Longitude: ${crd.longitude}`);
       console.log(`More or less ${crd.accuracy} meters.`);
       $currentLocation.longitude = crd.longitude;
-      currentLocation.latitude = crd.latitude;
-
-      // setMapLocation(crd.longitude, crd.latitude)
+      $currentLocation.latitude = crd.latitude;
+      setMapLocation(
+        $currentLocation.longitude,
+        $currentLocation.latitude,
+        true,
+      );
     }
 
     function error(err) {
@@ -95,12 +87,15 @@
   }
 
   function setMapLocation(longitude, latitude, center = false) {
+    console.log("setMapLocation", longitude, latitude, center);
     locMarker.setLngLat([longitude, latitude]);
     if (center) {
       map.setCenter([longitude, latitude]);
     }
     let elevation = map.queryTerrainElevation([longitude, latitude]);
+    console.log("elevation", elevation);
     let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
+    console.log("slope", slope, "aspect", aspect);
     setCurrentLocation(longitude, latitude, elevation, slope, aspect);
     getForecastOpenMeteo($currentDateTime);
   }
@@ -244,23 +239,24 @@
   });
 </script>
 
-<div>
-  <div class="flex flex-row place-items-baseline justify-center">
+<div class="flex flex-col justify-center">
+  <div class="flex flex-row place-items-baseline justify-center pb-2">
     <div class="items-baseline align-text-bottom pr-4">
-      <span class="align-bottom">Select location on the Map</span>
+      <span class="align-bottom text-slate-500">Select location on the Map</span
+      >
     </div>
     <div>
-      <Button outline primary-200 size="xs" on:click={geolocateForecast}
+      <Button outline primary-200 size="xs" on:click={geolocate}
         >Geolocate</Button
       >
     </div>
   </div>
 
-  <div class="grow w-full p-2 sm:w-1/2 min-w-96">
-    <div class="aspect-square" bind:clientWidth={width}>
-      <div
-        class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
-      >
+  <div class="aspect-square" bind:clientWidth={width}>
+    <div
+      class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
+    >
+      {#if $currentLocation.elevation}
         {$currentLocation.latitude.toFixed(3)}<i
           class="text-xl wi wi-degrees"
         />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
@@ -274,11 +270,13 @@
           class="text-2xl wi wi-wind
       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
         />
-      </div>
-      <div class="map z-0" bind:this={mapContainer} />
+      {/if}
     </div>
+    <div class="map z-0" bind:this={mapContainer} />
   </div>
 </div>
+
+<!-- </div> -->
 
 <!-- <div -->
 <!--   class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1" -->
