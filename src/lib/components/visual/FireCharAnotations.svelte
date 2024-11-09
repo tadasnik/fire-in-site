@@ -6,6 +6,12 @@
   import { getContext, tick } from "svelte";
   import { max } from "d3-array";
   import { writable } from "svelte/store";
+  import heli from "$lib/assets/icons/helicop.png";
+  import beater from "$lib/assets/icons/beater.png";
+  import leaf_blower from "$lib/assets/icons/leaf_blower.png";
+  import multi from "$lib/assets/icons/multi.png";
+  import unimog from "$lib/assets/icons/unimog.png";
+  import UKFuelModels from "$lib/data/UKFuelModels.json";
 
   const { data, x, y, xScale, yScale, xRange, yRange, xDomain } =
     getContext("LayerCake");
@@ -47,6 +53,36 @@
     {cap(tick.label)}
   </div>
 {/each}
+<img
+  class="h-7"
+  src={heli}
+  style="position:absolute; top:20%; right:50%"
+  alt="helicopter"
+/>
+<img
+  class="h-7"
+  src={leaf_blower}
+  style="position:absolute; top:95%; right:98%"
+  alt="leaf blower"
+/>
+<img
+  class="h-7"
+  src={beater}
+  style="position:absolute; top:85%; right:85%"
+  alt="fire beater"
+/>
+<img
+  class="h-7"
+  src={unimog}
+  style="position:absolute; top:70%; right:10%"
+  alt="unimog"
+/>
+<img
+  class="h-7"
+  src={multi}
+  style="position:absolute; top:20%; right:10%"
+  alt="multi truck"
+/>
 
 <style>
   .label {
