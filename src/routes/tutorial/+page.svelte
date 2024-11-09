@@ -25,7 +25,7 @@
   let width;
 </script>
 
-<div class="max-w-md mx-auto items-center overflow-hidden md:max-w-2xl pt-10">
+<div class="max-w-80 mx-auto items-center overflow-hidden md:max-w-2xl pt-10">
   <div class="flex flex-col text-slate-600">
     <Heading
       tag="h2"
