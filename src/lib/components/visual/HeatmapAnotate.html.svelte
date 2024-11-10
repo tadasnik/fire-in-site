@@ -1,6 +1,6 @@
 <script>
   import { getContext } from "svelte";
-  import { Popover, Modal, Gallery, Button } from "flowbite-svelte";
+  import { Popover, Modal, Gallery, Button, Select } from "flowbite-svelte";
   import {
     getFuelsImages,
     getFuelModelsFileNames,
@@ -9,7 +9,9 @@
   import {
     selectedFuel,
     selectedOutput,
+    selectedOutputs,
   } from "$lib/shared/stores/modelStore.js";
+  import { outputNodes } from "$lib/data/outputNodes.js";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
   import { Html } from "layercake";
@@ -73,7 +75,22 @@
     {forecastLabel}
   </div>
 </div>
-
+<div
+  class="flex absolute justify-end overflow text-right items-center"
+  style:left={"49" + "px"}
+  style:top={"-25" + "px"}
+  style:height={cellSize + "px"}
+>
+  <div class="text-xs hover:text-primary-900 pr-1" id="is_time">time (H)</div>
+</div>
+<Popover
+  class="w-64 text-sm font-light relative"
+  arrow={false}
+  title=""
+  placement="right"
+  offset={20}
+  triggeredBy="#is_time">Click to select time</Popover
+>
 {#each Object.values(weatherProps) as prop, i}
   <div
     class="flex justify-end overflow text-right items-center"
@@ -96,14 +113,26 @@
   >
 {/each}
 
+<div class="absolute items-end min-w-64 p-1" style:left="95px">
+  <div class="" />
+  <Select id="select-output" class="" size="sm" bind:value={$selectedOutput}>
+    {#each $selectedOutputs as output}
+      <option value={output}
+        >{outputNodes[output].label}
+        ({outputNodes[output].units})</option
+      >
+    {/each}
+  </Select>
+
+  <!-- <div class="pl-2 text-xl"> -->
+  <!--   {axisLabel} -->
+  <!-- </div> -->
+</div>
 <div
-  class="flex columns-2 items-end min-w-96"
+  class="flex columns-2 items-end min-w-64 p-1"
   style:height={cellSize * gapSize + "px"}
 >
   <div class="w-[{leftMargin}px]" />
-  <div class="pl-2 text-xl">
-    {axisLabel}
-  </div>
 </div>
 <div class="flex justify-end">
   {#if !commonOutput}

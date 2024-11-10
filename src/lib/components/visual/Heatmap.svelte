@@ -129,7 +129,7 @@
   const topMargin = 60;
   const bottomMargin = 20;
   const cellSize = 25;
-  const gapSize = 1.5;
+  const gapSize = 1.9;
 
   $: fuelsTicks = Object.keys(fireBehaviourData[0]);
   $: yCountWeather = Object.keys(weatherProps).length;

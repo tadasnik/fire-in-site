@@ -17,6 +17,8 @@
   import AxisY from "$lib/components/visual/AxisY.svelte";
   import FireCharAnotations from "$lib/components/visual/FireCharAnotations.svelte";
   import DensityContours from "./DensityContours.svelte";
+  import Tooltip from "$lib/components/visual/FireCharacteristicsTooltip.svelte";
+  import HistoricalSelectDate from "./HistoricalSelectDate.svelte";
 
   export let parentWidth;
   export let data;
@@ -25,6 +27,9 @@
   export let zKey;
 
   $: flatData = flatten(data, "values");
+  let evt;
+  let hideTooltip = true;
+  const addCommas = format(",");
 </script>
 
 <div class="flex w-full h-full">
@@ -61,12 +66,33 @@ unit area (MJ/m2)"
         axisLabel="Rate of spread
 (m/min)"
       />
-      <ScatterSvg data={flatData} />
-      <!-- <DensityContours {data} /> -->
     </Svg>
+    <Svg>
+      <ScatterSvg
+        data={flatData}
+        on:mousemove={(event) => (evt = hideTooltip = event)}
+        on:mouseout={() => (hideTooltip = false)}
+      />
+    </Svg>
+    <!-- <DensityContours {data} /> -->
 
     <Html>
       <FireCharAnotations />
+      {#if hideTooltip !== false}
+        <Tooltip {evt} let:detail>
+          <!-- For the tooltip, do another data join because the hover event only has the data from the geography data -->
+          {@const tooltipData = {
+            ...detail,
+          }}
+          {#each Object.entries(tooltipData) as [key, value]}
+            {@const keyCapitalized = key.replace(/^\w/, (d) => d.toUpperCase())}
+            <div class="row">
+              <span>{keyCapitalized}:</span>
+              {typeof value === "number" ? addCommas(value) : value}
+            </div>
+          {/each}
+        </Tooltip>
+      {/if}
     </Html>
     <!-- <Html> -->
     <!--   <Labels /> -->

@@ -3,7 +3,6 @@
   import { Select, Button, Popover, Label, Spinner } from "flowbite-svelte";
   import { timeFormat } from "d3-time-format";
   import Map from "$lib/components/ui/Map.svelte";
-  import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import {
     selectedOutput,
@@ -158,12 +157,12 @@
     </div>
     <div class="grow w-full sm:w-1/2 min-w-96 p-2 md:pl-8">
       <div class="flex flex-row place-items-baseline justify-center">
-        <div class="items-baseline align-text-bottom pr-4">
+        <div class="items-baseline align-text-bottom pr-2">
           <span class="align-bottom">Select model output</span>
         </div>
 
         <div>
-          <Select id="select-output" class="" bind:value={$selectedOutput}>
+          <Select id="select-output" size="sm" bind:value={$selectedOutput}>
             {#each $selectedOutputs as output}
               <option value={output}
                 >{outputNodes[output].label}
@@ -185,14 +184,16 @@
       </div>
     </div>
   </div>
-  {#if $forecastMode === "historical"}
-    <div class="container mx-auto w-auto p-4 mb-6">
-      <HistoricalSelectDate></HistoricalSelectDate>
-    </div>
-  {/if}
-  {#if $fetchingForecast === false}
-    <HourlyForecast></HourlyForecast>
-  {/if}
+  <div class="flex mx-auto md:justify-center max-w-96 md:max-w-xl">
+    {#if $forecastMode === "historical"}
+      <div class="container mx-auto w-auto p-4 mb-6">
+        <HistoricalSelectDate></HistoricalSelectDate>
+      </div>
+    {/if}
+    {#if $fetchingForecast === false}
+      <HourlyForecast></HourlyForecast>
+    {/if}
+  </div>
 </div>
 
 <style>

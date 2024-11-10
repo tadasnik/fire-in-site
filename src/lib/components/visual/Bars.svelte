@@ -6,10 +6,6 @@
   import { Popover } from "flowbite-svelte";
   import { onMount, getContext } from "svelte";
 
-  import {
-    getFuelsImages,
-    getFuelsFileNames,
-  } from "$lib/firebase/firebase.client";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   const { data, xGet, yGet, y, xScale, yScale, xRange } =
     getContext("LayerCake");
