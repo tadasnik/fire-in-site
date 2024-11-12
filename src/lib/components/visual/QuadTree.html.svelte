@@ -22,7 +22,7 @@
   export let y = "y";
 
   /** @type {String} [searchRadius]  The number of pixels to search around the mouse's location. This is the third argument passed to [`quadtree.find`](https://github.com/d3/d3-quadtree#quadtree_find) and by default a value of `undefined` means an unlimited range. */
-  export let searchRadius = null;
+  export let searchRadius = 10;
 
   /** @type {Array} [dataset]  The dataset to work off ofdefaults to $data if left unset. You can pass override the default here in here in case you don't want to use the main data or it's in a strange format. */
   export let dataset = undefined;
@@ -33,10 +33,11 @@
   $: yGetter = y === "y" ? $yGet : $xGet;
 
   function executeClick(e) {
-    if ($timeMode === "current") {
-      $timeMode = "user";
-    }
-    $currentDateTime = new Date(timeSel);
+    // if ($timeMode === "current") {
+    //   $timeMode = "user";
+    // }
+    // $currentDateTime = new Date(timeSel);
+    // console.log("executeClick", e);
   }
 
   function findItem(evt) {
@@ -45,9 +46,10 @@
     const xLayerKey = `layer${x.toUpperCase()}`;
     const yLayerKey = `layer${y.toUpperCase()}`;
 
-    found = finder.find(evt[xLayerKey], evt[yLayerKey], searchRadius) || {};
+    found = finder.find(evt[xLayerKey], evt["layerY"], searchRadius) || {};
     visible = Object.keys(found).length > 0;
-    timeSel = found.time;
+    // console.log("found", found["surface.primary.fuel.model.catalogKey"]);
+    // timeSel = found.time;
   }
 
   $: finder = quadtree()

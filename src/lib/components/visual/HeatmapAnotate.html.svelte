@@ -15,6 +15,7 @@
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
   import { Html } from "layercake";
+  import { fuelCodeFormat } from "$lib/shared/utils.js";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
 
   /** @type {Array} annotations - A list of annotation objects. */
@@ -45,15 +46,6 @@
   /** @type {number} topMargin - annotation (y axis) element width in px. */
   export let topMargin;
 
-  function twoCharsBold(textToBold) {
-    const chars = textToBold.split("");
-    let bold = `<b>${chars[0]}${chars[1]}</b>`;
-    if (chars.length > 2) {
-      bold += chars.slice(2).join("");
-    }
-    return bold;
-  }
-
   let clickOutsideModal = false;
 
   function handleFuelClick(fuelObject) {
@@ -76,7 +68,7 @@
   </div>
 </div>
 <div
-  class="flex absolute justify-end overflow text-right items-center"
+  class="flex absolute justify-end text-right items-center"
   style:left={"49" + "px"}
   style:top={"-25" + "px"}
   style:height={cellSize + "px"}
@@ -151,7 +143,7 @@
       >
         <div class="hover:text-primary-900">
           {#if $y(fuelObject) !== "All fuels"}
-            {@html twoCharsBold($y(fuelObject))}
+            {@html fuelCodeFormat($y(fuelObject))}
           {:else}
             {$y(fuelObject)}
           {/if}

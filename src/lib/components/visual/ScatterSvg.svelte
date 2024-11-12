@@ -6,6 +6,7 @@
   import { getContext, createEventDispatcher } from "svelte";
   import { raise } from "layercake";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
+  import { fuelRootCode } from "$lib/shared/utils.js";
 
   const {
     z,
@@ -26,9 +27,6 @@
 
   /** @type {Number} [r=5] – The circle's radius. */
   export let r = 10;
-
-  /** @type {String} [fill='#0cf'] – The circle's fill color. */
-  export let fill = "#0cf";
 
   /** @type {String} [stroke='#000'] – The circle's stroke color. */
   export let stroke = "#000";
@@ -59,22 +57,23 @@
   console.log("SCATTER data", data);
 </script>
 
-<g
-  class="scatter-group"
-  on:mouseout={() => dispatch("mouseout")}
-  on:blur={() => dispatch("mouseout")}
-  role="tooltip"
->
+<g class="scatter-group">
   {#each data as d, i}
     <defs>
-      <pattern id={i} patternUnits="userSpaceOnUse" width="20" height="20">
+      <pattern
+        id={i}
+        x="0"
+        y="0"
+        patternUnits="objectBoundingBox"
+        width="1"
+        height="1"
+      >
         <image
           xlink:href={images[
             "/src/lib/assets/bars_background/" +
-              UKFuelModels[d["surface.primary.fuel.model.catalogKey"]].photo
+              fuelRootCode(d["surface.primary.fuel.model.catalogKey"]) +
+              ".webp"
           ]}
-          y="0"
-          x="0"
         />
       </pattern>
     </defs>
@@ -86,23 +85,6 @@
       fill="url(#{i})"
       {stroke}
       stroke-width={strokeWidth}
-      on:mouseover={(e) =>
-        dispatch("mousemove", {
-          e,
-          props: {
-            flame: d["surface.weighted.fire.flameLength"],
-            name: d["surface.primary.fuel.model.catalogKey"],
-          },
-        })}
-      on:focus={(e) =>
-        dispatch("mousemove", {
-          e,
-          props: {
-            flame: d["surface.weighted.fire.flameLength"],
-            name: d["surface.primary.fuel.model.catalogKey"],
-          },
-        })}
-      on:mousemove={handleMousemove(d)}
     />
   {/each}
 </g>

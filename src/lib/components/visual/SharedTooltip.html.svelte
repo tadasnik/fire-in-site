@@ -6,9 +6,12 @@
   import { getContext } from "svelte";
   import { format } from "d3-format";
 
+  import { fuelCodeFormat } from "$lib/shared/utils.js";
   import QuadTree from "./QuadTree.html.svelte";
+  import FireCharacteristics from "./FireCharacteristics.svelte";
+  import UKFuelModels from "$lib/data/UKFuelModels";
 
-  const { data, width, yScale, config } = getContext("LayerCake");
+  const { data, width, yScale, xScale, config } = getContext("LayerCake");
 
   const commas = format(",");
   const titleCase = (d) => d.replace(/^\w/, (w) => w.toUpperCase());
@@ -36,23 +39,19 @@
    */
   function sortResult(result) {
     if (Object.keys(result).length === 0) return [];
-    const rows = Object.keys(result)
-      .filter((d) => d !== $config.x)
-      .map((key) => {
-        return {
-          key,
-          value: result[key],
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-
+    const rows = {
+      key: result["surface.primary.fuel.model.catalogKey"],
+      value: result["surface.weighted.fire.flameLength"],
+      yval: result["surface.weighted.fire.spreadRate"],
+      xval: result["surface.weighted.fire.heatPerUnitArea"],
+    };
     return rows;
   }
 </script>
 
 <QuadTree
   dataset={dataset || $data}
-  y="x"
+  y="y"
   let:x
   let:y
   let:visible
@@ -61,22 +60,16 @@
 >
   {@const foundSorted = sortResult(found)}
   {#if visible === true}
-    <div style="left:{x}px;" class="line" />
     <div
       class="tooltip"
       style="
         width:{w}px;
         display: {visible ? 'block' : 'none'};
-        top:{$yScale(foundSorted[0].value) + offset}px;
-        left:{Math.min(Math.max(w2, x), $width - w2)}px;"
+        top:{$yScale(foundSorted.yval) + offset}px;
+        left:{$xScale(foundSorted.xval) + -4 * offset}px;"
     >
-      <div class="title">{formatTitle(found[$config.x])}</div>
-      {#each foundSorted as row}
-        <div class="row">
-          <span class="key">{formatKey(row.key)}:</span>
-          {formatValue(row.value)}
-        </div>
-      {/each}
+      <div class="title">{@html fuelCodeFormat(foundSorted.key)}</div>
+      <span class="key">Flame lenght: {foundSorted.value.toFixed(1)}(m)</span>
     </div>
   {/if}
 </QuadTree>
@@ -93,20 +86,10 @@
     z-index: 15;
     pointer-events: none;
   }
-  .line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    border-left: 1px dotted #666;
-    pointer-events: none;
-  }
-  .tooltip,
-  .line {
-    transition: left 250ms ease-out, top 250ms ease-out;
-  }
-  .title {
-    font-weight: bold;
+  .tooltip {
+    transition:
+      left 250ms ease-out,
+      top 250ms ease-out;
   }
   .key {
     color: #999;

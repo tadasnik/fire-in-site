@@ -51,7 +51,7 @@
   <!--   </Label> -->
   <!-- </div> -->
 
-  {#if $selectedOutput !== "ignition.firebrand.probabiity"}
+  {#if $selectedOutput !== "ignition.firebrand.probability"}
     <BarFigure
       data={$_outputForecast.get($dateTime)}
       time={$dateTime}

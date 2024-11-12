@@ -13,8 +13,16 @@
   import { timeParse, timeFormat } from "d3-time-format";
 
   import { outputNodes } from "$lib/data/outputNodes.js";
-  import { _maxVal, selectedOutput } from "$lib/shared/stores/modelStore";
-  import { forecastMode } from "$lib/shared/stores/forecastStore";
+  import {
+    _maxVal,
+    selectedOutput,
+    _outputForecastArray,
+  } from "$lib/shared/stores/modelStore";
+  import {
+    forecastMode,
+    focusDayIndex,
+    forecastOpenMeteo,
+  } from "$lib/shared/stores/forecastStore";
   import { dateString } from "$lib/shared/stores/timeStore";
 
   import Heatmap from "$lib/components/visual/HeatmapInner.svelte";
@@ -24,8 +32,6 @@
   import HeatmapWindDir from "$lib/components/visual/HeatmapWindDir.html.svelte";
   import MultiSelect from "../ui/MultiSelect.svelte";
 
-  export let fireBehaviourData;
-  export let forecastData;
   export let xKey;
   export let yKey;
   export let zKey;
@@ -109,6 +115,12 @@
   // };
 
   // $: console.log("Selected output", $selectedOutput);
+  $: fireBehaviourData = $_outputForecastArray.slice(
+    $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
+    $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
+  );
+
+  $: forecastData = $forecastOpenMeteo;
   $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
   $: groupedData = groupLonger(fireBehaviourData, seriesNames, {
     groupTo: yKey,
@@ -181,7 +193,7 @@
     </LayerCake>
   </div>
   <div
-    class="flex-initial xcontainer z-0"
+    class="flex-initial xcontainer z-0 overflow-x-scroll"
     style="height:{topMargin +
       chartHeight +
       bottomMargin}px; width:{heatmapWidth}px"

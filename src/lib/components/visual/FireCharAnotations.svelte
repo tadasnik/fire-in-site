@@ -54,33 +54,33 @@
   </div>
 {/each}
 <img
-  class="h-7"
+  class="h-12"
   src={heli}
-  style="position:absolute; top:20%; right:50%"
+  style="position:absolute; top:60%; right:5%"
   alt="helicopter"
 />
 <img
   class="h-7"
   src={leaf_blower}
-  style="position:absolute; top:95%; right:98%"
+  style="position:absolute; top:92%; right:98%"
   alt="leaf blower"
 />
 <img
-  class="h-7"
+  class="h-9"
   src={beater}
-  style="position:absolute; top:85%; right:85%"
+  style="position:absolute; top:85%; right:93%"
   alt="fire beater"
 />
 <img
-  class="h-7"
+  class="h-5"
   src={unimog}
-  style="position:absolute; top:70%; right:10%"
+  style="position:absolute; top:90%; right:5%"
   alt="unimog"
 />
 <img
   class="h-7"
   src={multi}
-  style="position:absolute; top:20%; right:10%"
+  style="position:absolute; top:75%; right:5%"
   alt="multi truck"
 />
 

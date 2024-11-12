@@ -3,14 +3,7 @@
   import { Modal, Gallery, Carousel, Button } from "flowbite-svelte";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { selectedFuel } from "$lib/shared/stores/modelStore.js";
-  import {
-    getFuelModelImages,
-    getFuelModelsFileNames,
-    getFuelsImages,
-    getFuelModelsImages,
-    getFuelImage,
-    getFuelModelsUrls,
-  } from "$lib/firebase/firebase.client";
+  import { fuelCodeFormat } from "$lib/shared/utils.js";
 
   const fuelsImages = import.meta.glob("$lib/assets/fuelModelPhotos/*.webp", {
     eager: true,
@@ -41,6 +34,7 @@
   bind:open={clickOutsideModal}
   autoclose
   outsideclose
+  class="overflow"
 >
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
     <Carousel {images} imgClass="min-h-72" let:Controls>
@@ -50,7 +44,9 @@
   <div class="text-left">
     <p>{UKFuelModels[$selectedFuel].description}</p>
     <div class="content pt-2">
-      <div class="text-lg text-primary-800">Fuel model parameters</div>
+      <div class="text-lg text-primary-800">
+        ({@html fuelCodeFormat($selectedFuel)}) Fuel model parameters
+      </div>
       <ul>
         <li>
           Fuel height <strong>{UKFuelModels[$selectedFuel].depth}</strong>(m)

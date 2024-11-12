@@ -19,6 +19,7 @@
   import DensityContours from "./DensityContours.svelte";
   import Tooltip from "$lib/components/visual/FireCharacteristicsTooltip.svelte";
   import HistoricalSelectDate from "./HistoricalSelectDate.svelte";
+  import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
 
   export let parentWidth;
   export let data;
@@ -30,9 +31,11 @@
   let evt;
   let hideTooltip = true;
   const addCommas = format(",");
+  console.log("parentWidth", parentWidth);
+  const formatXtip = timeFormat("%b %d, %H:00");
 </script>
 
-<div class="flex w-full h-full">
+<div class="flex grow">
   <LayerCake
     padding={{ top: 10, right: 10, bottom: 30, left: 40 }}
     x={xKey}
@@ -46,7 +49,7 @@
   >
     <Html>
       <img
-        alt="Background witn countour lines fire characteristics figure"
+        alt="Background with countour lines fire characteristics figure"
         src={fireCharBackg}
       />
     </Html>
@@ -66,8 +69,6 @@ unit area (MJ/m2)"
         axisLabel="Rate of spread
 (m/min)"
       />
-    </Svg>
-    <Svg>
       <ScatterSvg
         data={flatData}
         on:mousemove={(event) => (evt = hideTooltip = event)}
@@ -93,6 +94,7 @@ unit area (MJ/m2)"
           {/each}
         </Tooltip>
       {/if}
+      <SharedTooltip formatTitle={formatXtip} dataset={flatData} />
     </Html>
     <!-- <Html> -->
     <!--   <Labels /> -->

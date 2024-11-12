@@ -46,7 +46,7 @@
 </script>
 
 <div
-  class="flex flex-row items-end p-2 w-screen space-x-0.5 xl:justify-center
+  class="flex flex-row items-end p-2 space-x-0.5 xl:justify-center
   divide-slate-500"
 >
   {#each $daysInForecast as day}

@@ -7,14 +7,15 @@
   import { onMount, getContext } from "svelte";
 
   import UKFuelModels from "$lib/data/UKFuelModels.json";
+  import { fuelRootCode } from "$lib/shared/utils.js";
   const { data, xGet, yGet, y, xScale, yScale, xRange } =
     getContext("LayerCake");
 
+  function rootFuelCode(fuel) {}
   const images = import.meta.glob(["$lib/assets/bars_background/**.webp"], {
     eager: true,
     as: "url",
   });
-  // $: console.log("BARS images", images);
 </script>
 
 <g class="bar-group">
@@ -31,9 +32,9 @@
         <image
           xlink:href={images[
             "/src/lib/assets/bars_background/" +
-              UKFuelModels[d["surface.primary.fuel.model.catalogKey"]].photo
+              fuelRootCode(d["surface.primary.fuel.model.catalogKey"]) +
+              ".webp"
           ]}
-          y={-$yScale.bandwidth() * 2}
         />
       </pattern>
     </defs>
