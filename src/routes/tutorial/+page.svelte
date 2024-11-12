@@ -40,7 +40,7 @@
     </Heading>
     <!-- <Heading tag="h3">Getting Started</Heading> -->
 
-    <Heading tag="h4">1. Accessing the Fire Behaveur Modelling System</Heading>
+    <Heading tag="h4">1. Accessing the Fire Behaviour Modelling System</Heading>
     <P class="pt-5 pb-8">
       The main modelling section (home page of the FireInSite web application)
       is loaded when the application starts. The main application page consists
