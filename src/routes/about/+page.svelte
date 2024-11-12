@@ -117,13 +117,13 @@
           FireInSite integrates
         </span>
         terrain information from
-        <a href="https://www.mapbox.com/about/maps/">Mapbox</a>
+        <A href="https://www.mapbox.com/about/maps/">Mapbox</A>
         digital elevation
-        <a
+        <A
           href="https://docs.mapbox.com/data/tilesets/reference/mapbox-terrain-dem-v1/"
-          >dataset</a
+          >dataset</A
         >
-        and weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a>
+        and weather data by <A href="https://open-meteo.com/">Open-Meteo.com</A>
         with BehavePlus fire behaviour model to provide a seamless user experience.
         The system has built-in fuel models representative of dominant UK surface
         fuels and calculates dead fuel moisture content using machine learning model
@@ -145,6 +145,14 @@
           </ul>
         </P>
       </div>
+    </div>
+    <div class="p-8">
+      <P class="mt-2">
+        <span class="text-lg leading-tight text-primary-900 font-bold">
+          To find out how to use FireInsite
+        </span>
+        please visit <A href="/tutorial">tutorial</A> page.
+      </P>
     </div>
   </div>
 </div>

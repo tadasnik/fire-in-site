@@ -14,6 +14,7 @@
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { fuelNodes } from "$lib/data/fuelNodes.js";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
+  import { fuelCodeFormat } from "$lib/shared/utils.js";
 
   import { slide } from "svelte/transition";
 
@@ -83,7 +84,9 @@
   <TableBody tableBodyClass="divide-y">
     {#each $selectedFuels as fuel, i}
       <TableBodyRow on:click={() => toggleRow(i)}>
-        <TableBodyCell class="text-sm">{UKFuelModels[fuel].code}</TableBodyCell>
+        <TableBodyCell class="text-sm"
+          >{@html fuelCodeFormat(UKFuelModels[fuel].code)}</TableBodyCell
+        >
         {#each Object.entries(showItems) as [key, item]}
           <TableBodyCell>{UKFuelModels[fuel][key]}</TableBodyCell>
         {/each}

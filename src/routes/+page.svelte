@@ -39,6 +39,8 @@
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
   import HourlyForecast from "$lib/components/visual/HourlyForecast.svelte";
   import HistoricalSelectDate from "$lib/components/visual/HistoricalSelectDate.svelte";
+  import DayPicker from "$lib/components/visual/DayPicker.svelte";
+  import Heatmap from "$lib/components/visual/Heatmap.svelte";
 
   let width;
 
@@ -173,7 +175,7 @@
         </div>
       </div>
 
-      <div class="aspect-square pt-2" bind:clientWidth={width}>
+      <div class="flex aspect-square pt-2" bind:clientWidth={width}>
         {#if browser && $fetchingForecast === false}
           <CurrentBehaviour></CurrentBehaviour>
         {:else}
@@ -184,15 +186,26 @@
       </div>
     </div>
   </div>
-  <div class="flex mx-auto md:justify-center max-w-96 md:max-w-xl">
+  <div class="flex flex-col mx-auto md:justify-center">
     {#if $forecastMode === "historical"}
-      <div class="container mx-auto w-auto p-4 mb-6">
-        <HistoricalSelectDate></HistoricalSelectDate>
+      <HistoricalSelectDate></HistoricalSelectDate>
+    {/if}
+    {#if $forecastMode === "forecast"}
+      <div class="container flex max-w-sm md:max-w-4xl overflow-x-auto">
+        <DayPicker />
       </div>
     {/if}
-    {#if $fetchingForecast === false}
-      <HourlyForecast></HourlyForecast>
-    {/if}
+    <div
+      class="flex mx-auto max-w-sm md:max-w-4xl overflow-x-auto md:justify-center"
+    >
+      {#if $fetchingForecast === false}
+        <Heatmap
+          xKey="time"
+          zKey={$selectedOutput}
+          yKey="surface.primary.fuel.model.catalogKey"
+        />
+      {/if}
+    </div>
   </div>
 </div>
 

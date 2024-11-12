@@ -14,13 +14,17 @@
   import {
     selectedOutput,
     selectedOutputs,
+    _outputForecast,
   } from "$lib/shared/stores/modelStore";
+  import { dateTime } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
   import Map from "$lib/components/ui/Map.svelte";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
   import { browser } from "$app/environment";
   import { fetchingForecast } from "$lib/shared/stores/forecastStore";
+  import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
+  import flameTable from "$lib/assets/flameTable.webp";
 
   let width;
 </script>
@@ -79,13 +83,13 @@
     <Heading tag="h4">3. Select model output</Heading>
     <P class="pt-5 pb-8">
       Click on the “select model output” drop down menu (default setting is fire
-      spread rate) to change the fire behaviour prediction variable shown in the
-      fire behaviour bar chart and fire behaviour table. This allows you to
-      switch between the outputs for Surface Fire Rate of Spread, Heat per Unit
-      Area, Fireline Intensity, Fire Flame Length, Dead 1 hour fuel moisture and
-      Probability of Ignition. This then updates the Fire Behaviour Bar Chart
-      and the Fire Behaviour Table to show the predictions for your metric of
-      choice.
+      spread rate) to change the fire behaviour prediction variable shown above
+      the fire behaviour bar chart, within fire behaviour forecast graph. This
+      allows you to switch between the outputs for Surface Fire Rate of Spread,
+      Heat per Unit Area, Fireline Intensity, Fire Flame Length, Dead 1 hour
+      fuel moisture and Probability of Ignition. This then updates the Fire
+      Behaviour Bar Chart and the Fire Behaviour Table to show the predictions
+      for your metric of choice.
     </P>
     <div>
       <div
@@ -121,16 +125,14 @@
       it will provide you with the prediction e.g. if you chose rate of spread
       it will tell you the length of the bar in m/min etc.
     </P>
-    <div class="container justify-center max-w-96 mx-auto pb-8">
-      <div class="aspect-square pt-2" bind:clientWidth={width}>
-        {#if browser && $fetchingForecast === false}
-          <CurrentBehaviour></CurrentBehaviour>
-        {:else}
-          <div class="flex justify-center">
-            <Spinner></Spinner>
-          </div>
-        {/if}
-      </div>
+    <div class="flex aspect-square pt-2" bind:clientWidth={width}>
+      {#if browser && $fetchingForecast === false}
+        <CurrentBehaviour></CurrentBehaviour>
+      {:else}
+        <div class="flex justify-center">
+          <Spinner></Spinner>
+        </div>
+      {/if}
     </div>
     <P class="pt-5 pb-8">
       You can also choose to view the results as a Fire Characteristics Chart,
@@ -140,11 +142,47 @@
       <Span italic>'Settings'</Span> drop down menu and change the selected <Span
         italic>'Chart type'</Span
       > to <Span italic>'Fire Characteristics'</Span>. This chart will then
-      appear in place of the Fire Behaviour Bar Chart. The Fire Characteristics
-      Chart will plot dots the anticipated fire behaviour showing Heat per unit
-      area (x axis), rate of spread (y axis) and flame length (colour bands).
-      The flame length colour bands link to the National Operational Guidance
-      for UK firefighters. For ease of reference these are:
+      appear in place of the Fire Behaviour Bar Chart.
+    </P>
+
+    <!-- {#if browser && $fetchingForecast === false} -->
+    <!--   <div class="flex w-96 h-96 pt-2"> -->
+    <!--     <FireCharacteristics -->
+    <!--       parentWidth="400px" -->
+    <!--       data={$_outputForecast.get($dateTime)} -->
+    <!--       xKey="surface.weighted.fire.heatPerUnitArea" -->
+    <!--       yKey="surface.weighted.fire.spreadRate" -->
+    <!--       zKey="surface.primary.fuel.model.catalogKey" -->
+    <!--     /> -->
+    <!--   </div> -->
+    <!-- {/if} -->
+    <P class="pt-5 pb-8">
+      The Fire Characteristics Chart will plot dots the anticipated fire
+      behaviour showing Heat per unit area (x axis), rate of spread (y axis) and
+      flame length (colour bands). The flame length colour bands link to the
+      National Operational Guidance for UK firefighters. For ease of reference
+      these are:
+    </P>
+    <div class="flex flex-col max-w-md items-center pb-8">
+      <img src={flameTable} alt="Flame Length Table" />
+    </div>
+    <Heading tag="h4">5. Fuel models</Heading>
+    <P class="pt-5 pb-8">
+      To familiarise yourself with the fuel models - you can either click on the
+      fuel model names that form the row of the fire behaviour table. This will
+      show a short description and provide an example image of the fuel type.
+      For further information and to compare all fuel model parameters in a
+      single table click on <Span italic>"Fuel Models"</Span> link at the top of
+      the page. This will take you to a table of the specific parameters used in
+      each fuel model, you can click on each row and it will expand to reveal additional
+      images and a short description.
+    </P>
+    <Heading tag="h4">6. Fuel moisture models</Heading>
+    <P class="pt-5 pb-8">
+      The FireInSite UK specific dead fuel model is selected as the default fuel
+      moisture model for use with dead fuels. If you wish to change to the
+      Fosberg (kestrel FFMC tables) or Simple FFMC (Nelson) fuel moisture models
+      click <Span italic>"Settitngs"</Span> and select which you require.
     </P>
   </div>
 </div>
