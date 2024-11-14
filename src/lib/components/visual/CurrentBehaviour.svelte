@@ -13,6 +13,7 @@
     _outputForecast,
     _outputForecastArray,
     chartType,
+    commonOutputs,
   } from "$lib/shared/stores/modelStore.js";
   import {
     dateTime,
@@ -51,7 +52,7 @@
   <!--   </Label> -->
   <!-- </div> -->
 
-  {#if $selectedOutput !== "ignition.firebrand.probability"}
+  {#if !$commonOutputs.includes($selectedOutput)}
     <BarFigure
       data={$_outputForecast.get($dateTime)}
       time={$dateTime}

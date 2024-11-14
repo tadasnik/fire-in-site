@@ -21,7 +21,7 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'site.moisture.dead.tl1h',
   'ignition.firebrand.probability'
 ])
-export const commonOutputs = readable(['ignition.firebrand.probability'])
+export const commonOutputs = readable([])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.spreadRate')
 export const fuelMoistureModel = writable('fireInSite')
