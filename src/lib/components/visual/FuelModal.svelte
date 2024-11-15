@@ -10,7 +10,7 @@
     as: "url",
   });
 
-  console.log("fuelsImages", fuelsImages);
+  // console.log("fuelsImages", fuelsImages);
   export let clickOutsideModal;
 
   function getFuelImages(fuel) {

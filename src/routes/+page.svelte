@@ -175,7 +175,7 @@
         </div>
       </div>
 
-      <div class="flex aspect-square pt-2" bind:clientWidth={width}>
+      <div class="flex grow aspect-square pt-2" bind:clientWidth={width}>
         {#if browser && $fetchingForecast === false}
           <CurrentBehaviour></CurrentBehaviour>
         {:else}

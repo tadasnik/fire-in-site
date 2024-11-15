@@ -21,7 +21,7 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'site.moisture.dead.tl1h',
   'ignition.firebrand.probability'
 ])
-export const commonOutputs = readable([])
+export const commonOutputs = readable(["ignition.firebrand.probability", "site.moisture.dead.tl1h"])
 export const selectedInput = writable('site.moisture.dead.category')
 export const selectedOutput = writable('surface.weighted.fire.spreadRate')
 export const fuelMoistureModel = writable('fireInSite')
@@ -269,7 +269,7 @@ export const requiredSiteInputsForecastOpen = derived(
         requiredSiteInputs.set(time, requiredSiteI)
       }
     })
-    // console.log("requiredSiteInputsForecastOpen", requiredSiteInputs)
+    // console.log("requiredSiteInputsForecastOpen run end")
     return requiredSiteInputs
   }
 )
@@ -323,6 +323,7 @@ export const requiredFuelInputs = derived(
         }
       })
     })
+    // console.log('requiredFuelInputs end::')
     return requiredFuelI
   }
 )
@@ -427,12 +428,13 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
   return resultForecast
 })
 
-export const _outputForecastArray = derived([_outputForecast, commonOutputs, selectedOutput],
-  ([$_outputForecast, $commonOutputs, $selectedOutput]) => {
+export const _outputForecastArray = derived([_outputForecast, selectedOutput],
+  ([$_outputForecast, $selectedOutput]) => {
     const outputArray = []
     $_outputForecast.forEach((forecast, time) => {
       const timeObject = {}
-      if ($commonOutputs.includes($selectedOutput)) {
+      if (get(commonOutputs).includes($selectedOutput) && (get(fuelMoistureModel) != "fireInSite")) {
+        // console.log("common output modelStore")
         timeObject['All fuels'] = forecast[0].values[0][$selectedOutput]
       } else {
         forecast.forEach((item) => {

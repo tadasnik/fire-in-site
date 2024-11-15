@@ -93,7 +93,7 @@ export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
     let months = [];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     monthNames.forEach((month, i) => {
-      months.push({ value: i, name: month });
+      months.push({ value: i + 1, name: month });
     })
     if ($historicalYear === get(currentYear)) {
       return months.slice(0, get(currentDate).getMonth() + 1)
@@ -106,7 +106,7 @@ export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
 export const dayOptions = derived([historicalYear, historicalMonth], ([$historicalYear, $historicalMonth]) => {
   const daysInHistoryMonth = new Date(
     $historicalYear,
-    $historicalMonth + 1,
+    $historicalMonth - 1,
     0,
   ).getDate();
 
@@ -114,7 +114,8 @@ export const dayOptions = derived([historicalYear, historicalMonth], ([$historic
   const daysOb = days.map((day) => {
     return { value: day, name: day };
   });
-  if ($historicalYear === get(currentYear) && $historicalMonth === get(currentDate).getMonth()) {
+
+  if ($historicalYear === get(currentYear) && $historicalMonth === get(currentDate).getMonth() + 1) {
     return daysOb.slice(0, get(currentDate).getDate())
   } else {
     return daysOb
@@ -127,7 +128,7 @@ export const historicalDate = derived([historicalYear, historicalMonth, historic
     return false
   } else {
     const histDate = new Date($historicalYear, $historicalMonth, $historicalDay, 12, 0)
-    if (histDate < new Date(1970, 1, 1, 12, 0)) {
+    if (histDate < new Date(1970, 0, 1, 12, 0)) {
       return false
     } else if (histDate > new Date()) {
       return false

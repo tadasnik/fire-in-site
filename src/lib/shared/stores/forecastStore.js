@@ -184,7 +184,6 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
 })
 
 export const currentTimeIndex = derived([dateTime], ([$dateTime]) => {
-  // console.log("dateTime", $dateTime)
   const index = get(forecastOpenMeteo).time.indexOf($dateTime)
   return index > -1 ? index : 0
 })

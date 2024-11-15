@@ -17,9 +17,9 @@
     interpolateRdYlGn,
   } from "d3-scale-chromatic";
   import { selectedOutput } from "$lib/shared/stores/modelStore";
-  import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
-  import MultiSelect from "../ui/MultiSelect.svelte";
+  import { dateTime } from "$lib/shared/stores/timeStore";
   import { focusDayIndex } from "$lib/shared/stores/forecastStore";
+  import MultiSelect from "../ui/MultiSelect.svelte";
 
   const { data, z, zGet } = getContext("LayerCake");
 
@@ -35,7 +35,8 @@
   export let modelOutputProps;
 
   $: isSelectedClass = (x) => {
-    return $currentTimeIndex == x
+    // console.log("isSelectedClass", x);
+    return $dateTime == x
       ? "text-sm font-bold text-neutral-500"
       : "text-xs text-neutral-400";
   };
@@ -74,11 +75,11 @@
 {/each}
 
 {#each $data as fuelObject, i}
-  {#each fuelObject.values as object, x}
+  {#each fuelObject.values as object, j}
     <rect
       width={cellSize}
       height={cellSize}
-      x={x * cellSize}
+      x={j * cellSize}
       y={(datasetsProps[0] + gapSize + i) * cellSize}
       style="fill:{modelOutputProps[$selectedOutput][0](
         object[$selectedOutput],
@@ -87,9 +88,9 @@
     />
     {#if (!modelOutputProps[$selectedOutput][3] && $z(object) > 0.05) || modelOutputProps[$selectedOutput][3]}
       <text
-        x={x * cellSize + cellSize / 2}
+        x={j * cellSize + cellSize / 2}
         y={(datasetsProps[0] + gapSize + i) * cellSize + cellSize / 2}
-        class={isSelectedClass(x)}
+        class={isSelectedClass(object.time)}
         text-anchor="middle"
         dominant-baseline="middle"
         style="fill:{$z(object) >= modelOutputProps[$selectedOutput][2][0] &&

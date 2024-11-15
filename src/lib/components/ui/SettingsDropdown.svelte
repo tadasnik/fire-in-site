@@ -26,14 +26,12 @@
     if (value === "Fosberg") {
       $fuelMoistureModel = "Fosberg";
       $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
-    } else if (value === "Nelson") {
-      $fuelMoistureModel = "Nelson";
-      $modelConfigValues["configure.fuel.moisture"].value = "individual";
     } else {
-      $fuelMoistureModel = "fireInSite";
-      $modelConfigValues["configure.fuel.moisture"].value = "individual";
+      if ($modelConfigValues["configure.fuel.moisture"].value === "fosberg") {
+        $modelConfigValues["configure.fuel.moisture"].value = "individual";
+      }
     }
-    console.log("Fuel moisture model changed to ", value);
+    // console.log("Fuel moisture model changed to ", value);
   }
 
   function handleTimeModeChange(value) {

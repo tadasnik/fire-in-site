@@ -119,6 +119,7 @@
     $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
     $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
   );
+  $: console.log("forecastOpenMeteo", $forecastOpenMeteo);
 
   $: forecastData = $forecastOpenMeteo;
   $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
@@ -149,8 +150,8 @@
   $: chartHeight = (yCountWeather + yCount) * cellSize + cellSize;
   $: heatmapWidth = fireBehaviourData.length * cellSize;
   $: dayPickerHeight = 40;
-  $: console.log("Heatmap forecast data", forecastData);
-  $: console.log("Heatmap output data", fireBehaviourData);
+  // $: console.log("Heatmap forecast data", forecastData);
+  // $: console.log("Heatmap output data", fireBehaviourData);
 </script>
 
 <div
