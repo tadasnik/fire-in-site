@@ -53,6 +53,7 @@
       0,
       [13, 26],
       "Temp. (C)",
+      "Air temperature at 2 metres",
     ],
     relativeHumidity2m: [
       "screenRelativeHumidity",
@@ -61,6 +62,7 @@
       0,
       [42, 80],
       "Rel. Hum. (%)",
+      "Relative humidity",
     ],
     precipitation: [
       "totalPrecipAmount",
@@ -69,6 +71,7 @@
       1,
       [0, 2],
       "Rain (mm)",
+      "Total precipitation",
     ],
     windSpeed10m: [
       "windSpeed10m",
@@ -77,6 +80,7 @@
       0,
       [3, 14],
       "Wind (m/s)",
+      "Wind speed at 10 metres",
     ],
     windGusts10m: [
       "windGustSpeed10m",
@@ -85,6 +89,7 @@
       0,
       [3, 14],
       "Wind gust (m/s)",
+      "Wind gust speed at 10 metres",
     ],
     windDirection10m: [
       "windDirectionFrom10m",
@@ -93,6 +98,7 @@
       0,
       [0, 360],
       "Wind dir.",
+      "Wind direction",
     ],
   };
   const modelOutputProps = {

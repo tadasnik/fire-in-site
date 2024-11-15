@@ -1,6 +1,6 @@
 <script>
   import { browser } from "$app/environment";
-  import { Select, Button, Popover, Label, Spinner } from "flowbite-svelte";
+  import { Select, Button, Spinner } from "flowbite-svelte";
   import { timeFormat } from "d3-time-format";
   import Map from "$lib/components/ui/Map.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";

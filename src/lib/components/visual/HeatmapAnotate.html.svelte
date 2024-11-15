@@ -101,7 +101,7 @@
     title=""
     placement="right"
     offset={20}
-    triggeredBy={"#" + "is" + i}>{prop[0]}</Popover
+    triggeredBy={"#" + "is" + i}>{prop[6]}</Popover
   >
 {/each}
 
