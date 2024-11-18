@@ -23,7 +23,7 @@
     $fetchingForecast = true;
     let dateTime = new Date(
       $historicalYear,
-      $historicalMonth,
+      $historicalMonth - 1,
       $historicalDay,
       12,
     );
