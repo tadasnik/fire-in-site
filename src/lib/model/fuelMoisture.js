@@ -58,8 +58,14 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
     // console.log("resultMoist", resultMoist)
     for (let i = 0; i < deadFuelsCount; i++) {
       let values = []
+      let forecastIndex = 0;
       for (let x = i; x < resultMoist.length; x = x + deadFuelsCount) {
-        values.push(resultMoist[x]);
+        forecastIndex = forecastIndex + 1;
+        if ((nelsonFFMCs[forecastIndex] > 30) && (resultMoist[x] < nelsonFFMCs[forecastIndex])) {
+          values.push(nelsonFFMCs[forecastIndex]);
+        } else {
+          values.push(resultMoist[x]);
+        }
       }
       forecast["ffmc" + "_" + deadFuelsCategories[i]] = values
     }
@@ -79,7 +85,7 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
     fetchingForecast.set(false);
   }
   forecast["ffmc_nelson"] = nelsonFFMCs
-  // console.log("forecast", forecast)
+  console.log("forecast", forecast)
   return forecast
 
 }
