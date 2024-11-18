@@ -35,7 +35,7 @@
   export let xKey;
   export let yKey;
   export let zKey;
-  const scaleTemp = scaleSequential(interpolatePuOr).domain([5, 30]);
+  const scaleTemp = scaleSequential(interpolatePuOr).domain([0, 30]);
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([15, 0]);

@@ -44,6 +44,7 @@
   const formatValues = (d) => (d < 10 ? d.toFixed(1) : Math.round(d));
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
   console.log("haetmap innner DATA", $data);
+  console.log("haetmap forecast DATA", forecastData);
 </script>
 
 {#each Object.entries(weatherProps) as [prop, values], i}
@@ -57,7 +58,7 @@
         style="fill:{values[2](weatherObject)}
         ;stroke-width:.2;stroke:grey"
       />
-      {#if weatherObject > 0}
+      {#if !(prop == "precipitation" && weatherObject <= 0)}
         <text
           x={x * cellSize + cellSize / 2}
           y={i * cellSize + cellSize / 2}
