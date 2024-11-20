@@ -71,29 +71,6 @@
     navigator.geolocation.getCurrentPosition(success, error, options);
   }
 
-  function fetchHistoricalForecast() {
-    $fetchingForecast = true;
-    let dateTime = new Date(
-      $historicalYear,
-      $historicalMonth,
-      $historicalDay,
-      12,
-    );
-    console.log(
-      "Calling fetch forecast from handle historical, currentdateTime ",
-      $currentDateTime,
-      dateTime,
-    );
-    getForecastOpenMeteo(dateTime);
-  }
-
-  function geolocateForecast() {
-    // geolocate();
-    // $currentLocation.longitude = lon;
-    // $currentLocation.latitudex = lat;
-    // getForecastOpenMeteo($currentDateTime);
-  }
-
   function configOptions(configKey) {
     const options = [];
     $modelConfigValues[configKey].options.forEach((element) => {
