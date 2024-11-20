@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store'
+import { readable, writable, derived, get } from 'svelte/store'
 import { currentLocation } from '$lib/shared/stores/locationStore'
 import { dateTime, currentDateTime, differenceHours, getMonth, dateString, focusDay } from '$lib/shared/stores/timeStore'
 import fetchForecastJSON from "$lib/weather/metoffice";
@@ -7,15 +7,15 @@ import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
 
 export const forecastOpenMeteo = writable({
   time: [1403984000],
-  temperature2m: [15.05],
-  relativeHumidity2m: [78.61],
+  temperature_2m: [15.05],
+  relative_humidity_2m: [78.61],
   precipitation: [0],
-  weatherCode: [3],
-  cloudCover: [75],
-  windSpeed10m: [3.12],
-  windDirection10m: [150],
+  weather_code: [3],
+  cloud_cover: [75],
+  wind_speed_10m: [3.12],
+  wind_direction_10m: [150],
   windGusts10m: [5.05],
-  globalTiltedIrradiance: [0],
+  global_tilted_irradiance: [0],
 })
 
 export const forecastTimeSeries = writable([{
@@ -37,12 +37,16 @@ export const forecastTimeSeries = writable([{
   visibility: 19389,
   windDirectionFrom10m: 330,
   windGustSpeed10m: 5.05,
-  windSpeed10m: 3.12
+  wind_speed_10m: 3.12
 }])
 
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
+export const forecastModel = writable('ukmo_seamless')
+export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
+{ 'value': 'ecmwf_ifs025', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 0.25 degree global model' },
+{ 'value': 'icon_seamless', 'displayName': 'ICON', 'description': 'German Weather service (DWD) ICON model with 2km (central Europe), 7km (Europe) and 11km (global) resolution for central Europe, Europe and globe' }])
 export const fetchingForecast = writable(true)
 export const forecastDays = writable(5)
 export const forecastDaysPast = writable(1)
@@ -67,7 +71,8 @@ export async function getForecastOpenMeteo(dateTime) {
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
         console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
-        hourlyVars = ["global_tilted_irradiance",
+        hourlyVars = [
+          "global_tilted_irradiance",
           "temperature_2m",
           "relative_humidity_2m",
           "precipitation",
@@ -84,6 +89,7 @@ export async function getForecastOpenMeteo(dateTime) {
           get(currentLocation).slope,
           get(currentLocation).aspect,
           get(forecastMode),
+          get(forecastModel),
           hourlyVars,
           dateTime,
         );
@@ -99,6 +105,7 @@ export async function getForecastOpenMeteo(dateTime) {
           get(currentLocation).slope,
           get(currentLocation).aspect,
           get(forecastMode),
+          get(forecastModel),
           hourlyVars,
           dateTime,
         );
@@ -121,7 +128,7 @@ export async function getForecastOpenMeteo(dateTime) {
       // Update stores
       forecastOpenMeteo.set(resultMoist);
       fetchingForecast.set(false);
-      currentDateTime.set(new Date(dateTime));
+      currentDateTime.set(dateTime);
     } catch (error) {
       console.error("Error fetching forecast:", error);
       fetchingForecast.set(false);
