@@ -172,7 +172,7 @@ export const requiredSiteInputsCurrenWeather = derived(
     const forecastInputs = {
       "site.temperature.air": "screenTemperature",
       "site.temperature.relativeHumidity": "screenRelativeHumidity",
-      "site.wind.speed.at10m": "windSpeed10m",
+      "site.wind.speed.at10m": "wind_speed_10m",
       "site.wind.direction.source.fromNorth": "windDirectionFrom10m"
     }
     const locationInputs = {
@@ -218,10 +218,10 @@ export const requiredSiteInputsForecastOpen = derived(
     let deadFMC = null
     const requiredSiteInputs = new Map()
     const forecastInputs = {
-      "site.temperature.air": "temperature2m",
-      "site.temperature.relativeHumidity": "relativeHumidity2m",
-      "site.wind.speed.at10m": "windSpeed10m",
-      "site.wind.direction.source.fromNorth": "windDirection10m",
+      "site.temperature.air": "temperature_2m",
+      "site.temperature.relativeHumidity": "relative_humidity_2m",
+      "site.wind.speed.at10m": "wind_speed_10m",
+      "site.wind.direction.source.fromNorth": "wind_direction_10m",
     }
     const locationInputs = {
       "site.slope.direction.aspect": $currentLocation.aspect,
@@ -244,7 +244,7 @@ export const requiredSiteInputsForecastOpen = derived(
           if (Object.keys(forecastInputs).includes(input)) {
             requiredSiteI[input] = [$forecastOpenMeteo[forecastInputs[input]][nr]]
           } else if (input == "site.temperature.shading") {
-            requiredSiteI[input] = [$forecastOpenMeteo["cloudCover"]]
+            requiredSiteI[input] = [$forecastOpenMeteo["cloud_cover"]]
           } else if (Object.keys(timeInputs).includes(input)) {
             requiredSiteI[input] = [timeInputs[input]]
           } else if (Object.keys(locationInputs).includes(input)) {

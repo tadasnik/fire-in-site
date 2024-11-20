@@ -45,10 +45,11 @@
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
   console.log("haetmap innner DATA", $data);
   console.log("haetmap forecast DATA", forecastData);
+  console.log("focusDayIndex", $focusDayIndex);
 </script>
 
 {#each Object.entries(weatherProps) as [prop, values], i}
-  {#if prop != "windDirection10m"}
+  {#if prop != "wind_direction_10m"}
     {#each forecastData[prop].slice($focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0], $focusDayIndex[1] < 0 ? forecastData.length : $focusDayIndex[1]) as weatherObject, x}
       <rect
         width={cellSize}

@@ -24,7 +24,7 @@
 >
   <div class="flex justify-end overflow text-right items-center" />
 
-  {#each forecastData["windDirection10m"].slice($focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0], $focusDayIndex[1] < 0 ? forecastData.length : $focusDayIndex[1]) as dataObject, x}
+  {#each forecastData["wind_direction_10m"].slice($focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0], $focusDayIndex[1] < 0 ? forecastData.length : $focusDayIndex[1]) as dataObject, x}
     <div
       class="flex shrink-0 items-center justify-center align-middle"
       style:height={cellSize + "px"}

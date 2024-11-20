@@ -8,7 +8,7 @@
   const displayProps = {
     Temperature: ["screenTemperature", 0, "wi wi-thermometer"],
     "Relative Humidity": ["screenRelativeHumidity", 0, "wi wi-humidity"],
-    "Wind Speed at 10m": ["windSpeed10m", 0, "wi wi-strong-wind"],
+    "Wind Speed at 10m": ["wind_speed_10m", 0, "wi wi-strong-wind"],
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
 </script>

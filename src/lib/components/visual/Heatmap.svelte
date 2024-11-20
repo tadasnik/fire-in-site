@@ -46,7 +46,7 @@
   const scaleHeat = scaleSequential(interpolateReds).domain([0, 60]);
 
   const weatherProps = {
-    temperature2m: [
+    temperature_2m: [
       "temerature2m",
       "wi wi-thermometer",
       scaleTemp,
@@ -55,7 +55,7 @@
       "Temp. (C)",
       "Air temperature at 2 metres",
     ],
-    relativeHumidity2m: [
+    relative_humidity_2m: [
       "screenRelativeHumidity",
       "wi wi-humidity",
       scaleHum,
@@ -71,10 +71,10 @@
       1,
       [0, 2],
       "Rain (mm)",
-      "Total precipitation",
+      "Total precipitation (rain + showers + snow)",
     ],
-    windSpeed10m: [
-      "windSpeed10m",
+    wind_speed_10m: [
+      "wind_speed_10m",
       "wi wi-windy",
       scaleWind,
       0,
@@ -82,7 +82,7 @@
       "Wind (m/s)",
       "Wind speed at 10 metres",
     ],
-    windGusts10m: [
+    wind_gusts_10m: [
       "windGustSpeed10m",
       "wi wi-strong-wind",
       scaleWind,
@@ -91,7 +91,7 @@
       "Wind gust (m/s)",
       "Wind gust speed at 10 metres",
     ],
-    windDirection10m: [
+    wind_direction_10m: [
       "windDirectionFrom10m",
       "wi wi-wind-direction",
       scaleTemp,

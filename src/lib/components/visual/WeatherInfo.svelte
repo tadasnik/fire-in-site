@@ -90,7 +90,7 @@
   const displayProps = {
     Temperature: ["screenTemperature", 0, "wi wi-thermometer"],
     "Relative Humidity": ["screenRelativeHumidity", 0, "wi wi-humidity"],
-    "Wind Speed at 10m": ["windSpeed10m", 0, "wi wi-strong-wind"],
+    "Wind Speed at 10m": ["wind_speed_10m", 0, "wi wi-strong-wind"],
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
   // $: console.log("Weather info data", data);
@@ -116,12 +116,12 @@
       </div>
 
       <div class="space-x-0">
-        <span class="">{data.temperature2m[$currentTimeIndex].toFixed(0)}</span
+        <span class="">{data.temperature_2m[$currentTimeIndex].toFixed(0)}</span
         ><i class="text-xl wi wi-degrees" /><span class="font-bold">C</span>
       </div>
       <div>
         <span class="pl-0"
-          >{data.relativeHumidity2m[$currentTimeIndex].toFixed(0)}</span
+          >{data.relative_humidity_2m[$currentTimeIndex].toFixed(0)}</span
         >
         <i class="wi wi-humidity" />
       </div>
@@ -129,12 +129,12 @@
         <i
           class="text-xl wi wi-wind
         wi-from-{getWindCardinalDirection(
-            data.windDirection10m[$currentTimeIndex],
+            data.wind_direction_10m[$currentTimeIndex],
           )}"
         />
 
         <span class="pl-0">
-          {data.windSpeed10m[$currentTimeIndex].toFixed(0)}</span
+          {data.wind_speed_10m[$currentTimeIndex].toFixed(0)}</span
         ><span class="font-bold pl-1"> m/s</span>
       </div>
     </div>
