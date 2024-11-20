@@ -1,10 +1,12 @@
 <script>
+  import { get } from "svelte/store";
   import {
     Dropdown,
     DropdownDivider,
     DropdownItem,
     Radio,
     Helper,
+    Span,
   } from "flowbite-svelte";
   import {
     fuelMoistureModel,
@@ -18,9 +20,14 @@
     forecastMode,
     forecastModes,
     getForecastOpenMeteo,
+    forecastModel,
+    forecastModels,
   } from "$lib/shared/stores/forecastStore";
   import { timeMode, currentDateTime } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
+  import CurrentBehaviour from "../visual/CurrentBehaviour.svelte";
+
+  console.log("forecastModels", $forecastModels);
 
   function handleFuelMoistureChange(value) {
     if (value === "Fosberg") {
@@ -33,14 +40,16 @@
     }
     // console.log("Fuel moisture model changed to ", value);
   }
+  function handleModelChange(value) {
+    $fetchingForecast = true;
+    $forecastModel = value;
+    getForecastOpenMeteo(get(currentDateTime));
+  }
 
   function handleTimeModeChange(value) {
     $fetchingForecast = true;
     $forecastMode = value;
     if (value === "historical") {
-      if ($timeMode === "current") {
-        $timeMode = "user";
-      }
     } else {
       console.log("setting currentDateTime to now, fetching forecast");
       let dateTime = new Date();
@@ -49,7 +58,7 @@
   }
 </script>
 
-<div>
+<div class="max-w-80 bg-gray-100aa">
   <div class="px-4 py-2">
     <span class="block text-lg text-gray-900 dark:text-white"
       >Dead fuel moisture model:</span
@@ -131,15 +140,27 @@
   <DropdownDivider></DropdownDivider>
   <div class="px-4 py-2">
     <span class="block text-lg text-gray-900 dark:text-white"
-      >Select model output:</span
+      >Weather model:</span
     >
   </div>
 
-  {#each $selectedOutputs as output}
-    <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-      <Radio bind:group={$selectedOutput} value={output}
-        >{outputNodes[output].label}</Radio
-      >
-    </li>
-  {/each}
+  {#if $forecastMode === "forecast"}
+    {#each $forecastModels as { value, displayName, description }}
+      <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+        <Radio
+          bind:group={$forecastModel}
+          {value}
+          on:change={() => handleModelChange(value)}
+        >
+          {displayName}
+        </Radio>
+        <Helper class="ps-6">{description}</Helper>
+      </li>
+    {/each}
+  {:else}
+    <Helper class="ps-6"
+      ><Span class="text-base">ERA5 reanalysis.</Span> Switch Weather mode to forecast
+      to choose between differend forecasting models</Helper
+    >
+  {/if}
 </div>
