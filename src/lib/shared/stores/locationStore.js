@@ -29,7 +29,6 @@ export async function getLocation() {
       const text = response.text();
     }
   } catch (error) {
-    throw new Error(error);
-
+    return [52, -1.5]
   }
 }
