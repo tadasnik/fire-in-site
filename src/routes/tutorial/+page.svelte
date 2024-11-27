@@ -73,12 +73,6 @@
       <div id="map1">
         <Map></Map>
       </div>
-      <Popover
-        class="w-64 text-sm font-light "
-        title="Popover title"
-        triggeredBy="#map1"
-        >And here's some amazing content. It's very engaging. Right?</Popover
-      >
     </div>
     <Heading tag="h4">3. Select model output</Heading>
     <P class="pt-5 pb-8">
