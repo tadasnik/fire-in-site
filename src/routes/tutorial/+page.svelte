@@ -176,7 +176,7 @@
       The FireInSite UK specific dead fuel model is selected as the default fuel
       moisture model for use with dead fuels. If you wish to change to the
       Fosberg (kestrel FFMC tables) or Simple FFMC (Nelson) fuel moisture models
-      click <Span italic>"Settitngs"</Span> and select which you require.
+      click <Span italic>"Settings"</Span> and select which you require.
     </P>
   </div>
 </div>
