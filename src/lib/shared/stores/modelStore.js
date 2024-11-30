@@ -358,6 +358,9 @@ export const _inputsForecast = derived(
             inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_bracken[i]]
           }
         }
+        // live herb moisture cannot be lower than dead 1h moisture!!!
+        inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'] < inputsTime[fuel]['site.moisture.dead.tl1h'] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
+
       })
       inputsForecast.set(time, inputsTime)
       i++
@@ -400,7 +403,7 @@ export const _selectedTimeOutput = derived([requiredSiteInputsForecastOpen, curr
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
   // console.log("_outputForecast start")
-  // console.log('requiredSiteInputsForecastOpen in _outputForecast:', $_inputsForecast)
+  console.log('requiredSiteInputsForecastOpen in _outputForecast:', $_inputsForecast)
 
   const convertUnits = ["surface.weighted.fire.heatPerUnitArea", "surface.weighted.fire.firelineIntensity"]
   const resultForecast = new Map()
