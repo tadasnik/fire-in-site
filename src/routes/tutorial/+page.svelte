@@ -18,7 +18,7 @@
   } from "$lib/shared/stores/modelStore";
   import { dateTime } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
-  import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
+  import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import Map from "$lib/components/ui/Map.svelte";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
   import { browser } from "$app/environment";

@@ -1,40 +1,21 @@
 <script>
   import { browser } from "$app/environment";
   import { Select, Button, Spinner } from "flowbite-svelte";
-  import { timeFormat } from "d3-time-format";
   import Map from "$lib/components/ui/Map.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import {
     selectedOutput,
     selectedOutputs,
     modelConfigValues,
-    advancedMode,
   } from "$lib/shared/stores/modelStore.js";
 
   import {
     forecastOpenMeteo,
     forecastLocation,
-    getForecastOpenMeteo,
     forecastMode,
     fetchingForecast,
-    forecastDays,
-    daysInForecast,
-    focusDayIndex,
   } from "$lib/shared/stores/forecastStore.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
-  import {
-    dateTime,
-    currentDateTime,
-    historicalYear,
-    historicalMonth,
-    historicalDay,
-    historicalDate,
-    focusDay,
-    timeMode,
-    yearsOptions,
-    monthOptions,
-    dayOptions,
-  } from "$lib/shared/stores/timeStore.js";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
   import HourlyForecast from "$lib/components/visual/HourlyForecast.svelte";
@@ -81,9 +62,13 @@
 
   $: console.log("currentLocation  !??????", $currentLocation);
   // $: console.log("fetchingForecast  !??????", $fetchingForecast);
-  // $: console.log("FOcUsIndex  !??????", $focusDayIndex);
   // $: console.log("Forecast MOde  !??????", $forecastMode);
 </script>
+
+<svelte:head>
+  <title>FireInSite</title>
+  <meta name="description" content="Fire behaviour prediction system" />
+</svelte:head>
 
 <div class="flex flex-col justify-center content-center w-full space-y-5">
   <div class="container mx-auto justify-center p-2 items-center">

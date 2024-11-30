@@ -35,7 +35,7 @@
     HomeOutline,
   } from "flowbite-svelte-icons";
   import { timeFormat } from "d3-time-format";
-  import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
+  import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
   import {
     getLocation,
@@ -132,7 +132,6 @@
         console.log("curr", curr);
         return { ...curr, isLoading: false };
       });
-      // getForecastOpenMeteo(new Date()); // promise.then(fetchForecast());
     });
     return () => {
       unsuscribe;

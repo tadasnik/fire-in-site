@@ -3,7 +3,7 @@
   import SignIn from "$lib/components/auth/SignIn.svelte";
   import SignUp from "$lib/components/auth/SignUp.svelte";
   import { register, resetCredentials } from "$lib/shared/stores/authStore";
-  import FireInSiteLogo from "$lib/assets/FireInSitlogo.png";
+  import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   console.log("register = ", register);
   console.log("resetCredentials = ", resetCredentials);
 </script>
