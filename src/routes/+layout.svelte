@@ -162,6 +162,11 @@
   const dateFormat = timeFormat("%a %b %e, %H %p");
 </script>
 
+<svelte:head>
+  <title>FireInSite</title>
+  <meta name="description" content="Fire behaviour prediction system" />
+</svelte:head>
+
 <header
   class="top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
 >
