@@ -66,8 +66,12 @@
 </script>
 
 <svelte:head>
-  <title>FireInSite</title>
-  <meta name="description" content="Fire behaviour prediction system" />
+  <title>FireInSite fire behaviour prediction system</title>
+  <meta
+    name="description"
+    content="Fire behaviour predictions for a wide range of
+    temperate shrub and grass-dominated vegetation fuels in your browser."
+  />
 </svelte:head>
 
 <div class="flex flex-col justify-center content-center w-full space-y-5">
