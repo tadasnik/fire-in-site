@@ -70,6 +70,14 @@
   };
 </script>
 
+<svelte:head>
+  <title>FireInSite fuel models</title>
+  <meta
+    name="description"
+    content="Fuel models (numerical representations) of temperate shrub and grass-dominated vegetation types used in the FireInSite fire behaviour prediction system."
+  />
+</svelte:head>
+
 <Table>
   <TableHead>
     <TableHeadCell class="text-sm">Fuel code</TableHeadCell>
