@@ -212,8 +212,8 @@ export const requiredSiteInputsCurrenWeather = derived(
 
 
 export const requiredSiteInputsForecastOpen = derived(
-  [requiredInputs, siteInputs, forecastOpenMeteo, currentLocation, fuelMoistureModel],
-  ([$requiredInputs, $siteInputs, $forecastOpenMeteo, $currentLocation, $fuelMoistureModel]) => {
+  [requiredInputs, siteInputs, forecastOpenMeteo, fuelMoistureModel],
+  ([$requiredInputs, $siteInputs, $forecastOpenMeteo, $fuelMoistureModel]) => {
     // console.log("requiredSiteInputsForecastOpen forecastOpenMeteo", $forecastOpenMeteo)
     let deadFMC = null
     const requiredSiteInputs = new Map()
@@ -224,8 +224,8 @@ export const requiredSiteInputsForecastOpen = derived(
       "site.wind.direction.source.fromNorth": "wind_direction_10m",
     }
     const locationInputs = {
-      "site.slope.direction.aspect": $currentLocation.aspect,
-      "site.slope.steepness.degrees": $currentLocation.slope,
+      "site.slope.direction.aspect": get(currentLocation).aspect,
+      "site.slope.steepness.degrees": get(currentLocation).slope,
       "site.location.elevation.diff": get(elevationDiff)
 
     }
@@ -269,7 +269,7 @@ export const requiredSiteInputsForecastOpen = derived(
         requiredSiteInputs.set(time, requiredSiteI)
       }
     })
-    // console.log("requiredSiteInputsForecastOpen run end")
+    console.log("requiredSiteInputsForecastOpen run end")
     return requiredSiteInputs
   }
 )
@@ -323,7 +323,7 @@ export const requiredFuelInputs = derived(
         }
       })
     })
-    // console.log('requiredFuelInputs end::')
+    console.log('requiredFuelInputs end::')
     return requiredFuelI
   }
 )
@@ -336,7 +336,7 @@ export const _inputsForecast = derived(
     // console.log('requiredSiteInputsForecastOpen in _inputsForecast :', $requiredSiteInputsForecastOpen)
     const inputsForecast = new Map()
     const forecastOpenMeteoFFMC = get(forecastOpenMeteo)
-    // console.log('forecastOpenMeteoFFMC :', forecastOpenMeteoFFMC)
+    console.log('forecastOpenMeteoFFMC in _inputs :', forecastOpenMeteoFFMC)
     let i = 0;
     $requiredSiteInputsForecastOpen.forEach((forecast, time) => {
       // console.log('time :', time)
@@ -359,13 +359,12 @@ export const _inputsForecast = derived(
           }
         }
         // live herb moisture cannot be lower than dead 1h moisture!!!
-        inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'] < inputsTime[fuel]['site.moisture.dead.tl1h'] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
-
+        inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'][0] < inputsTime[fuel]['site.moisture.dead.tl1h'][0] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
       })
       inputsForecast.set(time, inputsTime)
       i++
     })
-    // console.log('_inputsForecast end :')
+    console.log('_inputsForecast end :')
     // console.log('inputsForecast :', inputsForecast)
     return inputsForecast
   }
