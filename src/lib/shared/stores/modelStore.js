@@ -357,9 +357,9 @@ export const _inputsForecast = derived(
           } else {
             inputsTime[fuel]['site.moisture.dead.tl1h'] = [forecastOpenMeteoFFMC.ffmc_bracken[i]]
           }
+          // live herb moisture cannot be lower than dead 1h moisture!!!
+          inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'][0] < inputsTime[fuel]['site.moisture.dead.tl1h'][0] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
         }
-        // live herb moisture cannot be lower than dead 1h moisture!!!
-        inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'][0] < inputsTime[fuel]['site.moisture.dead.tl1h'][0] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
       })
       inputsForecast.set(time, inputsTime)
       i++
