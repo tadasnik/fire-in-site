@@ -14,9 +14,6 @@
   } from "$lib/shared/stores/timeStore";
   import heli from "$lib/assets/icons/helicop.png";
 
-  /** @type {number} cellSize - heatmap cell size in px */
-  export let cellSize;
-
   const dateFormat = timeFormat("%a %e %b");
 
   Date.prototype.addHours = function (h) {

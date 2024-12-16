@@ -51,10 +51,8 @@
       />
       <AxisY
         gridlines={false}
-        snapTicks={true}
         tickMarks={true}
         ticks={$selectedFuels}
-        baseLine
         axisLabel={outputNodes[yKey].label}
       />
     </Svg>
