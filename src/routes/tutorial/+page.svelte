@@ -14,7 +14,6 @@
   import {
     selectedOutput,
     selectedOutputs,
-    _outputForecast,
   } from "$lib/shared/stores/modelStore";
   import { dateTime } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
@@ -34,7 +33,7 @@
     <Heading
       tag="h2"
       class="mb-4"
-      customSize="text-3xl font-extrabold  md:text-5xl lg:text-6xl"
+      customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
     >
       <Span class="text-primary-600 font-bold">FireInSite</Span> User guide
     </Heading>

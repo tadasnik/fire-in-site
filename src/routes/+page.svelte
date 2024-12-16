@@ -6,7 +6,6 @@
   import {
     selectedOutput,
     selectedOutputs,
-    modelConfigValues,
   } from "$lib/shared/stores/modelStore.js";
 
   import {
@@ -52,15 +51,7 @@
     navigator.geolocation.getCurrentPosition(success, error, options);
   }
 
-  function configOptions(configKey) {
-    const options = [];
-    $modelConfigValues[configKey].options.forEach((element) => {
-      options.push({ name: element });
-    });
-    return options;
-  }
-
-  $: console.log("currentLocation  !??????", $currentLocation);
+  // $: console.log("currentLocation  !??????", $currentLocation);
   // $: console.log("fetchingForecast  !??????", $fetchingForecast);
   // $: console.log("Forecast MOde  !??????", $forecastMode);
 </script>

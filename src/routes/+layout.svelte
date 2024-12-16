@@ -149,7 +149,6 @@
     hidden1 = false;
   };
 
-  // $: console.log(" $$$$$$$ currentLocation:", $currentLocation);
   // $: console.log(" $$$$$$$ currentWeather:", $currentWeather);
   // $: console.log(" $$$$$$$ forecastTimeSeries:", $forecastTimeSeries);
   // $: console.log(" $$$$$$$ time:", $dateTime);
@@ -206,6 +205,7 @@
       <NavLi href="/fuelModels">Fuel Models</NavLi>
       <NavLi href="/about">About</NavLi>
       <NavLi href="/tutorial">Tutorial</NavLi>
+      <NavLi href="/climate">Climate</NavLi>
     </NavUl>
   </Navbar>
 </header>
@@ -279,8 +279,8 @@
     </div>
   {/if}
 </main>
-<Footer footerType="logo">
-  <hr class="my-6 border-gray-200 mx-auto dark:border-gray-700" />
+<Footer>
+  <hr class="my-6 mx-auto" />
   <div class="flex items-center text-center text-xs justify-between px-10">
     <p>
       FireInSite fire behaviour predictions leverage BehavePlus fire behaviour
