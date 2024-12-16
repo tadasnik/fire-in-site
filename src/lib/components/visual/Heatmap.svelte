@@ -1,7 +1,7 @@
 <script>
   import { LayerCake, Svg, Html, groupLonger, flatten } from "layercake";
   import { scaleBand } from "d3-scale";
-  import { scaleSequential } from "d3-scale";
+  import { scaleSequential, scaleDiverging } from "d3-scale";
   import {
     interpolatePuOr,
     interpolateYlOrRd,
@@ -35,6 +35,8 @@
   export let xKey;
   export let yKey;
   export let zKey;
+
+  //define colour scales
   const scaleTemp = scaleSequential(interpolatePuOr).domain([0, 30]);
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
@@ -44,6 +46,7 @@
   const scaleFlame = scaleSequential(interpolateReds).domain([0, 10]);
   const scaleSpread = scaleSequential(interpolateReds).domain([0, 60]);
   const scaleHeat = scaleSequential(interpolateReds).domain([0, 60]);
+  const scaleTransition = scaleDiverging([0, 1, 10], interpolatePuOr);
 
   const weatherProps = {
     temperature_2m: [
@@ -108,6 +111,12 @@
     "surface.weighted.fire.spreadRate": [scaleSpread, 0, [0, 40], false],
     "surface.weighted.fire.heatPerUnitArea": [scaleHeat, 0, [0, 20], false],
     "surface.weighted.fire.firelineIntensity": [scaleHeat, 0, [0, 20], false],
+    "crown.fire.initiation.transitionRatio": [
+      scaleTransition,
+      0,
+      [0, 9],
+      false,
+    ],
   };
 
   function isCommonOutput(output) {
@@ -125,7 +134,7 @@
     $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
     $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
   );
-  $: console.log("forecastOpenMeteo", $forecastOpenMeteo);
+  // $: console.log("forecastOpenMeteo", $forecastOpenMeteo);
 
   $: forecastData = $forecastOpenMeteo;
   $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
@@ -156,6 +165,7 @@
   $: chartHeight = (yCountWeather + yCount) * cellSize + cellSize;
   $: heatmapWidth = fireBehaviourData.length * cellSize;
   $: dayPickerHeight = 40;
+  // $: console.log("Heatmap fireBehaviourData data", $_outputForecastArray);
   // $: console.log("Heatmap forecast data", forecastData);
   // $: console.log("Heatmap output data", fireBehaviourData);
 </script>
@@ -222,7 +232,6 @@
           {forecastData}
           {weatherProps}
           {modelOutputProps}
-          halfPoint={$_maxVal / 2}
         />
       </Svg>
       <Html>
