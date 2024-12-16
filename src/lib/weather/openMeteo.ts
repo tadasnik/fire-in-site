@@ -1,39 +1,24 @@
 import { fetchWeatherApi } from 'openmeteo';
-import { get } from 'svelte/store';
-import { forecastDays, forecastDaysPast } from '$lib/shared/stores/forecastStore';
-import { getDateString } from '$lib/shared/stores/timeStore';
-
-Date.prototype.subtractDays = function (days: number) {
-  var date = new Date(this.valueOf());
-  date.setDate(date.getDate() - days);
-  return date;
-}
 
 
-export async function fetchForecastMeteo(latitude: number, longitude: number, slope: number, aspect: number, forecastMode: string, forecastModel: string, hourlyVars: string[], date: Date) {
-  console.log("fetchForecastMeteo", latitude, longitude, slope, aspect, forecastMode, forecastModel, hourlyVars, date)
-  function fillParams() {
-    const past_days = get(forecastDaysPast);
-    const forecast_days = get(forecastDays);
-    const start_date = getDateString(date.subtractDays(past_days))
-    const end_date = getDateString(date);
-    const baseParams = {
-      "latitude": latitude,
-      "longitude": longitude,
-      "hourly": hourlyVars,
-      "wind_speed_unit": "ms",
-      "tilt": slope,
-      "azimuth": aspect - 180,
-    };
-    if (forecastMode === "forecast") {
-      return { ...baseParams, "models": forecastModel, past_days, forecast_days };
-    } else if (forecastMode === "historical") {
-      return { ...baseParams, start_date, end_date };
-    }
-  }
-  console.log("fillParams", fillParams())
-  const url = forecastMode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
-  const responses = await fetchWeatherApi(url, fillParams())
+export async function fetchForecastMeteo(params: {
+  latitude: number,
+  longitude: number,
+  hourly: string[],
+  slope: number | undefined
+  aslope: number | undefined,
+  forecast_model: string | undefined,
+  start_date: string | undefined,
+  end_date: string | undefined,
+  forecast_mode: string | undefined,
+  forecast_days: number | undefined,
+}): Promise<any> {
+
+  console.log("fetchForecastMeteo params", params)
+
+  if (!params.forecast_mode) { params.forecast_mode = "forecast" }
+  const url = params.forecast_mode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
+  const responses = await fetchWeatherApi(url, params)
 
   // Helper function to form time ranges
   const range = (start: number, stop: number, step: number) =>
@@ -44,7 +29,7 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
 
   // Attributes for timezone and location
   const utcOffsetSeconds = response.utcOffsetSeconds();
-  // const timezone = response.timezone();
+  const timezone = response.timezone();
   // const timezoneAbbreviation = response.timezoneAbbreviation();
   // const forecastLatitude = response.latitude();
   // const forecastLongitude = response.longitude();
@@ -53,20 +38,22 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
 
   const hourly = response.hourly();
 
+  // console.log("openMeteo utcOffsetSeconds", utcOffsetSeconds)
+  // console.log("openMeteo timezone", timezone)
   // Note: The order of weather variables in the URL query and the indices below need to match!
   const weatherData = {
     "time": range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
       (t) => Number(3600000 * (Math.round(Number(new Date((t + utcOffsetSeconds) * 1000)) / 3600000))))
   }
 
-  for (let [nr, variable] of hourlyVars.entries()) {
+  for (let [nr, variable] of params.hourly.entries()) {
     weatherData[variable] = hourly.variables(nr)!.valuesArray()!
   }
 
-  console.log("openMeteo weatherData", weatherData)
-  if ((forecastModel === "ukmo_seamless") && (get(forecastDays) > 2) && (forecastMode === "forecast")) {
+  // console.log("openMeteo weatherData", weatherData)
+  if ((params.forecast_model === "ukmo_seamless") && (params.forecastDays > 2) && (params.forecastMode === "forecast")) {
     console.log("openMeteo fetching gti")
-    const gti = await fetchForecastMeteo(latitude, longitude, slope, aspect, forecastMode, "icon_seamless", ["global_tilted_irradiance"], date)
+    const gti = await fetchForecastMeteo({ ...params, forecast_model: "icon_seamless", hourlyVars: ["global_tilted_irradiance"] })
     for (let [nr, value] of weatherData["global_tilted_irradiance"].entries()) {
       if (Number.isNaN(value)) {
         weatherData["global_tilted_irradiance"][nr] = gti["global_tilted_irradiance"][nr]
@@ -74,6 +61,7 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
       };
     }
   }
+  weatherData["timeZone"] = timezone
   return weatherData;
 }
 //     "latitude": latitude,
@@ -82,7 +70,7 @@ export async function fetchForecastMeteo(latitude: number, longitude: number, sl
 //   "end_date": "2020-07-19",
 //     "hourly": ["temperature_2m", "relative_humidity_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m"],
 //     "wind_speed_unit": "ms"
-   // };
+// };
 //   const url = "https://historical-forecast-api.open-meteo.com/v1/forecast";
 //   const responses = await fetchWeatherApi(url, params);
 //
