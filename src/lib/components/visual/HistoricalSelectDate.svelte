@@ -18,6 +18,7 @@
     getForecastOpenMeteo,
     fetchingForecast,
   } from "$lib/shared/stores/forecastStore.js";
+  import CurrentBehaviour from "./CurrentBehaviour.svelte";
 
   function fetchHistoricalForecast() {
     $fetchingForecast = true;
@@ -27,12 +28,13 @@
       $historicalDay,
       12,
     );
+    currentDateTime.set(dateTime);
     console.log(
       "Calling fetch forecast from handle historical, currentdateTime ",
       $currentDateTime,
       dateTime,
     );
-    getForecastOpenMeteo(dateTime);
+    getForecastOpenMeteo();
   }
 </script>
 
