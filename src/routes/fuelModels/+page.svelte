@@ -20,10 +20,15 @@
   import { fuelNodes } from "$lib/data/fuelNodes.js";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
   import { fuelCodeFormat } from "$lib/shared/utils.js";
-
   import { slide } from "svelte/transition";
-
   import { selectedFuels } from "$lib/shared/stores/modelStore";
+
+  import heatherPhoto from "$lib/assets/fuelModelPhotos/clm_2.webp";
+  import mixedPhoto from "$lib/assets/fuelModelPhotos/mhl_3.webp";
+  import grassPhoto from "$lib/assets/fuelModelPhotos/grh_1.webp";
+  import gorsePhoto from "$lib/assets/fuelModelPhotos/gh_2.webp";
+  import fernPhoto from "$lib/assets/fuelModelPhotos/fn_forest.webp";
+  import forestPhoto from "$lib/assets/fuelModelPhotos/sn_2.webp";
 
   const fuelsImages = import.meta.glob("$lib/assets/fuelModelPhotos/*.webp", {
     eager: true,
@@ -72,38 +77,38 @@
       title: "Calluna fuels",
       description:
         "Calluna vulgaris dominated fuel models (<strong>CL</strong>). Four calluna fuel models are available based on fuel load and life cycle phase: low load or pioneer stage (<strong>CL</strong>l), medium load or building stage (<strong>CL</strong>m), high load or mature phase (<strong>CL</strong>h)  and degenarate phase (<strong>CL</strong>d).",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/clm_2.webp",
+      image: heatherPhoto,
     },
 
     {
       title: "Mixed heath models",
       description:
         "Mixed heath fuel models (<strong>MH</strong>) characterising dwarf shrub vegetation. Two mixed heath fuel models are available based on herbaceous fuel content: low herbaceous load (<strong>MH</strong>l) and high herbaceous load (<strong>MH</strong>h) models.",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/mhl_3.webp",
+      image: mixedPhoto,
     },
     {
       title: "Grass fuels",
       description:
         "Grass fuel models (<strong>GR</strong>) representing grass-dominated vegetation. Divided into low load (<strong>GR</strong>l), medium load (<strong>GR</strong>m) and high load (<strong>GR</strong>h) models based on fuel load and fuel bed height.",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/grh_1.webp",
+      image: grassPhoto,
     },
     {
       title: "Gorse fuels",
       description:
         "Gorse fuel models (<strong>G</strong>) characterising European gorse shrubs. The category is split into four categories primarily corresponding to different fuel bed heights and fuel loads: low (<strong>G</strong>l), medium (<strong>G</strong>m), high (<strong>G</strong>h) load and tall gorse (<strong>G</strong>t) models.",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/gh_2.webp",
+      image: gorsePhoto,
     },
     {
       title: "Fern model",
       description:
         "Fuel model (<strong>FN</strong>) representing fern vegetation, most commonly dominated by braken ferns. Very high load of herbaceous vegetation, fuel depth approximatelly one metre.",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/fn_forest.webp",
+      image: fernPhoto,
     },
     {
       title: "Forest litter models",
       description:
         "Fuel models representing litter in different forest types. These were split into broadleaf forest litter (<strong>BL</strong>), long needle litter (<strong>LN</strong>) and short needle litter (<strong>SN</strong>) models.",
-      imageUrl: "/src/lib/assets/fuelModelPhotos/sn_2.webp",
+      image: forestPhoto,
     },
   ];
 
@@ -140,30 +145,34 @@
 
     <P class="pt-5 pb-8"></P>
   </div>
-  <div class="columns-1 md:columns-2 xl:columns-3 space-y-4 p-5">
-    {#each fuelsClasses as fuel}
-      <div>
-        <Card img={fuel.imageUrl} imgClass="aspect-video">
-          <h5
-            class="mb-2 text-2xl font-bold tracking-tight text-gray-700 dark:text-white"
-          >
-            {fuel.title}
-          </h5>
-          <p
-            class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight"
-          >
-            {@html fuel.description}
-          </p>
-        </Card>
-      </div>
-    {/each}
-  </div>
+</div>
+<div
+  class="grid justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-4 px-10"
+>
+  {#each fuelsClasses as fuel}
+    <div>
+      <Card img={fuel.image} imgClass="aspect-video">
+        <h5
+          class="mb-2 text-2xl font-bold tracking-tight text-gray-700 dark:text-white"
+        >
+          {fuel.title}
+        </h5>
+        <p
+          class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight"
+        >
+          {@html fuel.description}
+        </p>
+      </Card>
+    </div>
+  {/each}
+</div>
+<div class="max-w-80 mx-auto items-center overflow-hidden md:max-w-2xl pt-10">
   <Heading
     tag="h4"
     class="mb-4"
-    customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
+    customSize="pt-10 text-2xl font-extrabold  md:text-3xl lg:text-4xl"
   >
-    <Span class="text-primary-600 font-bold">FireInSite</Span> fuel model values
+    <Span class="text-primary-600 font-bold">FireInSite</Span> fuel model table
   </Heading>
 </div>
 <Table>
