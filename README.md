@@ -1,6 +1,6 @@
 # FireInSite
 
-A fire behaviour prediction and visualization tool. Visit (https://fireinsite.org) to see the model in action.
+A fire behaviour prediction and visualization tool. Visit (https://fireinsite.org) to see the current version of the model.
 
 ## Brief introduction
 
@@ -8,19 +8,22 @@ FireInSite is a web-based application that forecasts fuel moisture, probability 
 
 FireInSite is built on over four years of intensive data collection of fuel moisture, vegetation flammability and energy contents taken from across the UK in characteristic fuels and these have been used to develop fuel models that describe the fire prone fuel types of the UK landscape. While the fuel models have been specifically designed and tailored to UK vegetation, the model can be used in other regions with similar humid temperate climates.
 
-The application integrates terrain information from Mapbox (https://www.mapbox.com/about/maps/) digital elevation tiles, weather data by Open-Meteo with BehavePlus fire behaviour model to provide both fire behaviour forecasts for five days and/or hindcasts (using historic weather).
+The model integrates terrain information from Mapbox digital elevation tiles, weather data by Open-Meteo with BehavePlus fire behaviour model to provide both fire behaviour forecasts for five days and/or hindcasts (using historic weather).
 
-## Built With
+The application is designed to be user-friendly and accessible to a wide range of users, including land managers, fire service personel and researchers.
 
-* [Svelte](https://svelte.dev/) - The web framework used.
+Built with Svelte and flowbite.
 
 ## Authors
 
 * **Tadas Nikonovas** - (https://github.com/tadasnik)
+* **Claire Belcher**
+* **Kerryn Little**
+
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 
@@ -42,12 +45,11 @@ npm create svelte@latest
 
 # create a new project in my-app
 npm create svelte@latest my-app
-```
 
 # create a new project in my-app
-
 npm install 
 
+```
 ##  Local server
 
 Once you've created a project and installed dependencies with `npm install`, start a development server:
@@ -58,13 +60,3 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
