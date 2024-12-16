@@ -43,9 +43,9 @@
 
   const formatValues = (d) => (d < 10 ? d.toFixed(1) : Math.round(d));
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
-  console.log("haetmap innner DATA", $data);
-  console.log("haetmap forecast DATA", forecastData);
-  console.log("focusDayIndex", $focusDayIndex);
+  // console.log("haetmap innner DATA", $data);
+  // console.log("haetmap forecast DATA", forecastData);
+  // console.log("focusDayIndex", $focusDayIndex);
 </script>
 
 {#each Object.entries(weatherProps) as [prop, values], i}
