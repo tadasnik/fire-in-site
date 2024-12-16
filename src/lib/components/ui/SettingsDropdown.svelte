@@ -43,17 +43,18 @@
   function handleModelChange(value) {
     $fetchingForecast = true;
     $forecastModel = value;
-    getForecastOpenMeteo(get(currentDateTime));
+    getForecastOpenMeteo();
   }
 
   function handleTimeModeChange(value) {
     $fetchingForecast = true;
     $forecastMode = value;
     if (value === "historical") {
+      console.log("setting forecastMode to historical");
     } else {
       console.log("setting currentDateTime to now, fetching forecast");
-      let dateTime = new Date();
-      getForecastOpenMeteo(dateTime);
+      $currentDateTime = new Date();
+      getForecastOpenMeteo();
     }
   }
 </script>
