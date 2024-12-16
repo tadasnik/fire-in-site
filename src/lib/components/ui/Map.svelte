@@ -4,7 +4,10 @@
   import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
-  import { getForecastOpenMeteo } from "$lib/shared/stores/forecastStore";
+  import {
+    getForecastOpenMeteo,
+    forecastMode,
+  } from "$lib/shared/stores/forecastStore";
   import { currentDateTime } from "$lib/shared/stores/timeStore";
   import "$lib/styles/mapbox-gl.css";
   import Layout from "../../../routes/+layout.svelte";
@@ -97,7 +100,9 @@
     let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
     console.log("slope", slope, "aspect", aspect);
     setCurrentLocation(longitude, latitude, elevation, slope, aspect);
-    getForecastOpenMeteo($currentDateTime);
+    if ($forecastMode === "forecast") {
+      getForecastOpenMeteo();
+    }
   }
 
   function getWindCardinalDirection(windDir) {
@@ -215,11 +220,15 @@
 
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
-      setMapLocation(
-        $currentLocation.longitude,
-        $currentLocation.latitude,
-        true,
-      );
+      console.log("Map load", $currentLocation);
+      if (!$currentLocation.userLocation) {
+        console.log("Map load no user location");
+        setMapLocation(
+          $currentLocation.longitude,
+          $currentLocation.latitude,
+          true,
+        );
+      }
     });
 
     map.on("click", function (e) {
