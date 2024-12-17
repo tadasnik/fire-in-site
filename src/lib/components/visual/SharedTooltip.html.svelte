@@ -8,8 +8,6 @@
 
   import { fuelCodeFormat } from "$lib/shared/utils.js";
   import QuadTree from "./QuadTree.html.svelte";
-  import FireCharacteristics from "./FireCharacteristics.svelte";
-  import UKFuelModels from "$lib/data/UKFuelModels";
 
   const { data, width, yScale, xScale, config } = getContext("LayerCake");
 
