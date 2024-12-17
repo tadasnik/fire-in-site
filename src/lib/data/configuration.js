@@ -167,6 +167,14 @@ export const modelConfigOptions = {
     'wetBulb': enter dry bulb, wet bulb, and elev and calculate dew point, relative humidity
     'dewPoint': enter dry bulb and dew point and calculate relative humidity
 `,
-  }
-
+  },
+  'link.crownFire': {
+    options: ['linkedToSurfaceFire', 'standAlone'],
+    value: 'linkedToSurfaceFire',
+    active: false,
+    description: `Surface fire variables required by the Crown Module are:
+    'linkedToSurfaceFire': linked to the corresponding Surface Module variables
+    'standAlone': entered directly (stand-alone mode)
+    `,
+  },
 }
