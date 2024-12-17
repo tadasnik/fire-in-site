@@ -19,7 +19,8 @@ export const selectedOutputs = writable(['surface.weighted.fire.spreadRate',
   'surface.weighted.fire.firelineIntensity',
   'surface.weighted.fire.flameLength',
   'site.moisture.dead.tl1h',
-  'ignition.firebrand.probability'
+  'ignition.firebrand.probability',
+  'crown.fire.initiation.transitionRatio'
 ])
 export const commonOutputs = readable(["ignition.firebrand.probability", "site.moisture.dead.tl1h"])
 export const selectedInput = writable('site.moisture.dead.category')
@@ -119,6 +120,7 @@ export const fuelInputs = writable(fuelProps)
 
 export const requiredConfig = derived(selectedOutputs, ($selectedOutputs) => {
   const requiredC = fireSim.selectOutputs($selectedOutputs)
+  // console.log('requiredConfig :', requiredC)
   return requiredC
 })
 
@@ -127,6 +129,7 @@ export const config = derived(
   ([$requiredConfig, $modelConfigValues]) => {
     const configArray = []
     $requiredConfig.forEach((item) => {
+      // console.log('item :', item)
       configArray.push([item, $modelConfigValues[item].value])
     })
     return configArray
@@ -135,6 +138,7 @@ export const config = derived(
 
 export const requiredInputs = derived(config, ($config) => {
   const requiredI = fireSim.updateConfig($config)
+  // console.log('requiredInputs :', requiredI)
   return requiredI
 })
 
@@ -215,6 +219,7 @@ export const requiredSiteInputsForecastOpen = derived(
   [requiredInputs, siteInputs, forecastOpenMeteo, fuelMoistureModel],
   ([$requiredInputs, $siteInputs, $forecastOpenMeteo, $fuelMoistureModel]) => {
     // console.log("requiredSiteInputsForecastOpen forecastOpenMeteo", $forecastOpenMeteo)
+    // console.log("requiredSiteInputsForecastOpen run start", $requiredInputs)
     let deadFMC = null
     const requiredSiteInputs = new Map()
     const forecastInputs = {
@@ -227,7 +232,11 @@ export const requiredSiteInputsForecastOpen = derived(
       "site.slope.direction.aspect": get(currentLocation).aspect,
       "site.slope.steepness.degrees": get(currentLocation).slope,
       "site.location.elevation.diff": get(elevationDiff)
-
+    }
+    const canopyInputs = {
+      "site.canopy.fuel.foliar.moistureContent": 50,
+      "site.canopy.crown.baseHeight": 5,
+      "site.canopy.crown.totalHeight": 20,
     }
     const deadMoistureCategories = { "site.moisture.dead.tl1h": 0, "site.moisture.dead.tl10h": 2, "site.moisture.dead.tl100h": 4 }
     // Do not run for past days
@@ -252,10 +261,12 @@ export const requiredSiteInputsForecastOpen = derived(
           } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
             // console.log("deadMoistureCategories", nr, input, deadMoistureCategories[input], $forecastOpenMeteo["ffmc_nelson"][nr])
             requiredSiteI[input] = [$forecastOpenMeteo["ffmc_nelson"][nr] + deadMoistureCategories[input]]
+          } else if (Object.keys(canopyInputs).includes(input)) {
+            // console.log('canopy input :', input)
+            requiredSiteI[input] = [canopyInputs[input]]
           } else {
             // console.log('required inputs non - forecast :', input)
             if (splitKey[0] === 'site' && splitKey[1] == ! 'moisture') {
-              // console.log("site input :", input, $siteInputs[input].value)
               requiredSiteI[input] = $siteInputs[input].value
             } else if (
               splitKey[0] === 'surface' &&
@@ -269,7 +280,7 @@ export const requiredSiteInputsForecastOpen = derived(
         requiredSiteInputs.set(time, requiredSiteI)
       }
     })
-    console.log("requiredSiteInputsForecastOpen run end")
+    console.log("requiredSiteInputsForecastOpen run end", requiredSiteInputs)
     return requiredSiteInputs
   }
 )
@@ -365,7 +376,7 @@ export const _inputsForecast = derived(
       i++
     })
     console.log('_inputsForecast end :')
-    // console.log('inputsForecast :', inputsForecast)
+    console.log('inputsForecast :', inputsForecast)
     return inputsForecast
   }
 )
@@ -402,9 +413,12 @@ export const _selectedTimeOutput = derived([requiredSiteInputsForecastOpen, curr
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
   // console.log("_outputForecast start")
-  console.log('requiredSiteInputsForecastOpen in _outputForecast:', $_inputsForecast)
+  // console.log('requiredSiteInputsForecastOpen in _outputForecast:', $_inputsForecast)
 
-  const convertUnits = ["surface.weighted.fire.heatPerUnitArea", "surface.weighted.fire.firelineIntensity"]
+  const convertUnits = [
+    "surface.weighted.fire.heatPerUnitArea",
+    "surface.weighted.fire.firelineIntensity"
+  ]
   const resultForecast = new Map()
   $_inputsForecast.forEach((forecast, time) => {
     const output = []
@@ -416,6 +430,8 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
           res[item] = res[item] * 10 ** -6
         })
       })
+      // force transitionRatio to number
+      result[0]["crown.fire.initiation.transitionRatio"] = Number(result[0]["crown.fire.initiation.transitionRatio"])
       output.push({
         "surface.primary.fuel.model.catalogKey": fuel,
         values: result
