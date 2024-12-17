@@ -14,7 +14,6 @@
   import Tooltip from "$lib/components/visual/spiral/Tooltip.html.svelte";
   import { xFromPolar, yFromPolar, cartesianFromPolarRad } from "./utils.js";
   import { currentLocation } from "$lib/shared/stores/locationStore.js";
-  import CurrentBehaviour from "../CurrentBehaviour.svelte";
 
   export let data = [];
   export let z = "vapour_pressure_deficit";
