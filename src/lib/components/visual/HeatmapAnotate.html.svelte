@@ -106,7 +106,6 @@
 {/each}
 
 <div class="absolute items-end min-w-72 p-1" style:left="95px">
-  <div class="" />
   <Select id="select-output" class="" size="sm" bind:value={$selectedOutput}>
     {#each $selectedOutputs as output}
       <option value={output}
