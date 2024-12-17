@@ -1,7 +1,10 @@
 import { readable, writable, derived, get } from 'svelte/store'
+import { add, sub } from "date-fns";
 import { currentLocation } from '$lib/shared/stores/locationStore'
-import { dateTime, currentDateTime, differenceHours, getMonth, dateString, focusDay } from '$lib/shared/stores/timeStore'
-import fetchForecastJSON from "$lib/weather/metoffice";
+import {
+  dateTime, currentDateTime, differenceHours,
+  getMonth, dateString, focusDay, getDateString
+} from '$lib/shared/stores/timeStore'
 import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
 import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
 
@@ -40,6 +43,11 @@ export const forecastTimeSeries = writable([{
   wind_speed_10m: 3.12
 }])
 
+export const climateOpenMeteo = writable([{
+  date: [1403984000],
+  vapour_pressure_deficit: [0],
+}])
+
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
@@ -50,70 +58,85 @@ export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName
 export const fetchingForecast = writable(true)
 export const forecastDays = writable(5)
 export const forecastDaysPast = writable(1)
+export const hourlyVarsFull = [
+  "global_tilted_irradiance",
+  "temperature_2m",
+  "relative_humidity_2m",
+  "precipitation",
+  "weather_code",
+  "cloud_cover",
+  "wind_speed_10m",
+  "wind_direction_10m",
+  "wind_gusts_10m",
+  "vapour_pressure_deficit",
+]
 
-Date.prototype.addDays = function (days) {
-  var date = new Date(this.valueOf());
-  date.setDate(date.getDate() + days);
-  return date;
+export function fillParams({
+  hourlyVars = hourlyVarsFull,
+  forecast_mode = undefined,
+  forecast_model = undefined,
+  start_date = undefined,
+  end_date = undefined,
+  forecast_days = undefined,
+  forecast_days_past = undefined
+} = {}) {
+  // console.log("start_date, end_date in fillParams", start_date, end_date)
+  if (forecast_mode === undefined) { forecast_mode = get(forecastMode) }
+  if (forecast_model === undefined) { forecast_model = get(forecastModel) }
+  if (forecast_days === undefined) { forecast_days = get(forecastDays) }
+  if (forecast_days_past === undefined) { forecast_days_past = get(forecastDaysPast) }
+  let baseParams = {
+    "latitude": get(currentLocation).latitude,
+    "longitude": get(currentLocation).longitude,
+    "hourly": hourlyVars,
+    "wind_speed_unit": "ms",
+    "timeformat": "unixtime",
+    "timezone": "auto",
+    "forecast_mode": forecast_mode,
+  };
+  if ("global_tilted_irradiance" in hourlyVars) {
+    baseParams = {
+      ...baseParams,
+      "tilt": get(currentLocation).slope,
+      "azimuth": get(currentLocation).aspect - 180,
+    }
+  }
+  if (forecast_mode === "forecast") {
+    return {
+      ...baseParams,
+      "models": forecast_model,
+      "past_days": forecast_days_past,
+      "forecast_days": forecast_days,
+    }
+  } else if (forecast_mode === "historical") {
+    if (start_date === undefined) {
+      start_date = getDateString(sub(get(currentDateTime), { days: get(forecastDaysPast) }))
+    }
+    if (end_date === undefined) { end_date = getDateString(get(currentDateTime)) }
+    return { ...baseParams, start_date, end_date };
+  }
 }
 
-Date.prototype.subtractDays = function (days) {
-  var date = new Date(this.valueOf());
-  date.setDate(date.getDate() - days);
-  return date;
-}
+export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, forecast_days, forecast_days_past, forecast_mode } = {}) {
+  if (hourlyVars === undefined) { hourlyVars = hourlyVarsFull }
+  if (forecast_mode === undefined) forecast_mode = get(forecastMode);
 
-export async function getForecastOpenMeteo(dateTime) {
+  // const start_date = getDateString(date.subtractDays(past_days))
+  // const end_date = getDateString(date);
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
     // console.log("fetching forecast openMeteo")
     try {
-      let hourlyVars = []
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
-        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
-        hourlyVars = [
-          "global_tilted_irradiance",
-          "temperature_2m",
-          "relative_humidity_2m",
-          "precipitation",
-          "weather_code",
-          "cloud_cover",
-          "wind_speed_10m",
-          "wind_direction_10m",
-          "wind_gusts_10m",
-          "vapour_pressure_deficit",
-        ]
-        result = await fetchForecastMeteo(
-          get(currentLocation).latitude,
-          get(currentLocation).longitude,
-          get(currentLocation).slope,
-          get(currentLocation).aspect,
-          get(forecastMode),
-          get(forecastModel),
-          hourlyVars,
-          dateTime,
-        );
-        // console.log("fetch forecast result", result)
-
+        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
+        result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
       } else {
         console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
 
         hourlyVars = ["global_tilted_irradiance"]
-        const gti = await fetchForecastMeteo(
-          get(currentLocation).latitude,
-          get(currentLocation).longitude,
-          get(currentLocation).slope,
-          get(currentLocation).aspect,
-          get(forecastMode),
-          get(forecastModel),
-          hourlyVars,
-          dateTime,
-        );
-
+        const gti = await fetchForecastMeteo(fillParams(["global_tilted_irradiance"], forecast_mode));
         result = get(forecastOpenMeteo)
         result["global_tilted_irradiance"] = gti["global_tilted_irradiance"]
-
-
       }
 
       // Second promise
@@ -128,13 +151,31 @@ export async function getForecastOpenMeteo(dateTime) {
       // Update stores
       forecastOpenMeteo.set(resultMoist);
       fetchingForecast.set(false);
-      currentDateTime.set(dateTime);
+      // currentDateTime.set(dateTime);
     } catch (error) {
       console.error("Error fetching forecast:", error);
       fetchingForecast.set(false);
     }
   }
 }
+
+export async function getHistory(hourlyVars = ['vapour_pressure_deficit'], start_date = undefined, end_date = undefined) {
+  try {
+    let result = {}
+    if (get(currentLocation).distanceFromPrevious > 4000) {
+      console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
+      // console.log("params in getHistory", fillParams(hourlyVars, 'historical', start_date, end_date))
+      result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode: "historical", start_date, end_date }));
+    } else {
+      // result = await fetchForecastMeteo(fillParams(hourlyVars, 'historical', start_date, end_date));
+    }
+    return result
+  } catch (error) {
+    console.error("Error fetching forecast:", error);
+  }
+  fetchingForecast.set(false);
+}
+
 export function getIndexOf(dateObject) {
   return get(forecastOpenMeteo).time.indexOf(dateObject.getTime())
 }
@@ -142,9 +183,9 @@ export function getIndexOf(dateObject) {
 export const daysInForecast = derived([forecastOpenMeteo], ([$forecastOpenMeteo]) => {
   let days = []
   // skiping past days
-  days.push((new Date($forecastOpenMeteo.time[0]).addDays(get(forecastDaysPast)).valueOf()))
+  days.push(add(new Date($forecastOpenMeteo.time[0]), { days: get(forecastDaysPast) }).valueOf())
   for (let i = 1; i < get(forecastDays); i++) {
-    days.push((new Date(days[i - 1]).addDays(1)).valueOf())
+    days.push(add(new Date(days[i - 1]), { days: 1 }).valueOf())
   }
   // console.log("daysInForecast", days)
   return days
