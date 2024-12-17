@@ -16,7 +16,6 @@
   import { timeFormat } from "d3-time-format";
   import { timeDay, timeMonth, timeYear } from "d3-time";
   import { cartesianFromPolarRad } from "$lib/components/visual/spiral/utils.js";
-  import { addMonth } from "$lib/components/visual/spiral/timeUtils.js";
 
   export let polarProps = {};
 
