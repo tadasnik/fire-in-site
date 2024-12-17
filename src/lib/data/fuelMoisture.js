@@ -44,7 +44,7 @@ export const fuelMoisture = {
       9: 150,
       10: 120,
       11: 40,
-      12: 30,
+      12: 40,
       "heatwave": 98,
     },
     "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
@@ -107,7 +107,7 @@ export const fuelMoisture = {
       9: 150,
       10: 120,
       11: 40,
-      12: 30,
+      12: 40,
       "heatwave": 98,
     },
     "surface.primary.fuel.model.behave.parms.cured.herb.fraction": {
