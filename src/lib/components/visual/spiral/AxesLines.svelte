@@ -12,6 +12,8 @@
     addDays,
     subDays,
     format,
+    getYear,
+    setYear,
   } from "date-fns";
   import { timeFormat } from "d3-time-format";
   import { timeDay, timeMonth, timeYear } from "d3-time";
@@ -70,10 +72,11 @@
   // the *0.001 is necessary to convert from milliseconds to seconds
   const startDate = fromUnixTime($data[0].date * 0.001);
   const extStartDate = subYears(startDate, 1);
-  const monthsPrevYear = eachMonthOfInterval({
-    start: extStartDate,
-    end: startDate,
-  }).slice(0, -1);
+  const extStartYear = getYear(extStartDate);
+  // const monthsPrevYear = eachMonthOfInterval({
+  //   start: extStartDate,
+  //   end: startDate,
+  // }).slice(0, -1);
 
   //dates of months in next year
   const lastDate = fromUnixTime($data[$data.length - 1].date * 0.001);
@@ -82,10 +85,12 @@
     start: lastDate,
     end: extEndDate,
   }).slice(1);
+  $: console.log("monthsPrevYear", monthsPrevYear, monthsNextYear);
 
   $: monthProps = monthsNextYear.map((month, i) => {
+    console.log("month", month);
     const { angle: startAngle, distance: start } = getAngleDistance(
-      monthsPrevYear[i],
+      setYear(new Date(month), extStartYear),
     );
     const { angle: endAngle, distance: end } = getAngleDistance(month);
     const endAngleNext = getAngle(addMonths(month, 1));
