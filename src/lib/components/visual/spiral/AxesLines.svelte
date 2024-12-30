@@ -85,10 +85,9 @@
     start: lastDate,
     end: extEndDate,
   }).slice(1);
-  $: console.log("monthsPrevYear", monthsPrevYear, monthsNextYear);
 
   $: monthProps = monthsNextYear.map((month, i) => {
-    console.log("month", month);
+    // console.log("month", month);
     const { angle: startAngle, distance: start } = getAngleDistance(
       setYear(new Date(month), extStartYear),
     );
@@ -110,7 +109,7 @@
   });
 
   $: todayProps = todayMarker();
-  $: console.log("monthProps", monthProps, todayProps);
+  // $: console.log("monthProps", monthProps, todayProps);
 
   $: getArc = (d) => {
     const distance = $xScale($xDomain[1]);
