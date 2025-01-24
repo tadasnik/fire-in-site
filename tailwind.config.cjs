@@ -7,6 +7,16 @@ const config = {
 
   theme: {
     extend: {
+      fontSize: {
+        xxs: ['0.7rem', {
+          lineHeight: '0.6rem',
+          letterSpacing: '-0.03em',
+          fontWeight: '500'
+        }],
+      },
+
+      spacing: { 100: '26rem', 120: '30rem' },
+      minWidth: { 100: '26rem', 120: '30rem' },
       colors: {
         // flowbite-svelte
         primary: {
@@ -21,7 +31,7 @@ const config = {
           800: '#566000',
           900: '#CF5700'
         }
-      }
+      },
     }
   }
 };
