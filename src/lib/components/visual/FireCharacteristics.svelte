@@ -30,8 +30,9 @@
   let evt;
   let hideTooltip = true;
   const addCommas = format(",");
-  $: console.log("flatData FireChars", flatData);
   const formatXtip = timeFormat("%b %d, %H:00");
+  $: valuesData = data.map((d) => d.values);
+  $: console.log("flatData FireChars", data, flatData, valuesData);
 </script>
 
 <div class="flex grow">
@@ -43,8 +44,7 @@
     xDomain={[0, 38]}
     yDomain={[0, 60]}
     zScale={scaleSequential(interpolateReds)}
-    {data}
-    flatdata={flatten(data, "values")}
+    data={valuesData}
   >
     <Html>
       <img
@@ -69,7 +69,7 @@ unit area (MJ/m2)"
 (m/min)"
       />
       <ScatterSvg
-        data={flatData}
+        data={valuesData}
         on:mousemove={(event) => (evt = hideTooltip = event)}
         on:mouseout={() => (hideTooltip = false)}
       />
@@ -78,7 +78,7 @@ unit area (MJ/m2)"
 
     <Html>
       <FireCharAnotations />
-      <SharedTooltip formatTitle={formatXtip} dataset={flatData} />
+      <SharedTooltip formatTitle={formatXtip} dataset={valuesData} />
     </Html>
     <!-- <Html> -->
     <!--   <Labels /> -->

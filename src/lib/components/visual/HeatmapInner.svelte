@@ -41,9 +41,11 @@
       : "text-xs text-neutral-400";
   };
 
-  const formatValues = (d) => (d < 10 ? d.toFixed(1) : Math.round(d));
+  const formatValues = (d) =>
+    d < 10
+      ? d.toFixed(modelOutputProps[$selectedOutput].roundTo)
+      : Math.round(d);
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
-  // console.log("haetmap innner DATA", $data);
   // console.log("haetmap forecast DATA", forecastData);
   // console.log("focusDayIndex", $focusDayIndex);
 </script>
@@ -78,25 +80,26 @@
 
 {#each $data as fuelObject, i}
   {#each fuelObject.values as object, j}
+    {@const value = formatValues($z(object))}
     <rect
       width={cellSize}
       height={cellSize}
       x={j * cellSize}
       y={(datasetsProps[0] + gapSize + i) * cellSize}
-      style="fill:{modelOutputProps[$selectedOutput][0](
-        object[$selectedOutput],
-      )}
+      style="fill:{modelOutputProps[$selectedOutput].scale($z(object))}
         ;stroke-width:.2;stroke:grey"
     />
-    {#if (!modelOutputProps[$selectedOutput][3] && $z(object) > 0.05) || modelOutputProps[$selectedOutput][3]}
+    <!-- {#if (!modelOutputProps[$selectedOutput].showSmallVals && $z(object) > 0.05) || modelOutputProps[$selectedOutput].showSmallVals} -->
+    {#if modelOutputProps[$selectedOutput].showSmallVals && value != 0}
       <text
         x={j * cellSize + cellSize / 2}
         y={(datasetsProps[0] + gapSize + i) * cellSize + cellSize / 2}
         class={isSelectedClass(object.time)}
         text-anchor="middle"
         dominant-baseline="middle"
-        style="fill:{$z(object) >= modelOutputProps[$selectedOutput][2][0] &&
-        object[$selectedOutput] < modelOutputProps[$selectedOutput][2][1]
+        style="fill:{value >=
+          modelOutputProps[$selectedOutput].scaleLimits[0] &&
+        value < modelOutputProps[$selectedOutput].scaleLimits[1]
           ? 'grey'
           : 'white'}">{formatValues($z(object))}</text
       >

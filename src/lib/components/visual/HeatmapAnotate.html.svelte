@@ -1,11 +1,7 @@
 <script>
   import { getContext } from "svelte";
   import { Popover, Modal, Gallery, Button, Select } from "flowbite-svelte";
-  import {
-    getFuelsImages,
-    getFuelModelsFileNames,
-  } from "$lib/firebase/firebase.client";
-
+  import { Html } from "layercake";
   import {
     selectedFuel,
     selectedOutput,
@@ -14,7 +10,7 @@
   import { outputNodes } from "$lib/data/outputNodes.js";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
-  import { Html } from "layercake";
+  import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
   import { fuelCodeFormat } from "$lib/shared/utils.js";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
 
@@ -106,14 +102,7 @@
 {/each}
 <div class="absolute items-end min-w-64 p-1" style:left="95px">
   <div class="" />
-  <Select id="select-output" class="" size="sm" bind:value={$selectedOutput}>
-    {#each $selectedOutputs as output}
-      <option value={output}
-        >{outputNodes[output].label}
-        ({outputNodes[output].units})</option
-      >
-    {/each}
-  </Select>
+  <SelectOutput />
 </div>
 <div
   class="flex columns-2 items-end min-w-64 p-1"

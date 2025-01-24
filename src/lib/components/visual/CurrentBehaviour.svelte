@@ -10,8 +10,8 @@
     selectedOutputs,
     modelConfigValues,
     advancedMode,
-    _outputForecast,
-    _outputForecastArray,
+    _outputForecastCanopy,
+    _outputUserInputs,
     chartType,
     commonOutputs,
     fuelMoistureModel,
@@ -30,13 +30,22 @@
     dayOptions,
   } from "$lib/shared/stores/timeStore.js";
 
+  import { forecastMode } from "$lib/shared/stores/forecastStore.js";
   let width;
+  $: console.log(
+    "_outputForecastCanopy in CurrentBehaviour",
+    $_outputForecastCanopy.get($dateTime),
+  );
+  $: data =
+    $forecastMode === "user"
+      ? $_outputUserInputs
+      : $_outputForecastCanopy.get($dateTime);
 </script>
 
 {#if $chartType === "fireChar"}
   <FireCharacteristics
     parentWidth={width}
-    data={$_outputForecast.get($dateTime)}
+    {data}
     xKey="surface.weighted.fire.heatPerUnitArea"
     yKey="surface.weighted.fire.spreadRate"
     zKey="surface.primary.fuel.model.catalogKey"
@@ -57,30 +66,25 @@
     <div class="flex flex-col p-2 text-primary-500">
       <div class="text-center text-2xl">All fuels</div>
       <div class="text-center text-9xl">
-        {Math.round(
-          $_outputForecast.get($dateTime)[0].values[0][$selectedOutput],
-        )}%
+        {Math.round(data[0].values[0][$selectedOutput])}%
       </div>
     </div>
   {:else}
     <BarFigure
-      data={$_outputForecast.get($dateTime)}
+      {data}
       time={$dateTime}
       xKey={$selectedOutput}
       yKey="surface.primary.fuel.model.catalogKey"
     />
-    {#each $_outputForecast.get($dateTime) as d, i}
+    {#each data as d, i}
       {@const fuel = d["surface.primary.fuel.model.catalogKey"]}
       <Popover
         class="absolute w-64 text-sm font-light z-50 "
         title={UKFuelModels[fuel].displayLabel}
         triggeredBy="#rect-{i}"
         triger="hover"
-        >{$_outputForecast
-          .get($dateTime)
-          [i].values[0][$selectedOutput].toFixed(3)} ({outputNodes[
-          $selectedOutput
-        ].units})</Popover
+        >{data[i].values[$selectedOutput].toFixed(3)}
+        ({outputNodes[$selectedOutput].displayUnits})</Popover
       >
     {/each}
   {/if}

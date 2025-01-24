@@ -3,7 +3,7 @@
   Generates an SVG bar chart.
  -->
 <script>
-  import { LayerCake, Svg, flatten } from "layercake";
+  import { LayerCake, Svg, Html, flatten } from "layercake";
   import { scaleBand } from "d3-scale";
   import { format } from "d3-format";
   import AxisX from "$lib/components/visual/AxisX.svelte";
@@ -11,6 +11,8 @@
   import Bars from "$lib/components/visual/Bars.svelte";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import { _maxVal, selectedFuels } from "$lib/shared/stores/modelStore";
+  import UKFuelModels from "$lib/data/UKFuelModels.json";
+  import BarAxisY from "$lib/components/visual/BarAxisY.svelte";
 
   export let data;
   export let time;
@@ -22,12 +24,12 @@
   const formatLabelY = (d) => format(`.1f`)(d);
 
   $: xMax = Math.ceil($_maxVal / 1) * 1;
-  // $: console.log("Bars data", data);
+  $: yTicks = $selectedFuels.map((i) => UKFuelModels[i].displayLabel);
 </script>
 
 <div class="chart-container w-full h-80 md:h-4/5">
   <LayerCake
-    padding={{ bottom: 20, left: 45 }}
+    padding={{ bottom: 20, left: 90 }}
     x={xKey}
     y={yKey}
     yScale={scaleBand().paddingInner(0.2)}
@@ -49,13 +51,13 @@
           ")"}
         formatTick={formatLabelY}
       />
-      <AxisY
-        gridlines={false}
-        tickMarks={true}
-        ticks={$selectedFuels}
-        axisLabel={outputNodes[yKey].label}
-      />
+      <!-- <AxisY gridlines={false} tickMarks={true} ticks={yTicks} /> -->
     </Svg>
+    <Html>
+      <BarAxisY
+        ticks={data.map((d) => d["surface.primary.fuel.model.catalogKey"])}
+      ></BarAxisY>
+    </Html>
   </LayerCake>
 </div>
 

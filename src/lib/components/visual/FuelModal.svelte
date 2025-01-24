@@ -29,8 +29,7 @@
 </script>
 
 <Modal
-  title="{UKFuelModels[$selectedFuel]
-    .displayLabel} ({$selectedFuel}) Fuel Model"
+  title={UKFuelModels[$selectedFuel].displayLabel}
   bind:open={clickOutsideModal}
   autoclose
   outsideclose

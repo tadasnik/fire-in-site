@@ -8,7 +8,7 @@
 
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { fuelRootCode } from "$lib/shared/utils.js";
-  const { data, xGet, yGet, y, xScale, yScale, xRange } =
+  const { data, xGet, yGet, y, xScale, yScale, xRange, x } =
     getContext("LayerCake");
 
   function rootFuelCode(fuel) {}
@@ -16,6 +16,7 @@
     eager: true,
     as: "url",
   });
+  $: console.log("Bars data", $data);
 </script>
 
 <g class="bar-group">
@@ -26,7 +27,7 @@
         x={$xScale.range()[0]}
         y={$yScale.step() * i}
         patternUnits="userSpaceOnUse"
-        width={$xGet(d.values[0])}
+        width={$xGet(d.values)}
         height={$yScale.bandwidth()}
       >
         <image
@@ -46,7 +47,7 @@
       x={$xScale.range()[0]}
       y={$yScale.step() * i}
       height={$yScale.bandwidth()}
-      width={$xGet(d.values[0]) === 0 ? 1 : $xGet(d.values[0])}
+      width={$xGet(d.values) === 0 ? 1 : $xGet(d.values)}
       fill="url(#{i})"
       stroke-width="1"
       stroke="grey"

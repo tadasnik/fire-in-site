@@ -1,0 +1,103 @@
+<script>
+  import { LayerCake, Svg, Html } from "layercake";
+  import { scaleLinear, scaleSequential } from "d3-scale";
+  import {
+    interpolateYlOrRd,
+    interpolateReds,
+    interpolateInferno,
+  } from "d3-scale-chromatic";
+  import { getDayOfYear } from "date-fns";
+  import ArcSvgSpiral from "$lib/components/visual/spiral/ArcSvgSpiral.svelte";
+  import AxesLines from "$lib/components/visual/spiral/AxesLines.svelte";
+  import Legend from "$lib/components/visual/spiral/Legend.svelte";
+  import YearAnotations from "$lib/components/visual/spiral/YearAnotations.svelte";
+  import Tooltip from "$lib/components/visual/spiral/Tooltip.html.svelte";
+  import { xFromPolar, yFromPolar, cartesianFromPolarRad } from "./utils.js";
+
+  export let data = [];
+  export let z = "vapour_pressure_deficit";
+  export let parentWidth, parentHeight;
+
+  //Rotate the spiral so that mid-January is align with y axis
+  // const angleRotate = 360 / 4.8;
+  // Rotate the spiral so that today is align with y axis
+  // const doyToday = getDayOfYear(new Date());
+  const doyToday = getDayOfYear(new Date("2024-07-15"));
+  const angleRotate = -90 + (365 - doyToday) * 0.9863; //360 / 4.8;
+  const minSpiralSize = 500;
+  $: minParentDim = parentWidth < parentHeight ? parentWidth : parentHeight;
+  $: minDim = minParentDim < minSpiralSize ? minSpiralSize : minParentDim;
+  $: console.log("parent dims", parentWidth, parentHeight);
+  $: console.log("angleRotate", angleRotate, doyToday);
+
+  const angleScale = scaleLinear()
+    .domain([1, 365 + 1])
+    .range([0, 2 * Math.PI]);
+  const radiusScale = scaleLinear()
+    .domain([data[0].date, data[data.length - 1].date])
+    .range([0.4, 0.95]);
+
+  const polarCoords = data.map((object) => {
+    let angle = angleScale(object.doy);
+    let dist = radiusScale(object.date);
+    const { x, y } = cartesianFromPolarRad(dist, angle);
+    return {
+      ...object,
+      x,
+      y,
+    };
+  });
+  $: console.log("cartesian coords", polarCoords);
+  $: console.log("minDim", minDim);
+
+  // $: distanceBetweenYears = (startUT, endUT) => {
+  //   const endDist = $xGet(startUT);
+  //   const startDist = $xGet(endUT);
+  //   return Math.abs(endDist - startDist);
+  // };
+  //
+  // // TODO move this to central logic component or main?
+  // $: cycleDistance = distanceBetweenYears(data[0], data[365]) * 0.9;
+  //
+  // const today = new Date();
+  // const todayAngle = $yScale(getDayOfYear(today));
+  // const todayDistance = $xScale(getYear(today));
+  // $: todayCoords = cartesianFromPolar(todayDistance, todayAngle);
+  //
+  // console.log("Spiral data", data);
+  // console.log("Spiral data", data[0].date, data[data.length - 1].date);
+  // xRange={[(minDim / 2) * 0.35, minDim / 2]}
+</script>
+
+<div class="absolute w-full h-full p-6 overflow-visible">
+  <LayerCake
+    padding={{ top: 20, right: 20, bottom: 20, left: 20 }}
+    x={"x"}
+    xRange={[0, minDim]}
+    xDomain={[-1, 1]}
+    y={"y"}
+    yRange={[(minDim / 2) * 0.35, minDim / 2]}
+    yDomain={[0, 1]}
+    {z}
+    zScale={scaleSequential(interpolateReds)}
+    {data}
+  >
+    <Svg>
+      <ArcSvgSpiral data={polarCoords} />
+      <AxesLines />
+    </Svg>
+    <Legend {z}>
+      <span slot="legend-title">
+        <h2>{z}</h2>
+        <br /><span style="opacity: 0.6">(Maximum daily value)</span>
+      </span>
+    </Legend>
+    <Html>
+      <YearAnotations />
+      <Tooltip dataset={polarCoords} />
+    </Html>
+  </LayerCake>
+</div>
+
+<style>
+</style>

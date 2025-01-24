@@ -30,7 +30,6 @@
   import AxisXTop from "$lib/components/visual/AxisXTop.html.svelte";
   import GroupLabels from "./GroupLabels.html.svelte";
   import HeatmapWindDir from "$lib/components/visual/HeatmapWindDir.html.svelte";
-  import MultiSelect from "../ui/MultiSelect.svelte";
 
   export let xKey;
   export let yKey;
@@ -46,7 +45,8 @@
   const scaleFlame = scaleSequential(interpolateReds).domain([0, 10]);
   const scaleSpread = scaleSequential(interpolateReds).domain([0, 60]);
   const scaleHeat = scaleSequential(interpolateReds).domain([0, 60]);
-  const scaleTransition = scaleDiverging([0, 1, 10], interpolatePuOr);
+  const scaleTransition = scaleSequential(interpolateReds).domain([0, 20]);
+  // const scaleTransition = scaleDiverging([0, 1, 10], interpolatePuOr);
 
   const weatherProps = {
     temperature_2m: [
@@ -105,18 +105,62 @@
     ],
   };
   const modelOutputProps = {
-    "site.moisture.dead.tl1h": [scaleMoist, 0, [10, 40], true],
-    "ignition.firebrand.probability": [scaleProb, 0, [10, 50], true],
-    "surface.weighted.fire.flameLength": [scaleFlame, 0, [0, 5], false],
-    "surface.weighted.fire.spreadRate": [scaleSpread, 0, [0, 40], false],
-    "surface.weighted.fire.heatPerUnitArea": [scaleHeat, 0, [0, 20], false],
-    "surface.weighted.fire.firelineIntensity": [scaleHeat, 0, [0, 20], false],
-    "crown.fire.initiation.transitionRatio": [
-      scaleTransition,
-      0,
-      [0, 9],
-      false,
-    ],
+    "site.moisture.dead.category": {
+      scale: scaleMoist,
+      roundTo: 0,
+      scaleLimits: [15, 40],
+      showSmallVals: true,
+    },
+
+    "site.moisture.dead.tl1h": {
+      scale: scaleMoist,
+      roundTo: 0,
+      scaleLimits: [15, 40],
+      showSmallVals: true,
+    },
+    "ignition.firebrand.probability": {
+      scale: scaleProb,
+      roundTo: 0,
+      scaleLimits: [10, 50],
+      showSmallVals: true,
+    },
+    "surface.weighted.fire.flameLength": {
+      scale: scaleFlame,
+      roundTo: 1,
+      scaleLimits: [0, 5],
+      showSmallVals: true,
+    },
+    "surface.weighted.fire.spreadRate": {
+      scale: scaleSpread,
+      roundTo: 0,
+      scaleLimits: [0, 40],
+      showSmallVals: true,
+    },
+    "surface.weighted.fire.heatPerUnitArea": {
+      scale: scaleHeat,
+      roundTo: 1,
+      scaleLimits: [0, 20],
+      showSmallVals: true,
+    },
+    "surface.weighted.fire.firelineIntensity": {
+      scale: scaleHeat,
+      roundTo: 1,
+      scaleLimits: [0, 20],
+      showSmallVals: true,
+    },
+
+    "crown.fire.initiation.transitionRatio": {
+      scale: scaleTransition,
+      roundTo: 0,
+      scaleLimits: [0, 10],
+      showSmallVals: false,
+    },
+    "crown.fire.transition.minBaseHeight": {
+      scale: scaleTransition,
+      roundTo: 0,
+      scaleLimits: [0, 10],
+      showSmallVals: true,
+    },
   };
 
   function isCommonOutput(output) {
