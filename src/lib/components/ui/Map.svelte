@@ -69,10 +69,10 @@
     function success(pos) {
       const crd = pos.coords;
 
-      console.log("Your current position is:");
-      console.log(`Latitude : ${crd.latitude}`);
-      console.log(`Longitude: ${crd.longitude}`);
-      console.log(`More or less ${crd.accuracy} meters.`);
+      // console.log("Your current position is:");
+      // console.log(`Latitude : ${crd.latitude}`);
+      // console.log(`Longitude: ${crd.longitude}`);
+      // console.log(`More or less ${crd.accuracy} meters.`);
       $currentLocation.longitude = crd.longitude;
       $currentLocation.latitude = crd.latitude;
       setMapLocation(
@@ -90,15 +90,15 @@
   }
 
   function setMapLocation(longitude, latitude, center = false) {
-    console.log("setMapLocation", longitude, latitude, center);
+    // console.log("setMapLocation", longitude, latitude, center);
     locMarker.setLngLat([longitude, latitude]);
     if (center) {
       map.setCenter([longitude, latitude]);
     }
     let elevation = map.queryTerrainElevation([longitude, latitude]);
-    console.log("elevation", elevation);
+    // console.log("elevation", elevation);
     let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
-    console.log("slope", slope, "aspect", aspect);
+    // console.log("slope", slope, "aspect", aspect);
     setCurrentLocation(longitude, latitude, elevation, slope, aspect);
     if ($forecastMode === "forecast") {
       getForecastOpenMeteo();
@@ -220,9 +220,9 @@
 
     // map.on("sourcedata", (e) => {
     map.on("load", () => {
-      console.log("Map load", $currentLocation);
+      // console.log("Map load", $currentLocation);
       if (!$currentLocation.userLocation) {
-        console.log("Map load no user location");
+        // console.log("Map load no user location");
         setMapLocation(
           $currentLocation.longitude,
           $currentLocation.latitude,
