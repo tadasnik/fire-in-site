@@ -2,7 +2,7 @@
   "mhl": {
     "domain": "UKFDRS",
     "label": "Mixed heath low herbaceous",
-    "displayLabel": "Mixed heath low herbaceous load",
+    "displayLabel": "Mixed heath\nlow herb. load",
     "code": "MHl",
     "depth": 0.45,
     "deadMext": 30,
@@ -51,7 +51,7 @@
   "mhh": {
     "domain": "UKFDRS",
     "label": "Mixed heath high herbaceous load",
-    "displayLabel": "Mixed heath high herbaceous load",
+    "displayLabel": "Mixed heath\nhigh herb. load",
     "code": "MHh",
     "depth": 0.45,
     "deadMext": 30,
@@ -100,7 +100,7 @@
   "gl": {
     "domain": "UKFDRS",
     "label": "European gorse low load",
-    "displayLabel": "European gorse low load",
+    "displayLabel": "Gorse\n low load",
     "code": "Gl",
     "depth": 0.55,
     "deadMext": 40,
@@ -149,7 +149,7 @@
   "gm": {
     "domain": "UKFDRS",
     "label": "European gorse medium load",
-    "displayLabel": "European gorse medium load",
+    "displayLabel": "Gorse\n medium load",
     "code": "Gm",
     "depth": 1.15,
     "deadMext": 40,
@@ -198,7 +198,7 @@
   "gh": {
     "domain": "UKFDRS",
     "label": "European gorse high load",
-    "displayLabel": "European gorse high load",
+    "displayLabel": "Gorse\n high load",
     "code": "Gh",
     "depth": 1.75,
     "deadMext": 40,
@@ -247,7 +247,7 @@
   "gt": {
     "domain": "UKFDRS",
     "label": "European gorse tall",
-    "displayLabel": "European gorse very tall",
+    "displayLabel": "Gorse\n very tall",
     "code": "Gt",
     "depth": 2.5,
     "deadMext": 40,
@@ -296,7 +296,7 @@
   "cll": {
     "domain": "UKFDRS",
     "label": "Calluna low load - pioneer",
-    "displayLabel": "Calluna low load",
+    "displayLabel": "Calluna\nlow load",
     "code": "CLl",
     "depth": 0.173,
     "deadMext": 40,
@@ -345,7 +345,7 @@
   "clm": {
     "domain": "UKFDRS",
     "label": "Calluna medium load - building",
-    "displayLabel": "Calluna medium load",
+    "displayLabel": "Calluna\nmedium load",
     "code": "CLm",
     "depth": 0.262,
     "deadMext": 40,
@@ -394,7 +394,7 @@
   "clh": {
     "domain": "UKFDRS",
     "label": "Calluna high load - mature phase",
-    "displayLabel": "Calluna high load",
+    "displayLabel": "Calluna\nhigh load",
     "code": "CLh",
     "depth": 0.35,
     "deadMext": 40,
@@ -443,7 +443,7 @@
   "cld": {
     "domain": "UKFDRS",
     "label": "Calluna medium load - degenerate phase",
-    "displayLabel": "Calluna degenerate phase",
+    "displayLabel": "Calluna\ndegenerate",
     "code": "CLd",
     "depth": 0.4,
     "deadMext": 40,
@@ -492,7 +492,7 @@
   "grl": {
     "domain": "UKFDRS",
     "label": "Low load grass",
-    "displayLabel": "Low load grass",
+    "displayLabel": "Grass\n low load",
     "code": "GRl",
     "depth": 0.6,
     "deadMext": 40,
@@ -541,7 +541,7 @@
   "grm": {
     "domain": "UKFDRS",
     "label": "Medium load grass",
-    "displayLabel": "Medium load grass",
+    "displayLabel": "Grass\nmedium load",
     "code": "GRm",
     "depth": 0.8,
     "deadMext": 40,
@@ -590,7 +590,7 @@
   "grh": {
     "domain": "UKFDRS",
     "label": "High load grass",
-    "displayLabel": "High load grass",
+    "displayLabel": "Grass\n high load",
     "code": "GRh",
     "depth": 1,
     "deadMext": 40,
@@ -639,7 +639,7 @@
   "fn": {
     "domain": "UKFDRS",
     "label": "Fern vegetation",
-    "displayLabel": "High load fern",
+    "displayLabel": "Fern\nhigh load",
     "code": "FN",
     "depth": 1.2,
     "deadMext": 40,
@@ -688,7 +688,7 @@
   "bl": {
     "domain": "UKFDRS",
     "label": "Broad leaf litter",
-    "displayLabel": "Broad leaf litter",
+    "displayLabel": "Litter\n broad leaf",
     "code": "BL",
     "depth": 0.05,
     "deadMext": 25,
@@ -737,7 +737,7 @@
   "sn": {
     "domain": "UKFDRS",
     "label": "Short needle litter",
-    "displayLabel": "Short needle litter",
+    "displayLabel": "Litter\n short needle",
     "code": "SN",
     "depth": 0.05,
     "deadMext": 30,
@@ -786,7 +786,7 @@
   "ln": {
     "domain": "UKFDRS",
     "label": "Long needle litter",
-    "displayLabel": "Long needle litter",
+    "displayLabel": "Litter\n long needle",
     "code": "LN",
     "depth": 0.05,
     "deadMext": 35,

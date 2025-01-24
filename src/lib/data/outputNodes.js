@@ -107,12 +107,25 @@ export const outputNodes = {
     description:
       'Active crown fire flame length, based on 20-foot wind speed, is calculated from active crown fireline intensity as described by Rothermel (1991). The flame length equation is taken from Thomas (1963) and differs from that used for surface fire (Byram 1959). Active crown fire flame length is also used to find spotting distance from active crown fire.'
   },
+
+  'crown.fire.transition.minBaseHeight': {
+    code: 'transitionMinHeight',
+    group: 'crown',
+    selected: false,
+    label: 'Crown fire transition height',
+    units: 'm',
+    displayUnits: 'm',
+    decimals: 0,
+    description: 'Canopy base height at which a surface fire likely to transition to a crown fire. This is the height at which the surface fire intensity is equal to critical fire intensity sufficient to ignite the crown fuels.'
+  },
+
   'crown.fire.initiation.transitionRatio': {
     code: 'transitionRatio',
     group: 'crown',
     selected: true,
     label: 'Crown fire transition ratio',
     units: 'ratio',
+    displayUnits: 'ratio',
     decimals: 1,
     description:
       'Transition ratio is the surface fireline intensity divided by the critical surface fireline intensity. If the transition ratio is greater than or equal to 1, then the surface fireline intensity is sufficient for a transition to crown fire. The transition ratio provides more information than the Yes or No answer provided by the transition to crown fire? variable. It is helpful to know whether the transition ratio is close to 1 or very different from 1. A value much higher than 1 may indicate that a transition to crown fire is more likely, while a value much less than 1 may indicate that the fire is more likely to remain a surface fire. As always, expert knowledge should be used to confirm model predictions.'
@@ -132,7 +145,7 @@ export const outputNodes = {
   'surface.primary.fuel.fire.scorchHeight': {
     code: 'scorchHeight',
     group: 'effects',
-    selected: true,
+    selected: false,
     label: 'Scorch height',
     units: 'm',
     decimals: 2,
@@ -150,15 +163,18 @@ export const outputNodes = {
     description:
       'Probability of mortality is the likelihood that a tree will be killed by a fire. The equation used to calculate probability of mortality depends on the mortality tree species. There are 13 mortality equations, which variously include bark thickness, tree crown length scorched and/or tree crown volume scorched. \nProbability of mortality can be interpreted as the probability of an individual tree dying, or it can be multiplied by the number of trees on a site to estimate the number of trees that will die.'
   },
+
   'site.moisture.dead.category': {
     label: 'Dead fuel moisture',
     code: 'deadFuelMoisture',
     units: '%',
+    displayUnits: '%',
     selected: true,
     decimals: 0,
     description:
       'Dead fuel moisture content is the portion (percent or fraction) of the fuel that is water, calculated on a dry weight basis.'
   },
+
 
   'site.moisture.dead.tl1h': {
     label: 'Dead 1h fuel moisture',

@@ -1,0 +1,25 @@
+Input parameter,Unit,Mixed Heath 1 Low Herbaceous,Mixed Heath 2 High Herbaceous,European Gorse Low load,European Gorse Med load,European Gorse High Load,"Calluna
+Low load – pioneer",CallunaMed load- Building,"Calluna
+High load
+= mature","Calluna
+- Degenerate",Broad leaf litter,Short needle litter ,Long needle litter ,Low load grass,Moderate Load Grass,High Load Grass
+Fuel Model Type,,Static,,,,,Static,Static,Static,Static,(used TL2 altered depth),(used Tl1 altered depth),(used Tl8 altered depth),,,
+1-h fuel load,t/ha,2.5,2.5,,,,1.77,1.96,2.23,1.95,3.14,2.24,13.00,0.2,0.2,0.2
+10-h fuel load,t/ha,0,0,,,,0,0,0,0,5.16,4.93,3.14,0,0,0
+100-h fuel load,t/ha,0,0,,,,0,0,0,0,4.93,8.07,2.47,0,0,0
+Live herbaceous fuel load,t/ha,3,6,,,,0.6,0.27,0.12,0.08,,,,3.4,7.6,9.52
+Live woody fuel load,t/ha,5.6,5.6,,,,2.95,7.82,11.58,8.85,,,,0,0,0
+1-h fuel SA/V,m2/m3,9560,9560,7377,7377,7377,9560,9560,9560,9560,6562,6562,5906,4921,7218,7218
+Live herbaceous fuel SA/V,m2/m3,5906,5906,5906,5906,5906,6562,6562,6562,6562,5906,5906,5906,4265,6562,6562
+Live woody fuel SA/V,m2/m3,1000,1000,4921,4921,4921,1000,1000,1000,1000,5249,5249,5249,4921,4921,4921
+Fuel bed depth,m,0.45,0.45,,,,0.173,0.262,0.35,0.408,4.5,0.03,0.05,0.6,0.9,1
+Dead fuel moisture of extinction,%,30,30,40,40,40,40,40,40,40,25,30,35,40,40,40
+Dead Fuel Heat Content,kJ/kg,22022,22022,19685,19685,19685,19500,19500,19500,19500,16440,n/a,n/a,19695,19695,19695
+Dead Fuel Heat Content,,18625,18625,21265,21265,21265,19000,19000,19000,19000,20373,17306,17221,16429,16429,16429
+Dead Fuel Heat Content,,20988,20988,22044,22044,22044,20000,20000,20000,20000,18805,20724,20728,22203,22203,22203
+Live fuel Moisture ,%,135,135,,,,110,,,,,,,,,
+Live Fuel Moisture ,,115,115,,,,90,,,,,,,,,
+Live Fuel Moisture ,,85,85,,,,75,,,,,,,,,
+Live fuel Heat Wave,,85,85,,,,75,75,75,75,,,,30,30,30
+,,,,,,,,,,,,,,,,
+,,i might update the mixed heath heat contents,,,,,,,,,,,,,,

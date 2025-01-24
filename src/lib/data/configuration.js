@@ -45,7 +45,7 @@ export const modelConfigOptions = {
   },
   'configure.fuel.moisture': {
     options: ['individual', 'liveCategory', 'fosberg', 'category'],
-    value: 'individual',
+    value: 'category',
     active: false,
     description: `When required as input, fuel moisture is entered for
     'individual': the 3 dead and 2 live fuel moisture classes
@@ -176,5 +176,5 @@ export const modelConfigOptions = {
     'linkedToSurfaceFire': linked to the corresponding Surface Module variables
     'standAlone': entered directly (stand-alone mode)
     `,
-  },
+  }
 }

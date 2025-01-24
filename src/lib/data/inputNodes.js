@@ -156,6 +156,19 @@ export const inputNodes = {
       'Live herbaceous fuel moisture content is the portion of the live grasses and forbs that is water, calculated on a dry weight basis.'
   },
 
+  'surface.primary.fuel.model.behave.parms.cured.herb.fraction': {
+    label: 'Cured herb frac.',
+    catalogParam: 'curedHerbFrac',
+    units: '%',
+    selected: false,
+    value: [15],
+    defValue: 15,
+    decimals: 0,
+    max: 100,
+    min: 0,
+    step: 1
+  },
+
   'site.moisture.live.stem': {
     label: 'Live stem fuel moisture',
     code: 'liveStemFuelMoisture',
@@ -327,7 +340,7 @@ export const inputNodes = {
     label: 'Tree species',
     code: 'treeSpecies',
     units: '',
-    selected: false,
+    selected: true,
     defValue: 'PINSPP',
     value: 'PINSPP',
     decimals: 0,

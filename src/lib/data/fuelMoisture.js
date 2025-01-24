@@ -1,3 +1,23 @@
+export const canopyMoisture = {
+  'cnfr': {
+    'site.canopy.fuel.foliar.moistureContent': {
+      1: 115,
+      2: 115,
+      3: 115,
+      4: 115,
+      5: 90,
+      6: 100,
+      7: 115,
+      8: 115,
+      9: 115,
+      10: 115,
+      11: 115,
+      12: 115,
+    },
+
+  },
+};
+
 export const fuelMoisture = {
 
   'mhl': {
