@@ -27,7 +27,7 @@
   import { outputNodes } from "$lib/data/outputNodes.js";
   import CurrentBehaviour from "../visual/CurrentBehaviour.svelte";
 
-  console.log("forecastModels", $forecastModels);
+  // console.log("forecastModels", $forecastModels);
 
   function handleFuelMoistureChange(value) {
     if (value === "Fosberg") {
@@ -35,7 +35,7 @@
       $modelConfigValues["configure.fuel.moisture"].value = "fosberg";
     } else {
       if ($modelConfigValues["configure.fuel.moisture"].value === "fosberg") {
-        $modelConfigValues["configure.fuel.moisture"].value = "individual";
+        $modelConfigValues["configure.fuel.moisture"].value = "category";
       }
     }
     // console.log("Fuel moisture model changed to ", value);
@@ -51,10 +51,13 @@
     $forecastMode = value;
     if (value === "historical") {
       console.log("setting forecastMode to historical");
-    } else {
+    } else if (value === "forecast") {
       console.log("setting currentDateTime to now, fetching forecast");
       $currentDateTime = new Date();
       getForecastOpenMeteo();
+    } else {
+      console.log("setting forecastMode to: ", value);
+      $fetchingForecast = false;
     }
   }
 </script>
