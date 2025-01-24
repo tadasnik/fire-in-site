@@ -50,7 +50,7 @@ export const climateOpenMeteo = writable([{
 
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
-export const forecastModes = ['forecast', 'historical']
+export const forecastModes = ['forecast', 'historical', 'user']
 export const forecastModel = writable('ukmo_seamless')
 export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
 { 'value': 'ecmwf_ifs025', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 0.25 degree global model' },
@@ -212,6 +212,7 @@ export const forecastTimeIndex = derived(forecastTimeSeries, ($forecastTimeSerie
   for (const [i, value] of $forecastTimeSeries.entries()) {
     indexMap.set(3600000 * (Math.round(new Date(value.time) / 3600000)), value)
   }
+  console.log("forecastTimeIndex", indexMap)
   return indexMap
 })
 

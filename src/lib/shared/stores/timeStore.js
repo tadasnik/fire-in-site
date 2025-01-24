@@ -125,15 +125,12 @@ export const dayOptions = derived([historicalYear, historicalMonth], ([$historic
 
 export const historicalDate = derived([historicalYear, historicalMonth, historicalDay], ([$historicalYear, $historicalMonth, $historicalDay]) => {
   if (isNaN($historicalYear) || isNaN($historicalMonth) || isNaN($historicalDay)) {
-    console.log('invalid date')
     return false
   } else {
     const histDate = new Date($historicalYear, $historicalMonth - 1, $historicalDay, 12, 0)
     if (histDate < new Date(1970, 0, 1, 12, 0)) {
       return false
     } else if (histDate > new Date()) {
-      console.log(histDate, new Date())
-      console.log('future date')
       return false
     } else {
       return histDate
