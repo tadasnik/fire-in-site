@@ -24,6 +24,7 @@
   import { fetchingForecast } from "$lib/shared/stores/forecastStore";
   import FireCharacteristics from "$lib/components/visual/FireCharacteristics.svelte";
   import flameTable from "$lib/assets/flameTable.webp";
+  import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
 
   let width;
 </script>
@@ -91,15 +92,7 @@
         <div class="items-baseline align-text-bottom pr-4">
           <span class="align-bottom">Select model output</span>
         </div>
-
-        <Select id="select-output" class="" bind:value={$selectedOutput}>
-          {#each $selectedOutputs as output}
-            <option value={output}
-              >{outputNodes[output].label}
-              ({outputNodes[output].units})</option
-            >
-          {/each}
-        </Select>
+        <SelectOutput></SelectOutput>
       </div>
     </div>
 

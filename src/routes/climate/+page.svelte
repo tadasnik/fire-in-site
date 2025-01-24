@@ -15,7 +15,6 @@
     fetchingForecast,
     getHistory,
     climateOpenMeteo,
-    getForecastOpenMeteo,
     fillParams,
   } from "$lib/shared/stores/forecastStore";
   import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
@@ -127,7 +126,8 @@
     climateOpenMeteo.set(daily);
     fetchingHistory = false;
   }
-  const sortedValues = getSortedValuesByProperty($climateOpenMeteo, weatherVar);
+
+  // const sortedValues = getSortedValuesByProperty($climateOpenMeteo, weatherVar);
   // console.log("sortedValues = ", sortedValues);
 
   // $: console.log("climateOpenMeteo ", $climateOpenMeteo);

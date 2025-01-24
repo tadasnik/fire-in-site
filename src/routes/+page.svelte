@@ -16,11 +16,14 @@
   } from "$lib/shared/stores/forecastStore.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
+  import CanopyControls from "$lib/components/ui/CanopyControls.svelte";
   import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
   import HourlyForecast from "$lib/components/visual/HourlyForecast.svelte";
   import HistoricalSelectDate from "$lib/components/visual/HistoricalSelectDate.svelte";
   import DayPicker from "$lib/components/visual/DayPicker.svelte";
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
+  import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
+  import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
 
   let width;
 
@@ -111,25 +114,16 @@
   <div
     class="container mx-auto flex flex-col md:flex-row justify-center items-center max-w-screen-xl"
   >
-    <div class="grow w-full sm:w-1/2 min-w-96 p-2 md:pl-8">
+    <div class="grow w-full md:w-1/2 min-w-96 max-w-120 pl-4 md:pl-8">
       <Map></Map>
     </div>
-    <div class="grow w-full sm:w-1/2 min-w-96 p-2 md:pl-8">
+    <div class="grow w-full md:w-1/2 min-w-96 max-w-120 p-2 md:pl-8">
       <div class="flex flex-row place-items-baseline justify-center">
         <div class="items-baseline align-text-bottom pr-2">
           <span class="align-bottom">Select model output</span>
         </div>
 
-        <div>
-          <Select id="select-output" size="sm" bind:value={$selectedOutput}>
-            {#each $selectedOutputs as output}
-              <option value={output}
-                >{outputNodes[output].label}
-                ({outputNodes[output].units})</option
-              >
-            {/each}
-          </Select>
-        </div>
+        <SelectOutput></SelectOutput>
       </div>
 
       <div class="flex grow aspect-square pt-2" bind:clientWidth={width}>
@@ -143,27 +137,32 @@
       </div>
     </div>
   </div>
-  <div class="flex flex-col mx-auto md:justify-center">
-    {#if $forecastMode === "historical"}
-      <HistoricalSelectDate></HistoricalSelectDate>
-    {/if}
-    {#if $forecastMode === "forecast"}
-      <div class="container flex max-w-sm md:max-w-4xl overflow-x-auto">
-        <DayPicker />
+  <div class="flex flex-col mx-auto min-w-120 md:justify-center">
+    {#if $forecastMode === "user"}
+      <UserInputControls></UserInputControls>
+    {:else}
+      {#if $forecastMode === "historical"}
+        <HistoricalSelectDate></HistoricalSelectDate>
+      {/if}
+      {#if $forecastMode === "forecast"}
+        <div class="flex min-w-120 max-w-120 md:max-w-4xl overflow-x-auto">
+          <DayPicker />
+        </div>
+      {/if}
+      <div
+        class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
+      >
+        {#if $fetchingForecast === false}
+          <Heatmap
+            xKey="time"
+            zKey={$selectedOutput}
+            yKey="surface.primary.fuel.model.catalogKey"
+          />
+        {/if}
       </div>
     {/if}
-    <div
-      class="flex mx-auto max-w-sm md:max-w-4xl overflow-x-auto md:justify-center"
-    >
-      {#if $fetchingForecast === false}
-        <Heatmap
-          xKey="time"
-          zKey={$selectedOutput}
-          yKey="surface.primary.fuel.model.catalogKey"
-        />
-      {/if}
-    </div>
   </div>
+  <CanopyControls></CanopyControls>
 </div>
 
 <style>
