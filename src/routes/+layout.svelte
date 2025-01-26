@@ -4,6 +4,7 @@
 
 <script>
   import "../app.postcss";
+  import { injectAnalytics } from "@vercel/analytics/sveltekit";
   import { onMount } from "svelte";
   import { sineIn } from "svelte/easing";
   import { auth, db } from "$lib/firebase/firebase.client";
