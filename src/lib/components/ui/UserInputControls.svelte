@@ -1,6 +1,5 @@
 <script>
   import { Range, Label } from "flowbite-svelte";
-  import RangeSlider from "svelte-range-slider-pips";
   import {
     siteInputsStore,
     fuelsInputs,
@@ -20,7 +19,6 @@
   let timer;
 
   onMount(() => {
-    console.log("forecastTimeIndex", $_outputForecastCanopy, $dateTime);
     console.log("fuelsInputs", $fuelsInputs);
     const currentForecast = $_outputForecastCanopy.get($dateTime)[0].values;
     console.log("currentForecast", currentForecast);
