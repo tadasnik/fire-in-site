@@ -5,7 +5,6 @@
     inputNodesStore,
   } from "$lib/shared/stores/modelStore.js";
   import { inputNodes } from "$lib/data/inputNodes.js";
-  import InputControl from "../InputControl.svelte";
 
   let timer;
 
