@@ -1,6 +1,5 @@
 <script>
   import { Range, Label } from "flowbite-svelte";
-  import RangeSlider from "svelte-range-slider-pips";
   import {
     canopyInputs,
     inputNodesStore,
