@@ -13,8 +13,6 @@
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import { inputNodes } from "$lib/data/inputNodes.js";
   import { onMount } from "svelte";
-  import InputControl from "../InputControl.svelte";
-  import FuelInputs from "../fuelInputs.svelte";
 
   let timer;
 

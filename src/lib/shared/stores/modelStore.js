@@ -575,7 +575,8 @@ export const _outputForecastArray = derived([_outputForecastCanopy, selectedOutp
       const timeObject = {}
       // console.log('forecast :', forecast)
       if (get(commonOutputs).includes($selectedOutput) && (get(fuelMoistureModel) != "fireInSite")) {
-        timeObject['All fuels'] = forecast[0].values[0][$selectedOutput]
+        console.log('common out ',forecast[0].values[$selectedOutput])
+        timeObject['All fuels'] = forecast[0].values[$selectedOutput]
       } else {
         forecast.forEach((item) => {
           timeObject[item["surface.primary.fuel.model.catalogKey"]] = item.values[$selectedOutput]
