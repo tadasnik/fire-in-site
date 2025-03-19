@@ -66,7 +66,7 @@
     <div class="flex flex-col p-2 text-primary-500">
       <div class="text-center text-2xl">All fuels</div>
       <div class="text-center text-9xl">
-        {Math.round(data[0].values[0][$selectedOutput])}%
+        {Math.round(data[0].values[$selectedOutput])}%
       </div>
     </div>
   {:else}

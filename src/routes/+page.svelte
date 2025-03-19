@@ -162,7 +162,10 @@
       </div>
     {/if}
   </div>
+   {#if $selectedOutput === "crown.fire.transition.minBaseHeight"}
+
   <CanopyControls></CanopyControls>
+{/if}
 </div>
 
 <style>

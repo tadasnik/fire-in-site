@@ -290,9 +290,10 @@
       Claire M Belcher, Kerryn Little and the rest of Toward a UK Fire Danger
       Rating System (UKFDRS) project team. Implementation: Tadas Nikonovas,
       Centre for Wildfire Research, Swansea University. Supported by Higher
-      Education Funding Council for Wales Impact Fellowship grant (RIG1062-117)
-      and NERC grant UK-FDRS ‘Toward a UK fire danger rating system:
-      Understanding fuels, fire behaviour and impacts’ (NE/T003553/1)
+      Education Funding Council for Wales Impact Fellowship grant (RIG1062-117),
+      NERC grant UK-FDRS ‘Toward a UK fire danger rating system:
+      Understanding fuels, fire behaviour and impacts’ (NE/T003553/1) and
+      funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No. 101003890 (FirEUrisk)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">
