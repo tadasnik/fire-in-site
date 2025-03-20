@@ -161,10 +161,9 @@
           />
         </div>
         {#if $selectedOutput == "crown.fire.transition.minBaseHeight"}
-          <div class="p-2 mx-auto max-w-120"></div>
-          {#if $selectedOutput === "crown.fire.transition.minBaseHeight"}
+          <div class="p-2 mx-auto max-w-120">
             <CanopyControls></CanopyControls>
-          {/if}
+          </div>
         {/if}
       {/if}
     {/if}
