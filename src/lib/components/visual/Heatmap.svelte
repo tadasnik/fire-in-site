@@ -82,7 +82,7 @@
       scaleWind,
       0,
       [3, 14],
-      "Wind (m/s)",
+      "Wind (km/h)",
       "Wind speed at 10 metres",
     ],
     wind_gusts_10m: [
@@ -91,7 +91,7 @@
       scaleWind,
       0,
       [3, 14],
-      "Wind gust (m/s)",
+      "Wind gust (km/h)",
       "Wind gust speed at 10 metres",
     ],
     wind_direction_10m: [
@@ -197,7 +197,7 @@
     }
   }
   const formatTickX = timeFormat("%H");
-  const leftMargin = 100;
+  const leftMargin = 102;
   const topMargin = 60;
   const bottomMargin = 20;
   const cellSize = 25;

@@ -16,7 +16,7 @@ export const inputNodes = {
   'site.wind.speed.at10m': {
     label: 'Wind speed at 10 metres',
     code: 'windSpeed10',
-    units: 'm/s',
+    units: 'km/h',
     selected: true,
     defValue: 5,
     value: [5],

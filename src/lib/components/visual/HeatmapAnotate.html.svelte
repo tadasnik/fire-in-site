@@ -100,7 +100,7 @@
     triggeredBy={"#" + "is" + i}>{prop[6]}</Popover
   >
 {/each}
-<div class="absolute items-end min-w-64 p-1" style:left="95px">
+<div class="absolute items-end min-w-96 p-1" style:left="95px">
   <div class="" />
   <SelectOutput />
 </div>
