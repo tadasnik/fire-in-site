@@ -39,7 +39,7 @@
   }
   $: isSelectedDayClass = (d) => {
     return isEqual(startOfDay(d), startOfDay($focusDay))
-      ? "grow min-h-24 font-bold text-xl text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2"
+      ? "grow min-h-24 font-bold text-xl text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2 rounded-t-lg"
       : "border-slate-500 border-b-2 border-l-1 border-r-1";
   };
 </script>
