@@ -200,8 +200,7 @@
       container: mapContainer,
       accessToken: import.meta.env.VITE_MAPBOX_GL_TOKEN,
 
-      // style: `mapbox://styles/mapbox/outdoors-v11`,
-      style: `mapbox://styles/mapbox/satellite-v9`,
+      style: `mapbox://styles/mapbox/satellite-streets-v12`,
       center: [$currentLocation.longitude, $currentLocation.latitude],
       zoom: initialState.zoom,
     });
