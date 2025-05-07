@@ -204,6 +204,7 @@
       center: [$currentLocation.longitude, $currentLocation.latitude],
       zoom: initialState.zoom,
     });
+    map.addControl(new mapboxgl.NavigationControl());
     map._isReady = false;
     map.ready = () => map._isReady;
     map.once("load", () => (map._isReady = true));
