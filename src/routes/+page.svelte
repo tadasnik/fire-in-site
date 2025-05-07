@@ -26,6 +26,7 @@
   import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
 
   let width;
+  let showMap = false;
 
   async function geolocate() {
     const options = {
