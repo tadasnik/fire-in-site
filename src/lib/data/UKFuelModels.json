@@ -636,11 +636,11 @@
     "curedHerbFrac": null,
     "selected": true
   },
-  "fn": {
+  "bk": {
     "domain": "UKFDRS",
-    "label": "Fern vegetation",
-    "displayLabel": "Fern\nhigh load",
-    "code": "FN",
+    "label": "Bracken vegetation",
+    "displayLabel": "Bracken\n high load",
+    "code": "BK",
     "depth": 1.2,
     "deadMext": 40,
     "dead1Load": 0,
@@ -680,7 +680,7 @@
       "12": 14180
     },
     "photo": "grass_small.webp",
-    "description": "Fern vegetation dominated by braken ferns. Very high herbaceous load, Fuel bed depth over one metre.",
+    "description": "Fern vegetation dominated by bracken ferns. Very high herbaceous load, Fuel bed depth over one metre.",
     "thumbnail": "grass_small.webp",
     "curedHerbFrac": null,
     "selected": true

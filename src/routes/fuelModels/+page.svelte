@@ -27,7 +27,7 @@
   import mixedPhoto from "$lib/assets/fuelModelPhotos/mhl_3.webp";
   import grassPhoto from "$lib/assets/fuelModelPhotos/grh_1.webp";
   import gorsePhoto from "$lib/assets/fuelModelPhotos/gh_2.webp";
-  import fernPhoto from "$lib/assets/fuelModelPhotos/fn_forest.webp";
+  import fernPhoto from "$lib/assets/fuelModelPhotos/bk_forest.webp";
   import forestPhoto from "$lib/assets/fuelModelPhotos/sn_2.webp";
 
   const fuelsImages = import.meta.glob("$lib/assets/fuelModelPhotos/*.webp", {
@@ -99,9 +99,9 @@
       image: gorsePhoto,
     },
     {
-      title: "Fern model",
+      title: "Bracken model",
       description:
-        "Fuel model (<strong>FN</strong>) representing fern vegetation, most commonly dominated by braken ferns. Very high load of herbaceous vegetation, fuel depth approximatelly one metre.",
+        "Fuel model (<strong>BK</strong>) representing vegetation dominated by bracken ferns.  Very high load of herbaceous vegetation, fuel depth approximatelly one metre.",
       image: fernPhoto,
     },
     {

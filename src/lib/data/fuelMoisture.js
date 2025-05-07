@@ -1024,7 +1024,7 @@ export const fuelMoisture = {
       12: 95
     },
   },
-  'fn': {
+  'bk': {
     "site.moisture.live.category": {
       1: 85,
       2: 85,
