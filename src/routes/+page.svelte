@@ -149,23 +149,25 @@
           <DayPicker />
         </div>
       {/if}
-      <div
-        class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
-      >
-        {#if $fetchingForecast === false}
+
+      {#if $fetchingForecast === false}
+        <div
+          class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
+        >
           <Heatmap
             xKey="time"
             zKey={$selectedOutput}
             yKey="surface.primary.fuel.model.catalogKey"
           />
+        </div>
+        {#if $selectedOutput == "crown.fire.transition.minBaseHeight"}
+          <div class="p-2 mx-auto max-w-120">
+            <CanopyControls></CanopyControls>
+          </div>
         {/if}
-      </div>
+      {/if}
     {/if}
   </div>
-   {#if $selectedOutput === "crown.fire.transition.minBaseHeight"}
-
-  <CanopyControls></CanopyControls>
-{/if}
 </div>
 
 <style>

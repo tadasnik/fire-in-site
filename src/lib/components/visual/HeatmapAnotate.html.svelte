@@ -111,9 +111,6 @@
   <div class="w-[{leftMargin}px]" />
 </div>
 <div class="flex justify-end">
-  {#if !commonOutput}
-    <div class="label-vertical text-base" style:width="35px">Fuel model</div>
-  {/if}
   <div class="text-right justify-end pr-2 pl-2">
     {#each $data as fuelObject, i}
       <div
