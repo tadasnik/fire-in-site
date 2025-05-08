@@ -39,7 +39,7 @@
   const scaleTemp = scaleSequential(interpolatePuOr).domain([0, 30]);
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
-  const scaleWind = scaleSequential(interpolateRdYlGn).domain([15, 0]);
+  const scaleWind = scaleSequential(interpolateRdYlGn).domain([50, 0]);
   const scaleProb = scaleSequential(interpolateRdYlGn).domain([60, 0]);
   const scaleMoist = scaleSequential(interpolatePuOr).domain([60, 0]);
   const scaleFlame = scaleSequential(interpolateReds).domain([0, 10]);
@@ -81,7 +81,7 @@
       "wi wi-windy",
       scaleWind,
       0,
-      [3, 14],
+      [15, 35],
       "Wind (km/h)",
       "Wind speed at 10 metres",
     ],
@@ -90,7 +90,7 @@
       "wi wi-strong-wind",
       scaleWind,
       0,
-      [3, 14],
+      [15, 35],
       "Wind gust (km/h)",
       "Wind gust speed at 10 metres",
     ],

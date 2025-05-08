@@ -89,7 +89,7 @@ export function fillParams({
     "latitude": get(currentLocation).latitude,
     "longitude": get(currentLocation).longitude,
     "hourly": hourlyVars,
-    "wind_speed_unit": "ms",
+    // "wind_speed_unit": "km/h",
     "timeformat": "unixtime",
     "timezone": "auto",
     "forecast_mode": forecast_mode,
