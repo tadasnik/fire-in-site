@@ -44,6 +44,7 @@
   } from "$lib/shared/stores/locationStore";
   import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
+  import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
@@ -165,6 +166,7 @@
 <header
   class="top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
 >
+  <DisclamerModal />;
   <Navbar
     color="default"
     fluid
@@ -291,9 +293,10 @@
       Rating System (UKFDRS) project team. Implementation: Tadas Nikonovas,
       Centre for Wildfire Research, Swansea University. Supported by Higher
       Education Funding Council for Wales Impact Fellowship grant (RIG1062-117),
-      NERC grant UK-FDRS ‘Toward a UK fire danger rating system:
-      Understanding fuels, fire behaviour and impacts’ (NE/T003553/1) and
-      funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No. 101003890 (FirEUrisk)
+      NERC grant UK-FDRS ‘Toward a UK fire danger rating system: Understanding
+      fuels, fire behaviour and impacts’ (NE/T003553/1) and funding from the
+      European Union’s Horizon 2020 research and innovation programme under
+      grant agreement No. 101003890 (FirEUrisk)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">
