@@ -24,7 +24,7 @@
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
   import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
   import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
-  import GeoLocation from "../lib/components/ui/GeoLocation.svelte";
+  // import GeoLocation from "../lib/components/ui/GeoLocation.svelte";
 
   let width;
   let showMap = false;
