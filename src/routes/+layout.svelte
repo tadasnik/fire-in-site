@@ -4,7 +4,6 @@
 
 <script>
   import "../app.postcss";
-  import { injectAnalytics } from "@vercel/analytics/sveltekit";
   import { onMount } from "svelte";
   import { sineIn } from "svelte/easing";
   import { auth, db } from "$lib/firebase/firebase.client";
@@ -47,7 +46,7 @@
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
-  injectAnalytics();
+
   let transitionParams = {
     x: -320,
     duration: 200,
