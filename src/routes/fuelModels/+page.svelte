@@ -6,19 +6,13 @@
     TableBodyRow,
     TableHead,
     TableHeadCell,
-    ImagePlaceholder,
     Card,
-    Modal,
-    Gallery,
-    Button,
     Heading,
     Span,
     P,
   } from "flowbite-svelte";
-  import { ArrowRightOutline } from "flowbite-svelte-icons";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import { fuelNodes } from "$lib/data/fuelNodes.js";
-  import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
   import { fuelCodeFormat } from "$lib/shared/utils.js";
   import { slide } from "svelte/transition";
   import { selectedFuels } from "$lib/shared/stores/modelStore";
