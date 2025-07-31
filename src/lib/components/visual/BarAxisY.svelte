@@ -68,7 +68,7 @@
         transform="translate(-60px, {$yScale.step() * i + 30})"
       >
         <div
-          class="text-right text-xxs leading-1 whitespace-nowrap hover:text-primary-900 items-end"
+          class="text-right text-[0.7rem] leading-[0.6rem] tracking-[-0.03em] whitespace-nowrap hover:text-primary-900 items-end"
         >
           <p class="font-bold">{tickLines[0]}</p>
           <p class="font-light">{tickLines[1]}</p>
