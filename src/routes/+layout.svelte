@@ -47,7 +47,7 @@
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
-
+  injectAnalytics();
   let transitionParams = {
     x: -320,
     duration: 200,
@@ -63,11 +63,10 @@
 
     // differenceHours($dateTime - Date($forecast.timeSeries[0].time));
     const unsuscribe = auth.onAuthStateChanged(async (user) => {
-      // console.log("user changed ", user);
       authStore.update((curr) => {
         return { ...curr, currentUser: user };
       });
-      console.log("user changed");
+      // console.log("user changed");
       if (
         // if browser and no user
         browser &&
@@ -110,7 +109,7 @@
           getDoc(defLocationRef)
             .then((defLoc) => {
               if (defLoc.exists()) {
-                console.log("Document data:", defLoc.data());
+                // console.log("Document data:", defLoc.data());
                 currentLocation.update((current) => ({
                   ...current,
                   userLocation: false,
@@ -119,7 +118,7 @@
                   longitude: defLoc.data().longitude,
                 }));
               } else {
-                console.log("No default location for user!");
+                // console.log("No default location for user!");
               }
             })
 
@@ -129,9 +128,9 @@
         }
       } else {
       }
-      console.log("executing isLoading false");
+      // console.log("executing isLoading false");
       authStore.update((curr) => {
-        console.log("curr", curr);
+        // console.log("curr", curr);
         return { ...curr, isLoading: false };
       });
     });
@@ -144,29 +143,20 @@
   let spanClass = "flex-1 ml-3 whitespace-nowrap";
 
   $: activeUrl = $page.url.pathname;
-  $: console.log("layout activeURl", activeUrl);
+  // $: console.log("layout activeURl", activeUrl);
 
   let hidden1 = true;
   const toggleDrawer = () => {
     hidden1 = false;
   };
 
-  // $: console.log(" $$$$$$$ currentWeather:", $currentWeather);
-  // $: console.log(" $$$$$$$ forecastTimeSeries:", $forecastTimeSeries);
-  // $: console.log(" $$$$$$$ time:", $dateTime);
-  // $: console.log(" $$$$$$$ fuel moisture:", $fuelM&oistureModel);
-  // $: console.log(" $$$$$$$ config options :", $modelConfigValues);
-  // $: console.log(
-  // " $$$$$$$ requiredSiteInputsForecast:",
-  // $requiredSiteInputsForecast
-  // );
-  const dateFormat = timeFormat("%a %b %e, %H %p");
+  // const dateFormat = timeFormat("%a %b %e, %H %p");
 </script>
 
 <header
   class="top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
 >
-  <DisclamerModal />;
+  <DisclamerModal />
   <Navbar
     color="default"
     fluid
