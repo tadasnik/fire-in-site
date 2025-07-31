@@ -51,7 +51,7 @@ export const climateOpenMeteo = writable([{
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
-export const forecastModel = writable('ecmwf_ifs025')
+export const forecastModel = writable('ukmo_seamless')
 export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
 { 'value': 'ecmwf_ifs025', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 0.25 degree global model' },
 { 'value': 'icon_seamless', 'displayName': 'ICON', 'description': 'German Weather service (DWD) ICON model with 2km (central Europe), 7km (Europe) and 11km (global) resolution for central Europe, Europe and globe' }])
@@ -128,10 +128,10 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
     try {
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
-        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
+        // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
         result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
       } else {
-        console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
+        // console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
 
         hourlyVars = ["global_tilted_irradiance"]
         const gti = await fetchForecastMeteo(fillParams(["global_tilted_irradiance"], forecast_mode));
@@ -163,7 +163,7 @@ export async function getHistory(hourlyVars = ['vapour_pressure_deficit'], start
   try {
     let result = {}
     if (get(currentLocation).distanceFromPrevious > 4000) {
-      console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
+      // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
       // console.log("params in getHistory", fillParams(hourlyVars, 'historical', start_date, end_date))
       result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode: "historical", start_date, end_date }));
     } else {
