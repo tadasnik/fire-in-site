@@ -28,6 +28,7 @@
     CloseButton,
     Footer,
     FooterBrand,
+    A,
   } from "flowbite-svelte";
   import {
     AdjustmentsHorizontalSolid,
@@ -44,9 +45,11 @@
   import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
+  import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
+  let openValidationModal = false;
   let transitionParams = {
     x: -320,
     duration: 200,
@@ -183,6 +186,10 @@
       <!-- </NavUl> -->
     </div>
     <NavUl>
+      {#if activeUrl !== "/"}
+        <NavLi href="/">The Model</NavLi>
+      {/if}
+
       <NavLi class="cursor-pointer">
         <div class="flex-col items-center">
           <AdjustmentsHorizontalSolid
@@ -191,6 +198,7 @@
           Settings
         </div>
       </NavLi>
+
       <Dropdown>
         <SettingsDropdown />
       </Dropdown>
@@ -198,6 +206,7 @@
       <NavLi href="/about">About</NavLi>
       <NavLi href="/tutorial">Tutorial</NavLi>
       <NavLi href="/climate">Climate</NavLi>
+      <ValidationModal bind:openValidationModal />
     </NavUl>
   </Navbar>
 </header>
@@ -241,7 +250,7 @@
             />
           </svelte:fragment>
         </SidebarItem>
-
+        <ValidationModal bind:openValidationModal />
         <SidebarDropdownWrapper label="Settings">
           <svelte:fragment slot="icon">
             <AdjustmentsHorizontalSolid
