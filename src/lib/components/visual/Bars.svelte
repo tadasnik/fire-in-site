@@ -16,7 +16,7 @@
     eager: true,
     as: "url",
   });
-  $: console.log("Bars data", $data);
+  // $: console.log("Bars data", $data);
 </script>
 
 <g class="bar-group">

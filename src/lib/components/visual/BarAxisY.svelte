@@ -41,7 +41,7 @@
     $selectedFuel = fuel;
     clickOutsideModal = !clickOutsideModal;
   }
-  $: console.log("BarsYaxis", ticks);
+  // $: console.log("BarsYaxis", ticks);
 </script>
 
 <div class="absolute w-full h-full">

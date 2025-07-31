@@ -7,7 +7,7 @@
   } from "$lib/shared/stores/modelStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
   $: outputs = [...$selectedOutputs, "crown.fire.transition.minBaseHeight"];
-  $: console.log(outputNodes);
+  // $: console.log(outputNodes);
   export let clickOutsideModal;
   function showDescription() {}
 </script>

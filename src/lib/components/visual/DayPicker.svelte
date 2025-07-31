@@ -17,7 +17,7 @@
 
   const dateFormat = timeFormat("%a %e %b");
 
-  $: console.log("focusDay", $focusDay);
+  // $: console.log("focusDay", $focusDay);
   Date.prototype.addHours = function (h) {
     this.setTime(this.getTime() + h * 60 * 60 * 1000);
     return this;

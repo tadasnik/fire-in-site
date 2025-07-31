@@ -14,7 +14,7 @@ export async function fetchForecastMeteo(params: {
   forecast_days: number | undefined,
 }): Promise<any> {
 
-  console.log("fetchForecastMeteo params", params)
+  // console.log("fetchForecastMeteo params", params)
 
   if (!params.forecast_mode) { params.forecast_mode = "forecast" }
   const url = params.forecast_mode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"

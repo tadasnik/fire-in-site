@@ -169,7 +169,7 @@ for (const [f_key, f_values] of Object.entries(UKFuelModels)) {
     }
   }
 }
-console.log('fuelProps :', fuelProps)
+// console.log('fuelProps :', fuelProps)
 
 export function getOutputsForecast(inputsForecast) {
   // console.log("_outputForecast start")
@@ -234,7 +234,7 @@ export const config = derived(
 export const requiredInputs = derived(config, ($config) => {
   // console.log('required config :', $config)
   const requiredI = fireSim.updateConfig($config)
-  console.log('requiredInputs :', requiredI)
+  // console.log('requiredInputs :', requiredI)
   return requiredI
 })
 
@@ -349,7 +349,7 @@ export const requiredSiteInputsForecastOpen = derived(
           } else if (Object.keys(locationInputs).includes(input)) {
             requiredSiteI[input] = [locationInputs[input]]
           } else if (Object.keys(deadMoistureCategories).includes(input) && ($fuelMoistureModel == "Nelson")) {
-            console.log("deadMoistureCategories", nr, input, deadMoistureCategories[input], $forecastOpenMeteo["ffmc_nelson"][nr])
+            // console.log("deadMoistureCategories", nr, input, deadMoistureCategories[input], $forecastOpenMeteo["ffmc_nelson"][nr])
             requiredSiteI[input] = [$forecastOpenMeteo["ffmc_nelson"][nr] + deadMoistureCategories[input]]
           } else if (input == "site.moisture.live.category") {
             // console.log("live moisture input in inputs:", input)
@@ -360,7 +360,7 @@ export const requiredSiteInputsForecastOpen = derived(
         requiredSiteInputs.set(time, requiredSiteI)
       }
     })
-    console.log("requiredSiteInputsForecastOpen run end", $requiredInputs, requiredSiteInputs)
+    // console.log("requiredSiteInputsForecastOpen run end", $requiredInputs, requiredSiteInputs)
     return requiredSiteInputs
   }
 );
@@ -410,7 +410,7 @@ export const requiredFuelInputs = derived(
         }
       })
     })
-    console.log('requiredFuelInputs end::', requiredFuelI)
+    // console.log('requiredFuelInputs end::', requiredFuelI)
     return requiredFuelI
   }
 )
@@ -420,7 +420,6 @@ export const _inputsForecast = derived(
   ([$requiredFuelInputs, $requiredSiteInputsForecastOpen]) => {
     // const grassFuels = {'grl': 'ffmc_grass', 'grm': 'ffmc_grass', 'grl': 'ffmc_grass', 'cll': 'ffmc_heather', 'clm': 'ffmc_heather', 'clh': 'ffmc_heather', 'cld': 'ffmc_heather', 'mhl': '}
     // console.log('requiredFuelInputs in _inputsForecast :', $requiredFuelInputs)
-    console.log('requiredSiteInputsForecastOpen in _inputsForecast :', $requiredSiteInputsForecastOpen)
     const inputsForecast = new Map()
     const forecastOpenMeteoFFMC = get(forecastOpenMeteo)
     // console.log('forecastOpenMeteoFFMC in _inputs :', forecastOpenMeteoFFMC)
@@ -453,13 +452,13 @@ export const _inputsForecast = derived(
       i++
     })
     // console.log('_inputsForecast end :')
-    console.log('inputsForecast end:', inputsForecast)
+    // console.log('inputsForecast end:', inputsForecast)
     return inputsForecast
   }
 )
 
 export const _outputUserInputs = derived([userInputs], ([$userInputs]) => {
-  console.log("RUN _outputUserInputs start", $userInputs)
+  // console.log("RUN _outputUserInputs start", $userInputs)
   const convertUnits = [
     "surface.weighted.fire.heatPerUnitArea",
     "surface.weighted.fire.firelineIntensity"
@@ -483,13 +482,13 @@ export const _outputUserInputs = derived([userInputs], ([$userInputs]) => {
 
     // output.push({ [fuel]: result })
   })
-  console.log("RUN _outputUserInputs end", output)
+  // console.log("RUN _outputUserInputs end", output)
   return output
 })
 
 export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) => {
-  console.log("RUN _outputForecast start")
-  console.log('_inputsForecast in _outputForecast:', $_inputsForecast)
+  // console.log("RUN _outputForecast start")
+  // console.log('_inputsForecast in _outputForecast:', $_inputsForecast)
   const convertUnits = [
     "surface.weighted.fire.heatPerUnitArea",
     "surface.weighted.fire.firelineIntensity"
@@ -528,14 +527,14 @@ export const _outputForecast = derived([_inputsForecast], ([$_inputsForecast]) =
   })
 
   // console.log("_outputForecast end")
-  console.log('outputs in end _outputForecast:', resultForecast)
+  // console.log('outputs in end _outputForecast:', resultForecast)
 
   return resultForecast
 })
 
 
 export const _outputForecastCanopy = derived([_outputForecast, canopyInputs], ([$_outputForecast, $canopyInputs]) => {
-  console.log("_outputForecastCanopy start", $_outputForecast)
+  // console.log("_outputForecastCanopy start", $_outputForecast)
   const resultForecastCanopy = new Map()
   $_outputForecast.forEach((forecast, time) => {
     const output = []
@@ -563,7 +562,7 @@ export const _outputForecastCanopy = derived([_outputForecast, canopyInputs], ([
     })
     resultForecastCanopy.set(time, output)
   })
-  console.log("_outputForecastCanopy end", resultForecastCanopy)
+  // console.log("_outputForecastCanopy end", resultForecastCanopy)
   return resultForecastCanopy
 })
 

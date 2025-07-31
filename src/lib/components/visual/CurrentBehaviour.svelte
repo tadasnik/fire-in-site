@@ -32,10 +32,10 @@
 
   import { forecastMode } from "$lib/shared/stores/forecastStore.js";
   let width;
-  $: console.log(
-    "_outputForecastCanopy in CurrentBehaviour",
-    $_outputForecastCanopy.get($dateTime),
-  );
+  // $: console.log(
+  //   "_outputForecastCanopy in CurrentBehaviour",
+  //   $_outputForecastCanopy.get($dateTime),
+  // );
   $: data =
     $forecastMode === "user"
       ? $_outputUserInputs
