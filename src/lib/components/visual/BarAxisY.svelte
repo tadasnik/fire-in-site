@@ -68,7 +68,7 @@
         transform="translate(-60px, {$yScale.step() * i + 30})"
       >
         <div
-          class="text-right text-xs leading-3 tracking-[-0.03em] whitespace-nowrap hover:text-primary-900 items-end"
+          class="text-right whitespace-nowrap hover:text-primary-900 items-end"
         >
           <p class="font-bold">{tickLines[0]}</p>
           <p class="font-light">{tickLines[1]}</p>
@@ -149,18 +149,8 @@
 <!-- </g> -->
 
 <style>
-  .tick {
-    font-size: 0.725em;
-    font-weight: 200;
-    font: #333;
-  }
-  .tick line {
-    stroke: #aaa;
-  }
-  .tick .gridline {
-    stroke-dasharray: 2;
-  }
-  .tick.tick-0 line {
-    stroke-dasharray: 0;
+  p {
+    line-height: 0.6rem;
+    font-size: 0.7rem;
   }
 </style>
