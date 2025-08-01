@@ -18,6 +18,7 @@
   export let data = [];
   export let z = "vapour_pressure_deficit";
   export let parentWidth, parentHeight;
+  $: console.log("Spiral width and height", parentWidth, parentHeight);
 
   //Rotate the spiral so that mid-January is align with y axis
   // const angleRotate = 360 / 4.8;
