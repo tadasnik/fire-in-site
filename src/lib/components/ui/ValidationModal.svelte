@@ -9,7 +9,7 @@
   $: console.log("openValidationModal", openValidationModal);
 </script>
 
-<A on:click={handleFuelClick}>User observations</A>
+<A on:click={handleFuelClick}>User feedback</A>
 <Modal
   title="Submit flame length observations"
   form
