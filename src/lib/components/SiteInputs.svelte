@@ -16,12 +16,12 @@
   import type { fromJSON } from "postcss";
 
   let timer: ReturnType<typeof setTimeout>;
-  let defaultModal = false;
+  let defaultModal = $state(false);
 
-  let currScenario = {
+  let currScenario = $state({
     label: "",
     description: "",
-  };
+  });
 
   async function readGlobalScenarios() {
     const scenariosQuerry = await getDocs(collection(db, "scenarios"));
@@ -101,17 +101,17 @@
     prepareScenario();
   }
 
-  $: isRange = (key) => {
+  let isRange = $derived((key) => {
     return $siteInputs[key].value.length > 1;
-  };
+  });
 
-  $: rangeSwitch = (key) => {
+  let rangeSwitch = $derived((key) => {
     if ($siteInputs[key].value.length > 1) {
       $siteInputs[key].value = [$siteInputs[key].defValue];
     } else {
       $siteInputs[key].value = [$siteInputs[key].min, $siteInputs[key].max];
     }
-  };
+  });
   // $: console.log("authStore ", $authStore)
   // $: console.log("requiredSiteInputsForecast ", $requiredSiteInputsForecast);
   // $: console.log("defaultModal ", defaultModal);
@@ -122,21 +122,23 @@
   <Accordion multiple>
     {#each Object.keys($requiredSiteInputsForecast) as key}
       <AccordionItem id={key}>
-        <span
-          slot="header"
-          class="flex flex-row basis-72 gap-1 align-middle text-base"
-        >
-          <div class="basis-2/3 text-right pr-3">
-            <span class="align-middle">{$siteInputs[key].label}</span>
-          </div>
+        {#snippet header()}
+                <span
+            
+            class="flex flex-row basis-72 gap-1 align-middle text-base"
+          >
+            <div class="basis-2/3 text-right pr-3">
+              <span class="align-middle">{$siteInputs[key].label}</span>
+            </div>
 
-          <div class="text-left align-middle">
-            <span class="align-middle"><b>{valuesDisplay(key)}</b></span>
-            <span class="text-xs align-middle"
-              >({$siteInputs[key].units})
-            </span>
-          </div>
-        </span>
+            <div class="text-left align-middle">
+              <span class="align-middle"><b>{valuesDisplay(key)}</b></span>
+              <span class="text-xs align-middle"
+                >({$siteInputs[key].units})
+              </span>
+            </div>
+          </span>
+              {/snippet}
 
         <div class="flex flex-row items-center">
           <div class="basis-32 grow pr-3">
@@ -251,25 +253,27 @@
         {/each}
       </div>
     </form>
-    <svelte:fragment slot="footer">
-      <Button
-        on:click={() =>
-          addScenario(currScenario, [
-            db,
-            "users",
-            $authStore.currentUser.uid,
-            "scenarios",
-            currScenario.label,
-          ])}>Save</Button
-      >
-      <Button color="alternative">Cancel</Button>
-      {#if $authStore.currentUser.uid === "SgbOOJpWvYVps3JY31UnfSgqKLX2"}
+    {#snippet footer()}
+      
         <Button
-          on:click={() => {
-            addScenario(currScenario, [db, "scenarios", currScenario.label]);
-          }}>Save to global</Button
+          on:click={() =>
+            addScenario(currScenario, [
+              db,
+              "users",
+              $authStore.currentUser.uid,
+              "scenarios",
+              currScenario.label,
+            ])}>Save</Button
         >
-      {/if}
-    </svelte:fragment>
+        <Button color="alternative">Cancel</Button>
+        {#if $authStore.currentUser.uid === "SgbOOJpWvYVps3JY31UnfSgqKLX2"}
+          <Button
+            on:click={() => {
+              addScenario(currScenario, [db, "scenarios", currScenario.label]);
+            }}>Save to global</Button
+          >
+        {/if}
+      
+      {/snippet}
   </Modal>
 </div>

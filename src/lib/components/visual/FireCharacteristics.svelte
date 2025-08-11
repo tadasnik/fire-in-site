@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { LayerCake, Svg, Html, groupLonger, flatten } from "layercake";
 
   import { scaleSequential } from "d3-scale";
@@ -20,19 +22,23 @@
   import HistoricalSelectDate from "./HistoricalSelectDate.svelte";
   import SharedTooltip from "$lib/components/visual/SharedTooltip.html.svelte";
 
-  export let parentWidth;
-  export let data;
-  export let xKey;
-  export let yKey;
-  export let zKey;
+  let {
+    parentWidth,
+    data,
+    xKey,
+    yKey,
+    zKey
+  } = $props();
 
-  $: flatData = flatten(data, "values");
-  let evt;
-  let hideTooltip = true;
+  let flatData = $derived(flatten(data, "values"));
+  let evt = $state();
+  let hideTooltip = $state(true);
   const addCommas = format(",");
   const formatXtip = timeFormat("%b %d, %H:00");
-  $: valuesData = data.map((d) => d.values);
-  $: console.log("flatData FireChars", data, flatData, valuesData);
+  let valuesData = $derived(data.map((d) => d.values));
+  run(() => {
+    console.log("flatData FireChars", data, flatData, valuesData);
+  });
 </script>
 
 <div class="flex grow">

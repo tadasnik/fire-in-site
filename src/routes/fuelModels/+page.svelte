@@ -106,9 +106,9 @@
     },
   ];
 
-  let openRow;
-  let details;
-  let doubleClickModal = false;
+  let openRow = $state();
+  let details = $state();
+  let doubleClickModal = $state(false);
 
   const toggleRow = (i) => {
     openRow = openRow === i ? null : i;

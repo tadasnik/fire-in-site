@@ -19,7 +19,7 @@
   import { timeDay, timeMonth, timeYear } from "d3-time";
   import { cartesianFromPolarRad } from "$lib/components/visual/spiral/utils.js";
 
-  export let polarProps = {};
+  let { polarProps = {} } = $props();
 
   const { width, height, xScale, yScale, xDomain, data } =
     getContext("LayerCake");
@@ -37,7 +37,7 @@
     };
   }
 
-  $: todayMarker = () => {
+  let todayMarker = $derived(() => {
     const today = new Date();
     const { angle: todayAngle, distance: todayDistance } =
       getAngleDistance(today);
@@ -67,7 +67,7 @@
       x4,
       y4,
     };
-  };
+  });
   // Dates of months in previous year
   // the *0.001 is necessary to convert from milliseconds to seconds
   const startDate = fromUnixTime($data[0].date * 0.001);
@@ -86,7 +86,7 @@
     end: extEndDate,
   }).slice(1);
 
-  $: monthProps = monthsNextYear.map((month, i) => {
+  let monthProps = $derived(monthsNextYear.map((month, i) => {
     // console.log("month", month);
     const { angle: startAngle, distance: start } = getAngleDistance(
       setYear(new Date(month), extStartYear),
@@ -106,12 +106,12 @@
       x3,
       y3,
     };
-  });
+  }));
 
-  $: todayProps = todayMarker();
+  let todayProps = $derived(todayMarker());
   // $: console.log("monthProps", monthProps, todayProps);
 
-  $: getArc = (d) => {
+  let getArc = $derived((d) => {
     const distance = $xScale($xDomain[1]);
     return [
       "M",
@@ -126,7 +126,7 @@
       $xScale(d.x3),
       $yScale(d.y3),
     ].join(" ");
-  };
+  });
 </script>
 
 <g>

@@ -2,8 +2,7 @@
   import "$lib/styles/weather-icons.css";
   import "$lib/styles/weather-icons-wind.css";
 
-  export let data;
-  export let title;
+  let { data, title } = $props();
   // export let displayProps;
   const displayProps = {
     Temperature: ["screenTemperature", 0, "wi wi-thermometer"],
@@ -21,7 +20,7 @@
     {#each Object.entries(displayProps) as [key, prop]}
       <span class="flex flex-row gap-1 align-middle">
         <div class="w-1/2 text-right pr-1 border-r-2">
-          <i class={prop[2]} />
+          <i class={prop[2]}></i>
         </div>
         <div class="w-1/2 text-left align-middle">
           <b>{data[prop[0]].toFixed(prop[1])}</b>

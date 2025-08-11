@@ -40,10 +40,12 @@
       <Carousel
         images={fireImages}
         imgClass="min-h-72"
-        let:Controls
-        let:Indicators
-        ><Indicators />
-        <Controls /></Carousel
+        
+        
+        >{#snippet children({ Controls, Indicators })}
+                <Indicators />
+          <Controls />              {/snippet}
+            </Carousel
       >
     </div>
 
@@ -105,10 +107,12 @@
       <Carousel
         images={fieldImages}
         imgClass="min-h-72"
-        let:Controls
-        let:Indicators
-        ><Indicators />
-        <Controls /></Carousel
+        
+        
+        >{#snippet children({ Controls, Indicators })}
+                <Indicators />
+          <Controls />              {/snippet}
+            </Carousel
       >
     </div>
     <div class="p-8">

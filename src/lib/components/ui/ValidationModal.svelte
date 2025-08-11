@@ -1,12 +1,16 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { Modal, P, A } from "flowbite-svelte";
   import { ArrowRightOutline } from "flowbite-svelte-icons";
-  export let openValidationModal;
+  let { openValidationModal = $bindable() } = $props();
   function handleFuelClick() {
     console.log("clickOutsideModal parrent was", openValidationModal);
     openValidationModal = !openValidationModal;
   }
-  $: console.log("openValidationModal", openValidationModal);
+  run(() => {
+    console.log("openValidationModal", openValidationModal);
+  });
 </script>
 
 <A on:click={handleFuelClick}>User feedback</A>

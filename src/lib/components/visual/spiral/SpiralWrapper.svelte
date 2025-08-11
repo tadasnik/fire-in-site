@@ -7,10 +7,10 @@
 
   const source =
     "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
-  let allData = [];
-  let isLoading = true;
-  let countries = [];
-  let country = "USA";
+  let allData = $state([]);
+  let isLoading = $state(true);
+  let countries = $state([]);
+  let country = $state("USA");
 
   const getData = async () => {
     const res = await csv(source);
@@ -19,7 +19,7 @@
     countries = [...new Set(res.map((d) => d.iso_code))];
   };
   onMount(getData);
-  $: filteredData = allData.filter((d) => d.iso_code === country);
+  let filteredData = $derived(allData.filter((d) => d.iso_code === country));
   const parseDate = timeParse("%Y-%m-%d");
 </script>
 
@@ -38,7 +38,8 @@
       metricAccessor={(d) => +d["new_cases_smoothed_per_million"]}
       timeAccessor={(d) => parseDate(d["date"])}
     >
-      <span slot="legend-title">
+      <!-- @migration-task: migrate this slot by hand, `legend-title` is an invalid identifier -->
+  <span slot="legend-title">
         New COVID-19 cases
         <br />per 1M people in
         <br />{countryNamesMap[country] || country}

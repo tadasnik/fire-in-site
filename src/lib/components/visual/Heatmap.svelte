@@ -31,9 +31,7 @@
   import GroupLabels from "./GroupLabels.html.svelte";
   import HeatmapWindDir from "$lib/components/visual/HeatmapWindDir.html.svelte";
 
-  export let xKey;
-  export let yKey;
-  export let zKey;
+  let { xKey, yKey, zKey } = $props();
 
   //define colour scales
   const scaleTemp = scaleSequential(interpolatePuOr).domain([0, 30]);
@@ -174,18 +172,18 @@
   // };
 
   // $: console.log("Selected output", $selectedOutput);
-  $: fireBehaviourData = $_outputForecastArray.slice(
+  let fireBehaviourData = $derived($_outputForecastArray.slice(
     $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
     $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
-  );
+  ));
   // $: console.log("forecastOpenMeteo", $forecastOpenMeteo);
 
-  $: forecastData = $forecastOpenMeteo;
-  $: seriesNames = Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey);
-  $: groupedData = groupLonger(fireBehaviourData, seriesNames, {
+  let forecastData = $derived($forecastOpenMeteo);
+  let seriesNames = $derived(Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey));
+  let groupedData = $derived(groupLonger(fireBehaviourData, seriesNames, {
     groupTo: yKey,
     valueTo: zKey,
-  });
+  }));
 
   function formatTickXLong(tick) {
     let format = timeFormat("%H");
@@ -203,12 +201,12 @@
   const cellSize = 25;
   const gapSize = 1.9;
 
-  $: fuelsTicks = Object.keys(fireBehaviourData[0]);
-  $: yCountWeather = Object.keys(weatherProps).length;
-  $: yCount = Object.keys(fireBehaviourData[0]).length;
-  $: chartHeight = (yCountWeather + yCount) * cellSize + cellSize;
-  $: heatmapWidth = fireBehaviourData.length * cellSize;
-  $: dayPickerHeight = 40;
+  let fuelsTicks = $derived(Object.keys(fireBehaviourData[0]));
+  let yCountWeather = $derived(Object.keys(weatherProps).length);
+  let yCount = $derived(Object.keys(fireBehaviourData[0]).length);
+  let chartHeight = $derived((yCountWeather + yCount) * cellSize + cellSize);
+  let heatmapWidth = $derived(fireBehaviourData.length * cellSize);
+  
   // $: console.log("Heatmap fireBehaviourData data", $_outputForecastArray);
   // $: console.log("Heatmap forecast data", forecastData);
   // $: console.log("Heatmap output data", fireBehaviourData);

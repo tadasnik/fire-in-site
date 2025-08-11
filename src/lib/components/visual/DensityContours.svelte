@@ -36,7 +36,7 @@
     "17becf",
   ];
 
-  export let data;
+  let { data } = $props();
 
   // /** @type {Number} [r=5] – The circle's radius. */
   // export let r = 5;
@@ -53,9 +53,9 @@
   const fuels = ["sh4", "sh6"];
   const myColor = scaleOrdinal(schemeCategory10); //.domain(fuels).range(schemeCategory10);
 
-  $: geoPathFn = geoPath();
+  let geoPathFn = $derived(geoPath());
 
-  $: fuelContours = (fuelData) => {
+  let fuelContours = $derived((fuelData) => {
     const contours = contourDensity()
       .x($xGet)
       .y($yGet)
@@ -63,7 +63,7 @@
       .bandwidth(3)
       .thresholds(20)(fuelData);
     return contours;
-  };
+  });
   // $: console.log(
   //   "data density",
   //   data[0].values.map((d) => $x(d))

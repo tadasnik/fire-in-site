@@ -10,8 +10,14 @@
     as: "url",
   });
 
-  // console.log("fuelsImages", fuelsImages);
-  export let clickOutsideModal;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} clickOutsideModal - console.log("fuelsImages", fuelsImages);
+   */
+
+  /** @type {Props} */
+  let { clickOutsideModal = $bindable() } = $props();
 
   function getFuelImages(fuel) {
     let images = [];
@@ -36,8 +42,10 @@
   class="overflow"
 >
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
-    <Carousel {images} imgClass="min-h-72" let:Controls>
-      <Controls /></Carousel
+    <Carousel {images} imgClass="min-h-72" >
+      {#snippet children({ Controls })}
+            <Controls />          {/snippet}
+        </Carousel
     >
   </div>
   <div class="text-left">

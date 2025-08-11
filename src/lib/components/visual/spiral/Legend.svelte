@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (legend-title to legend_title) making the component unusable -->
 <script>
   import { getContext } from "svelte";
   import { Canvas, Svg } from "layercake";

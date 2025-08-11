@@ -1,10 +1,12 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { Input, Label, Helper, ButtonGroup, Button } from "flowbite-svelte";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
-  let action = "";
-  let newPass = "";
-  let newEmail = "";
+  let action = $state("");
+  let newPass = $state("");
+  let newEmail = $state("");
 
   async function handleSubmit() {
     if (!action) {
@@ -17,7 +19,9 @@
       return await authHandlers.updateEmail(newEmail);
     }
   }
-  $: console.log("AuthReset action = ", action);
+  run(() => {
+    console.log("AuthReset action = ", action);
+  });
 </script>
 
 <div class="container">

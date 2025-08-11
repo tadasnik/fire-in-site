@@ -14,17 +14,19 @@
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import BarAxisY from "$lib/components/visual/BarAxisY.svelte";
 
-  export let data;
-  export let time;
-  export let xKey;
-  export let yKey;
+  let {
+    data,
+    time,
+    xKey,
+    yKey
+  } = $props();
 
   // $: plotData = data.get(time);
-  $: flatData = flatten(data, "values");
+  let flatData = $derived(flatten(data, "values"));
   const formatLabelY = (d) => format(`.1f`)(d);
 
-  $: xMax = Math.ceil($_maxVal / 1) * 1;
-  $: yTicks = $selectedFuels.map((i) => UKFuelModels[i].displayLabel);
+  let xMax = $derived(Math.ceil($_maxVal / 1) * 1);
+  let yTicks = $derived($selectedFuels.map((i) => UKFuelModels[i].displayLabel));
 </script>
 
 <div class="chart-container w-full h-80 md:h-4/5">

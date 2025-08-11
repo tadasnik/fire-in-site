@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { randomInt } from "d3-random";
   import { Select, Label, Badge, Heading } from "flowbite-svelte";
   import MultiSelect from "$lib/components/ui/MultiSelect.svelte";
@@ -14,9 +16,9 @@
   import { authStore } from "$lib/shared/stores/authStore";
   import AuthReset from "$lib/components/auth/AuthReset.svelte";
 
-  let email;
+  let email = $state();
 
-  let w;
+  let w = $state();
   const selectOptions = [];
   for (const [key, value] of Object.entries(UKFuels)) {
     selectOptions.push({ name: key + ": " + value.label, value: key });
@@ -35,7 +37,9 @@
   }
 
   const generator = randomInt(50, 100);
-  $: console.log("rand into, ", generator(100));
+  run(() => {
+    console.log("rand into, ", generator(100));
+  });
 </script>
 
 {#if $authStore.currentUser}
@@ -55,20 +59,22 @@
     <MultiSelect
       items={selectOptions}
       bind:value={$selectedFuels}
-      let:item
-      let:clear
+      
+      
     >
-      <Badge
-        dismissable={$selectedFuels.length > 1}
-        params={{ duration: 100 }}
-        on:close={clear}
-      >
-        {item.name}
-      </Badge>
-    </MultiSelect>
+      {#snippet children({ item, clear })}
+            <Badge
+          dismissable={$selectedFuels.length > 1}
+          params={{ duration: 100 }}
+          on:close={clear}
+        >
+          {item.name}
+        </Badge>
+                {/snippet}
+        </MultiSelect>
   </div>
 </section>
-<div />
+<div></div>
 <div class="w-full aspect-square container" bind:clientWidth={w}>
   <FireCharacteristics
     parentWidth={w}

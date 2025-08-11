@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `$: seriesNames = Object.keys(data[0]).filter((d) => d !== xKey);` to `$derived` because there's a variable named derived.
+     Rename the variable and try again or migrate by hand. -->
 <script>
   import { derived } from "svelte/store";
   import {

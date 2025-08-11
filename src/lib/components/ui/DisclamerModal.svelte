@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
 
-  let showModal = false;
+  let showModal = $state(false);
   const storageKey = "fireInSiteDisclaimerAcknowledged";
 
   onMount(() => {
@@ -47,7 +47,7 @@
       </p>
       <div class="flex justify-end">
         <button
-          on:click={closeModal}
+          onclick={closeModal}
           class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition"
         >
           I Understand
