@@ -17,27 +17,6 @@
 
   const { xScale, percentRange } = getContext("LayerCake");
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {Boolean} [tickMarks] - Show a vertical mark for each tick.
@@ -65,12 +44,12 @@
     tickGutter = 0,
     dx = 0,
     dy = 0,
-    units = $percentRange === true ? "%" : "px"
+    units = $percentRange === true ? "%" : "px",
   } = $props();
 
   const formatHour = timeFormat("%H");
   const formatDay = timeFormat("%a");
-  let tickLen = $derived(tickMarks === true ? tickMarkLength ?? 6 : 0);
+  let tickLen = $derived(tickMarks === true ? (tickMarkLength ?? 6) : 0);
 
   let isBandwidth = $derived(typeof $xScale.bandwidth === "function");
 
@@ -78,20 +57,25 @@
     return d == $dateTime ? "font-bold text-primary-500" : "";
   });
 
-  let tickVals = $derived(Array.isArray(ticks)
-    ? ticks
-    : isBandwidth
-    ? $xScale.domain()
-    : typeof ticks === "function"
-    ? ticks($xScale.ticks())
-    : $xScale.ticks(ticks));
+  let tickVals = $derived(
+    Array.isArray(ticks)
+      ? ticks
+      : isBandwidth
+        ? $xScale.domain()
+        : typeof ticks === "function"
+          ? ticks($xScale.ticks())
+          : $xScale.ticks(ticks),
+  );
 
   let halfBand = $derived(isBandwidth ? $xScale.bandwidth() / 2 : 0);
+
   function executeClick(e) {
     if ($timeMode === "current") {
       $timeMode = "user";
     }
+    console.log("Clicked on tick:", e);
     $currentDateTime = new Date(e);
+    console.log("changed:", e);
   }
 </script>
 
@@ -108,7 +92,7 @@
         class="gridline"
         style:left="{tickValUnits}{units}"
         style="top:0; bottom:0;"
-></div>
+      ></div>
     {/if}
     {#if tickMarks === true}
       <div
@@ -116,7 +100,7 @@
         style:left="{tickValUnits + halfBand}{units}"
         style:height="{tickLen}px"
         style:top="{-tickLen - tickGutter}px"
-></div>
+      ></div>
     {/if}
     <div
       class="tick tick-{i} "
@@ -125,10 +109,10 @@
     >
       <div
         class="flex-col grow -space-y-1 text-center align-middle {isSelectedClass(
-          tick
+          tick,
         )} hover:font-bold"
         role="button"
-        onclick={executeClick(tick)}
+        onclick={() => executeClick(tick)}
         style:transform={`translate(calc(-50% + ${dx}px), calc(-${
           tick === $dateTime ? 130 : 110
         }% + ${dy}px))`}
