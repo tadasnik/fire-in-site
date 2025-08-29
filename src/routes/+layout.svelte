@@ -170,12 +170,14 @@
     color="default"
     fluid
     class="flex items-center justify-between w-full mx-auto py-1.5 px-4 max-w-8xl"
-    
-    
   >
     {#snippet children({ hidden, toggle })}
-        <NavBrand href="/">
-        <img src={FireInSiteLogo} class="me-3 h-6 sm:h-9" alt="fireInSite Logo" />
+      <NavBrand href="/">
+        <img
+          src={FireInSiteLogo}
+          class="me-3 h-6 sm:h-9"
+          alt="fireInSite Logo"
+        />
       </NavBrand>
 
       <div class="flex md:order-2">
@@ -216,8 +218,8 @@
         <NavLi href="/climate">Climate</NavLi>
         <ValidationModal bind:openValidationModal />
       </NavUl>
-          {/snippet}
-    </Navbar>
+    {/snippet}
+  </Navbar>
 </header>
 <Drawer
   transitionType="fly"
@@ -233,49 +235,39 @@
       <SidebarGroup>
         <SidebarItem label="Home" href="/">
           {#snippet icon()}
-                  
-              <HomeOutline
-                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              />
-            
-                  {/snippet}
+            <HomeOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          {/snippet}
         </SidebarItem>
         <SidebarItem label="Fuel Models" href="/fuelModels">
           {#snippet icon()}
-                  
-              <ColumnOutline
-                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              />
-            
-                  {/snippet}
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          {/snippet}
         </SidebarItem>
         <SidebarItem label="About" href="/about">
           {#snippet icon()}
-                  
-              <ColumnOutline
-                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              />
-            
-                  {/snippet}
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          {/snippet}
         </SidebarItem>
         <SidebarItem label="Tutorial" href="/tutorial">
           {#snippet icon()}
-                  
-              <ColumnOutline
-                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              />
-            
-                  {/snippet}
+            <ColumnOutline
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          {/snippet}
         </SidebarItem>
         <ValidationModal bind:openValidationModal />
         <SidebarDropdownWrapper label="Settings">
           {#snippet icon()}
-                  
-              <AdjustmentsHorizontalSolid
-                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              />
-            
-                  {/snippet}
+            <AdjustmentsHorizontalSolid
+              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            />
+          {/snippet}
           <DropdownDivider></DropdownDivider>
 
           <SettingsDropdown></SettingsDropdown>
@@ -306,14 +298,14 @@
       FireInSite fire behaviour predictions leverage BehavePlus fire behaviour
       modelling system, fuel models representative of UK vegetation and
       open-meteo forecasts and historical weather. Authors: Tadas Nikonovas,
-      Claire M Belcher, Kerryn Little and the rest of Toward a UK Fire Danger
-      Rating System (UKFDRS) project team. Implementation: Tadas Nikonovas,
-      Centre for Wildfire Research, Swansea University. Supported by Higher
-      Education Funding Council for Wales Impact Fellowship grant (RIG1062-117),
-      NERC grant UK-FDRS ‘Toward a UK fire danger rating system: Understanding
-      fuels, fire behaviour and impacts’ (NE/T003553/1) and funding from the
-      European Union’s Horizon 2020 research and innovation programme under
-      grant agreement No. 101003890 (FirEUrisk)
+      Stefan Doerr, Claire M Belcher, Kerryn Little and the rest of Toward a UK
+      Fire Danger Rating System (UKFDRS) project team. Implementation: Tadas
+      Nikonovas, Centre for Wildfire Research, Swansea University. Supported by
+      Higher Education Funding Council for Wales Impact Fellowship grant
+      (RIG1062-117), NERC grant UK-FDRS ‘Toward a UK fire danger rating system:
+      Understanding fuels, fire behaviour and impacts’ (NE/T003553/1) and
+      funding from the European Union’s Horizon 2020 research and innovation
+      programme under grant agreement No. 101003890 (FirEUrisk)
     </p>
   </div>
   <div class="px-10 flex items-center justify-center">
