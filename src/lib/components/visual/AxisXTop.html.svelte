@@ -73,9 +73,7 @@
     if ($timeMode === "current") {
       $timeMode = "user";
     }
-    console.log("Clicked on tick:", e);
     $currentDateTime = new Date(e);
-    console.log("changed:", e);
   }
 </script>
 

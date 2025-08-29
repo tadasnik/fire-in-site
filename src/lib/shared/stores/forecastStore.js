@@ -51,7 +51,7 @@ export const climateOpenMeteo = writable([{
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
-export const forecastModel = writable('ukmo_seamless')
+export const forecastModel = writable('umo_seamless')
 export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
 { 'value': 'ecmwf_ifs025', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 0.25 degree global model' },
 { 'value': 'icon_seamless', 'displayName': 'ICON', 'description': 'German Weather service (DWD) ICON model with 2km (central Europe), 7km (Europe) and 11km (global) resolution for central Europe, Europe and globe' }])
@@ -104,7 +104,7 @@ export function fillParams({
   if (forecast_mode === "forecast") {
     return {
       ...baseParams,
-      "models": forecast_model,
+      "forecast_model": forecast_model,
       "past_days": forecast_days_past,
       "forecast_days": forecast_days,
     }
