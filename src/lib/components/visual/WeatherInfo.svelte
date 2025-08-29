@@ -7,9 +7,7 @@
   import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
   import { Spinner } from "flowbite-svelte";
 
-  export let data;
-  export let forecastLocation;
-  export let fireLocation;
+  let { data, forecastLocation, fireLocation } = $props();
   // export let displayProps;
   const metOfficeWeatherTypes = {
     "-1": "wi wi-showers",
@@ -112,18 +110,18 @@
       <div class="">
         <i
           class="text-2xl {metOfficeWeatherTypes[data.significantWeatherCode]}"
-        />
+></i>
       </div>
 
       <div class="space-x-0">
         <span class="">{data.temperature_2m[$currentTimeIndex].toFixed(0)}</span
-        ><i class="text-xl wi wi-degrees" /><span class="font-bold">C</span>
+        ><i class="text-xl wi wi-degrees"></i><span class="font-bold">C</span>
       </div>
       <div>
         <span class="pl-0"
           >{data.relative_humidity_2m[$currentTimeIndex].toFixed(0)}</span
         >
-        <i class="wi wi-humidity" />
+        <i class="wi wi-humidity"></i>
       </div>
       <div>
         <i
@@ -131,7 +129,7 @@
         wi-from-{getWindCardinalDirection(
             data.wind_direction_10m[$currentTimeIndex],
           )}"
-        />
+></i>
 
         <span class="pl-0">
           {data.wind_speed_10m[$currentTimeIndex].toFixed(0)}</span

@@ -14,7 +14,7 @@
 
   let locMarker;
   let map;
-  let mapContainer;
+  let mapContainer = $state();
   let lng, lat, zoom;
 
   lng = -3;
@@ -183,7 +183,7 @@
       ]);
     }
   }
-  let width;
+  let width = $state();
 
   onMount(() => {
     const initialState = { lng: lng, lat: lat, zoom: zoom };
@@ -262,16 +262,15 @@
     </div>
   </div>
 
-  <div class="aspect-square" bind:clientWidth={width}>
+  <div class="aspect-square overflow-hidden" bind:clientWidth={width}>
     <div
-      class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
+      class="w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
     >
       {#if $currentLocation.elevation}
-        {$currentLocation.latitude.toFixed(3)}<i
-          class="text-xl wi wi-degrees"
-        />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
+        {$currentLocation.latitude.toFixed(3)}<i class="text-xl wi wi-degrees"
+        ></i>{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
           3,
-        )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0
+        )}<i class="text-xl wi wi-degrees"></i>{$currentLocation.longitude >= 0
           ? "E"
           : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
           0,
@@ -279,10 +278,10 @@
         <i
           class="text-2xl wi wi-wind
       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
-        />
+        ></i>
       {/if}
     </div>
-    <div class="map z-0" bind:this={mapContainer} />
+    <div class="w-full h-full z-0" bind:this={mapContainer}></div>
   </div>
 </div>
 
@@ -309,7 +308,7 @@
 
 <style>
   .map {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
@@ -322,7 +321,7 @@
     padding: 6px 12px;
     font-family: monospace;
     z-index: 1;
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     margin: 12px;

@@ -27,19 +27,31 @@
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([10, 0]);
-  /** @type {Function} [calcCellSize=(w, h) => Math.min(w / 7, h / 5)] - A function givn the canvas width and height as arguments and expects a return number that will be used as the width and height for each cell. The default will choose a size that fits seven cells across and five rows top to bottom. */
-  export let cellSize;
-  export let gapSize;
-  export let forecastData;
-  export let weatherProps;
-  export let modelOutputProps;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Function} cellSize - A function givn the canvas width and height as arguments and expects a return number that will be used as the width and height for each cell. The default will choose a size that fits seven cells across and five rows top to bottom.
+   * @property {any} gapSize
+   * @property {any} forecastData
+   * @property {any} weatherProps
+   * @property {any} modelOutputProps
+   */
 
-  $: isSelectedClass = (x) => {
+  /** @type {Props} */
+  let {
+    cellSize,
+    gapSize,
+    forecastData,
+    weatherProps,
+    modelOutputProps
+  } = $props();
+
+  let isSelectedClass = $derived((x) => {
     // console.log("isSelectedClass", x);
     return $dateTime == x
       ? "text-sm font-bold text-neutral-500"
       : "text-xs text-neutral-400";
-  };
+  });
 
   const formatValues = (d) =>
     d < 10

@@ -24,9 +24,10 @@
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
   import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
   import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
-  // import GeoLocation from "../lib/components/ui/GeoLocation.svelte";
+  // import GeoLocation from "$lib/components/ui/GeoLocation.svelte";
+  // import FindLocation from "$lib/components/ui/FindLocation.svelte";
 
-  let width;
+  let width = $state();
   let showMap = false;
 
   async function geolocate() {
@@ -117,6 +118,7 @@
     class="container mx-auto flex flex-col md:flex-row justify-center items-center max-w-screen-xl"
   >
     <div class="grow w-full md:w-1/2 min-w-96 max-w-120 pl-4 md:pl-8">
+      <!-- <FindLocation></FindLocation> -->
       <!-- <GeoLocation></GeoLocation> -->
       <Map></Map>
     </div>

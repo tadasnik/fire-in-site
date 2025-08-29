@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { Range, Label } from "flowbite-svelte";
   import {
     siteInputsStore,
@@ -69,8 +71,12 @@
     debouncedUpdate(sliderValue);
   }
 
-  $: console.log("user Inputs", $userInputs);
-  $: console.log("user outputs", $_outputUserInputs);
+  run(() => {
+    console.log("user Inputs", $userInputs);
+  });
+  run(() => {
+    console.log("user outputs", $_outputUserInputs);
+  });
 </script>
 
 <div class="flex flex-col mx-auto">

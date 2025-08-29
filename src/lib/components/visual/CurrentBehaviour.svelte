@@ -36,10 +36,10 @@
   //   "_outputForecastCanopy in CurrentBehaviour",
   //   $_outputForecastCanopy.get($dateTime),
   // );
-  $: data =
-    $forecastMode === "user"
+  let data =
+    $derived($forecastMode === "user"
       ? $_outputUserInputs
-      : $_outputForecastCanopy.get($dateTime);
+      : $_outputForecastCanopy.get($dateTime));
 </script>
 
 {#if $chartType === "fireChar"}

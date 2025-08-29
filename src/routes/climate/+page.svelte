@@ -23,8 +23,8 @@
   import ColorbarAxisX from "$lib/components/visual/spiral/ColorbarAxisX.svelte";
 
   let daily = {};
-  let fetchingHistory = true;
-  let w, h;
+  let fetchingHistory = $state(true);
+  let w = $state(), h = $state();
   let margin = 20;
   let weatherVar = "vapour_pressure_deficit";
   // function dailyMaxGrouped(data, propToCalc, timeZone) {

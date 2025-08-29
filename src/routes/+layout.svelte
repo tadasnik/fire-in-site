@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   export const ssr = false;
 </script>
 
@@ -48,8 +48,15 @@
   import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  let openValidationModal = false;
+  /** @type {Props} */
+  let { children } = $props();
+
+  let openValidationModal = $state(false);
   let transitionParams = {
     x: -320,
     duration: 200,
@@ -144,10 +151,10 @@
 
   let spanClass = "flex-1 ml-3 whitespace-nowrap";
 
-  $: activeUrl = $page.url.pathname;
+  let activeUrl = $derived($page.url.pathname);
   // $: console.log("layout activeURl", activeUrl);
 
-  let hidden1 = true;
+  let hidden1 = $state(true);
   const toggleDrawer = () => {
     hidden1 = false;
   };
@@ -163,52 +170,54 @@
     color="default"
     fluid
     class="flex items-center justify-between w-full mx-auto py-1.5 px-4 max-w-8xl"
-    let:hidden
-    let:toggle
+    
+    
   >
-    <NavBrand href="/">
-      <img src={FireInSiteLogo} class="me-3 h-6 sm:h-9" alt="fireInSite Logo" />
-    </NavBrand>
+    {#snippet children({ hidden, toggle })}
+        <NavBrand href="/">
+        <img src={FireInSiteLogo} class="me-3 h-6 sm:h-9" alt="fireInSite Logo" />
+      </NavBrand>
 
-    <div class="flex md:order-2">
-      <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
-      <!-- <NavUl> -->
-      <!--   {#if !$authStore.currentUser} -->
-      <!--     <NavLi href="/authenticate">Sign in</NavLi> -->
-      <!--   {:else} -->
-      <!--     <NavLi -->
-      <!--       on:click={() => { -->
-      <!--         authHandlers.logout(); -->
-      <!--       }} -->
-      <!--       href="/">Sign out</NavLi -->
-      <!--     > -->
-      <!--   {/if} -->
-      <!-- </NavUl> -->
-    </div>
-    <NavUl>
-      {#if activeUrl !== "/"}
-        <NavLi href="/">The Model</NavLi>
-      {/if}
+      <div class="flex md:order-2">
+        <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
+        <!-- <NavUl> -->
+        <!--   {#if !$authStore.currentUser} -->
+        <!--     <NavLi href="/authenticate">Sign in</NavLi> -->
+        <!--   {:else} -->
+        <!--     <NavLi -->
+        <!--       on:click={() => { -->
+        <!--         authHandlers.logout(); -->
+        <!--       }} -->
+        <!--       href="/">Sign out</NavLi -->
+        <!--     > -->
+        <!--   {/if} -->
+        <!-- </NavUl> -->
+      </div>
+      <NavUl>
+        {#if activeUrl !== "/"}
+          <NavLi href="/">The Model</NavLi>
+        {/if}
 
-      <NavLi class="cursor-pointer">
-        <div class="flex-col items-center">
-          <AdjustmentsHorizontalSolid
-            class="w-4 h-4 ms-2 text-primary-900 dark:text-white inline"
-          />
-          Settings
-        </div>
-      </NavLi>
+        <NavLi class="cursor-pointer">
+          <div class="flex-col items-center">
+            <AdjustmentsHorizontalSolid
+              class="w-4 h-4 ms-2 text-primary-900 dark:text-white inline"
+            />
+            Settings
+          </div>
+        </NavLi>
 
-      <Dropdown>
-        <SettingsDropdown />
-      </Dropdown>
-      <NavLi href="/fuelModels">Fuel Models</NavLi>
-      <NavLi href="/about">About</NavLi>
-      <NavLi href="/tutorial">Tutorial</NavLi>
-      <NavLi href="/climate">Climate</NavLi>
-      <ValidationModal bind:openValidationModal />
-    </NavUl>
-  </Navbar>
+        <Dropdown>
+          <SettingsDropdown />
+        </Dropdown>
+        <NavLi href="/fuelModels">Fuel Models</NavLi>
+        <NavLi href="/about">About</NavLi>
+        <NavLi href="/tutorial">Tutorial</NavLi>
+        <NavLi href="/climate">Climate</NavLi>
+        <ValidationModal bind:openValidationModal />
+      </NavUl>
+          {/snippet}
+    </Navbar>
 </header>
 <Drawer
   transitionType="fly"
@@ -223,40 +232,50 @@
     >
       <SidebarGroup>
         <SidebarItem label="Home" href="/">
-          <svelte:fragment slot="icon">
-            <HomeOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          </svelte:fragment>
+          {#snippet icon()}
+                  
+              <HomeOutline
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              />
+            
+                  {/snippet}
         </SidebarItem>
         <SidebarItem label="Fuel Models" href="/fuelModels">
-          <svelte:fragment slot="icon">
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          </svelte:fragment>
+          {#snippet icon()}
+                  
+              <ColumnOutline
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              />
+            
+                  {/snippet}
         </SidebarItem>
         <SidebarItem label="About" href="/about">
-          <svelte:fragment slot="icon">
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          </svelte:fragment>
+          {#snippet icon()}
+                  
+              <ColumnOutline
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              />
+            
+                  {/snippet}
         </SidebarItem>
         <SidebarItem label="Tutorial" href="/tutorial">
-          <svelte:fragment slot="icon">
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          </svelte:fragment>
+          {#snippet icon()}
+                  
+              <ColumnOutline
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              />
+            
+                  {/snippet}
         </SidebarItem>
         <ValidationModal bind:openValidationModal />
         <SidebarDropdownWrapper label="Settings">
-          <svelte:fragment slot="icon">
-            <AdjustmentsHorizontalSolid
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          </svelte:fragment>
+          {#snippet icon()}
+                  
+              <AdjustmentsHorizontalSolid
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              />
+            
+                  {/snippet}
           <DropdownDivider></DropdownDivider>
 
           <SettingsDropdown></SettingsDropdown>
@@ -271,9 +290,9 @@
     <!--   >Private page user: {$authStore.currentUser.displayName} -->
     <!-- </heading> -->
     <!-- <AuthReset /> -->
-    <slot />
+    {@render children?.()}
   {:else if browser && !$authStore.isLoading}
-    <slot />
+    {@render children?.()}
   {:else}
     <div class="flex items-center justify-center h-screen">
       <Spinner size={8} />

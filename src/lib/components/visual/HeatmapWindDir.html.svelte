@@ -4,17 +4,23 @@
     currentTimeIndex,
     focusDayIndex,
   } from "$lib/shared/stores/forecastStore";
-  /** @type {number} cellSize - heatmap cell size in px */
-  export let cellSize;
+  
 
-  /** @type {Array} Weather forecast - array with objects containing hourly weather forecasts. */
-  export let forecastData;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {number} cellSize - heatmap cell size in px
+   * @property {Array} forecastData
+   */
 
-  $: isSelectedClass = (x) => {
+  /** @type {Props} */
+  let { cellSize, forecastData } = $props();
+
+  let isSelectedClass = $derived((x) => {
     return $currentTimeIndex == x
       ? "text-2xl font-bold text-neutral-500"
       : "text-xl text-neutral-400";
-  };
+  });
 </script>
 
 <div
@@ -22,7 +28,7 @@
   style:height={cellSize + "px"}
   style:top={5 * cellSize + "px"}
 >
-  <div class="flex justify-end overflow text-right items-center" />
+  <div class="flex justify-end overflow text-right items-center"></div>
 
   {#each forecastData["wind_direction_10m"].slice($focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0], $focusDayIndex[1] < 0 ? forecastData.length : $focusDayIndex[1]) as dataObject, x}
     <div
@@ -31,7 +37,7 @@
       style:width={cellSize + "px"}
     >
       <div class={isSelectedClass(x)}>
-        <i class="wi wi-wind from-{Math.round(dataObject)}-deg" />
+        <i class="wi wi-wind from-{Math.round(dataObject)}-deg"></i>
       </div>
     </div>
   {/each}

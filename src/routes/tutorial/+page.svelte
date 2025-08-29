@@ -26,7 +26,7 @@
   import flameTable from "$lib/assets/flameTable.webp";
   import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
 
-  let width;
+  let width = $state();
 </script>
 
 <div class="max-w-80 mx-auto items-center overflow-hidden md:max-w-2xl pt-10">

@@ -9,8 +9,14 @@
 
   const { data, width, yScale, xScale, z } = getContext("LayerCake");
 
-  /** @type {Number} [offset=-20] - A y-offset from the hover point, in pixels. */
-  export let offset = -20;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Number} [offset] - A y-offset from the hover point, in pixels.
+   */
+
+  /** @type {Props} */
+  let { offset = -20 } = $props();
 
   const w = 150;
   const w2 = w / 2;
@@ -30,27 +36,29 @@
   }
 </script>
 
-<QuadTree dataset={$data} y="y" let:x let:y let:visible let:found let:e>
-  {@const foundSorted = sortResult(found)}
-  {#if visible === true}
-    <div
-      class="absolute text-sm border border-gray-300 bg-white rounded-lg shadow-md p-2"
-      style="
-        width:{w}px;
-        display: {visible ? 'block' : 'none'};
-        top:{$yScale(foundSorted.y1) + offset}px;
-        left:{$xScale(foundSorted.x1) + -4 * offset}px;
-        transform: {getTranslation(foundSorted)};
+<QuadTree dataset={$data} y="y"     >
+  {#snippet children({ x, y, visible, found, e })}
+    {@const foundSorted = sortResult(found)}
+    {#if visible === true}
+      <div
+        class="absolute text-sm border border-gray-300 bg-white rounded-lg shadow-md p-2"
+        style="
+          width:{w}px;
+          display: {visible ? 'block' : 'none'};
+          top:{$yScale(foundSorted.y1) + offset}px;
+          left:{$xScale(foundSorted.x1) + -4 * offset}px;
+          transform: {getTranslation(foundSorted)};
 
-      "
-    >
-      <span class="key"
-        >{format(fromUnixTime(foundSorted.date * 0.001), "yyyy-MM-dd")}
-        <br />
-        VPD: {$z(foundSorted).toFixed(1)} (kPa)</span
+        "
       >
-    </div>
-  {/if}
+        <span class="key"
+          >{format(fromUnixTime(foundSorted.date * 0.001), "yyyy-MM-dd")}
+          <br />
+          VPD: {$z(foundSorted).toFixed(1)} (kPa)</span
+        >
+      </div>
+    {/if}
+  {/snippet}
 </QuadTree>
 
 <style>

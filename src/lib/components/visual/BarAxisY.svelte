@@ -13,29 +13,40 @@
   const { padding, height, xRange, yRange, yScale, y } =
     getContext("LayerCake");
 
-  /** @type {Boolean} [gridlines=true] - Extend lines from the ticks into the chart space */
-  export let gridlines = true;
+  
 
-  /** @type {Boolean} [tickMarks=false] - Show a vertical mark for each tick. */
-  export let tickMarks = false;
+  
 
-  /** @type {Function} [formatTick=d => d] - A function that passes the current tick value and expects a nicely formatted value in return. */
-  export let formatTick = (d) => d;
+  
 
-  /** @type {Number|Array|Function} [ticks=4] - If this is a number, it passes that along to the [d3Scale.ticks](https://github.com/d3/d3-scale) function. If this is an array, hardcodes the ticks to those values. If it's a function, passes along the default tick values and expects an array of tick values in return. */
-  export let ticks = 4;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Boolean} [gridlines] - Extend lines from the ticks into the chart space
+   * @property {Boolean} [tickMarks] - Show a vertical mark for each tick.
+   * @property {Function} [formatTick] - A function that passes the current tick value and expects a nicely formatted value in return.
+   * @property {Number|Array|Function} [ticks] - If this is a number, it passes that along to the [d3Scale.ticks](https://github.com/d3/d3-scale) function. If this is an array, hardcodes the ticks to those values. If it's a function, passes along the default tick values and expects an array of tick values in return.
+   */
+
+  /** @type {Props} */
+  let {
+    gridlines = true,
+    tickMarks = false,
+    formatTick = (d) => d,
+    ticks = 4
+  } = $props();
 
   const tickLen = 5;
-  $: isBandwidth = typeof $yScale.bandwidth === "function";
+  let isBandwidth = $derived(typeof $yScale.bandwidth === "function");
 
-  $: tickVals = Array.isArray(ticks)
+  let tickVals = $derived(Array.isArray(ticks)
     ? ticks
     : isBandwidth
       ? $yScale.domain()
       : typeof ticks === "function"
         ? ticks($yScale.ticks())
-        : $yScale.ticks(ticks);
-  let clickOutsideModal = false;
+        : $yScale.ticks(ticks));
+  let clickOutsideModal = $state(false);
 
   function handleFuelClick(fuel) {
     $selectedFuel = fuel;
@@ -63,7 +74,7 @@
       <div
         class="pr-2"
         role="button"
-        on:click={() => handleFuelClick(fuel)}
+        onclick={() => handleFuelClick(fuel)}
         data-id={i}
         transform="translate(-60px, {$yScale.step() * i + 30})"
       >

@@ -14,35 +14,49 @@
   import { fuelCodeFormat } from "$lib/shared/utils.js";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
 
-  /** @type {Array} annotations - A list of annotation objects. */
-  export let weatherProps;
+  
 
-  /** @type {number} cellSize - heatmap cell size in px */
-  export let cellSize;
+  
 
-  /** @type {number} gapSize - gap between weather and fire behaviour heatmaps
-   * in units of cellSize. */
-  export let gapSize;
+  
 
-  export let forecastData;
 
-  /** @type {string} Selectede fire behaviour, y axis label. */
-  export let axisLabel;
+  
 
-  /** @type {string} Forecast model. */
-  export let forecastLabel;
+  
 
-  /** @type {boolean} Selecteded fire behaviour output type (per fuel or common
-   * to all fuels). */
-  export let commonOutput;
+  
 
-  /** @type {number} leftMargin - annotation (y axis) element width in px. */
-  export let leftMargin;
+  
 
-  /** @type {number} topMargin - annotation (y axis) element width in px. */
-  export let topMargin;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Array} weatherProps - A list of annotation objects.
+   * @property {number} cellSize - heatmap cell size in px
+   * @property {number} gapSize - gap between weather and fire behaviour heatmaps
+   * @property {any} forecastData
+   * @property {string} axisLabel
+   * @property {string} forecastLabel
+   * @property {boolean} commonOutput
+   * @property {number} leftMargin - annotation (y axis) element width in px.
+   * @property {number} topMargin - annotation (y axis) element width in px.
+   */
 
-  let clickOutsideModal = false;
+  /** @type {Props} */
+  let {
+    weatherProps,
+    cellSize,
+    gapSize,
+    forecastData,
+    axisLabel,
+    forecastLabel,
+    commonOutput,
+    leftMargin,
+    topMargin
+  } = $props();
+
+  let clickOutsideModal = $state(false);
 
   function handleFuelClick(fuelObject) {
     $selectedFuel = $y(fuelObject);
@@ -58,7 +72,7 @@
   style:top="-{topMargin}px"
   style:height={cellSize + "px"}
 >
-  <div class="w-[{leftMargin}px]" />
+  <div class="w-[{leftMargin}px]"></div>
   <div class="pl-2 text-xl">
     {forecastLabel}
   </div>
@@ -101,14 +115,14 @@
   >
 {/each}
 <div class="absolute items-end min-w-96 p-1" style:left="95px">
-  <div class="" />
+  <div class=""></div>
   <SelectOutput />
 </div>
 <div
   class="flex columns-2 items-end min-w-64 p-1"
   style:height={cellSize * gapSize + "px"}
 >
-  <div class="w-[{leftMargin}px]" />
+  <div class="w-[{leftMargin}px]"></div>
 </div>
 <div class="flex justify-end">
   <div class="text-right justify-end pr-2 pl-2">
@@ -116,7 +130,7 @@
       <div
         class="flex justify-end overflow align-middle"
         role="button"
-        on:click={() => handleFuelClick(fuelObject)}
+        onclick={() => handleFuelClick(fuelObject)}
         data-id={i}
         style:left={cellSize / 2 + "px"}
         style:top={cellSize * i + "px"}

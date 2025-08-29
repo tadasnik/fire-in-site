@@ -11,7 +11,7 @@
 
   const formatTickX = timeFormat("%b. %e");
   // $: console.log("Multiline data", $data);
-  $: path = (values) => {
+  let path = $derived((values) => {
     return (
       "M" +
       values
@@ -20,7 +20,7 @@
         })
         .join("L")
     );
-  };
+  });
 </script>
 
 <g class="line-group">

@@ -1,4 +1,6 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { LayerCake, Svg, Html } from "layercake";
   import { scaleLinear, scaleSequential } from "d3-scale";
   import {
@@ -15,9 +17,24 @@
   import { xFromPolar, yFromPolar, cartesianFromPolarRad } from "./utils.js";
   import { currentLocation } from "$lib/shared/stores/locationStore.js";
 
-  export let data = [];
-  export let z = "vapour_pressure_deficit";
-  export let parentWidth, parentHeight;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [data]
+   * @property {string} [z]
+   * @property {any} parentWidth
+   * @property {any} parentHeight
+   */
+
+  /** @type {Props} */
+  let {
+    data = [],
+    z = "vapour_pressure_deficit",
+    parentWidth,
+    parentHeight,
+  } = $props();
+  run(() => {
+    console.log("Spiral width and height", parentWidth, parentHeight);
+  });
 
   //Rotate the spiral so that mid-January is align with y axis
   // const angleRotate = 360 / 4.8;
@@ -30,8 +47,12 @@
   const angleRotate = (-90 + (365 - doyToday) * (360 / 365)) * (Math.PI / 180); //360 / 4.8;
 
   const minSpiralSize = 500;
-  $: minParentDim = parentWidth < parentHeight ? parentWidth : parentHeight;
-  $: minDim = minParentDim < minSpiralSize ? minSpiralSize : minParentDim;
+  let minParentDim = $derived(
+    parentWidth < parentHeight ? parentWidth : parentHeight,
+  );
+  let minDim = $derived(
+    minParentDim < minSpiralSize ? minSpiralSize : minParentDim,
+  );
 
   //days for a full cycle
   const fullCycle = 365;
@@ -98,6 +119,7 @@
       <AxesLines {polarProps} />
     </Svg>
     <Legend {z}>
+      <!-- @migration-task: migrate this slot by hand, `legend-title` is an invalid identifier -->
       <span slot="legend-title">
         <h2>Vapour pressure deficit</h2>
         <h2>

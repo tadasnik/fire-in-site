@@ -7,7 +7,7 @@
   const { width, height, xDomain, xScale, yScale, data } =
     getContext("LayerCake");
 
-  export let polarProps = {};
+  let { polarProps = {} } = $props();
 
   const range = (start, stop, step) =>
     Array.from(
@@ -23,7 +23,7 @@
 
   const yearLabelAngle = $yScale(16);
 
-  $: years = yearsIn.map((year) => {
+  let years = $derived(yearsIn.map((year) => {
     let yearDate = new Date(year, 0, 17);
     const distance = polarProps.radiusScale(getTime(yearDate));
     const angle =
@@ -35,7 +35,7 @@
       x: $xScale(x),
       y: $yScale(y),
     };
-  });
+  }));
 </script>
 
 <div class="">

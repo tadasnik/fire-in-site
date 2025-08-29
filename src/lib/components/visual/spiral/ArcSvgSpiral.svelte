@@ -5,7 +5,7 @@
   import { xFromPolar, yFromPolar } from "./utils.js";
   import { cartesianFromPolarRad } from "./utils.js";
 
-  export let polarProps = {};
+  let { polarProps = {} } = $props();
 
   const { xScale, yScale, zGet, data } = getContext("LayerCake");
 
@@ -30,10 +30,10 @@
   //   };
   // });
 
-  $: cycleDistance =
-    Math.abs($xScale($data[365].dist) - $xScale($data[0].dist)) * 0.9;
+  let cycleDistance =
+    $derived(Math.abs($xScale($data[365].dist) - $xScale($data[0].dist)) * 0.9);
 
-  $: getArc = (d) => {
+  let getArc = $derived((d) => {
     return [
       "M",
       $xScale(d.x1),
@@ -47,7 +47,7 @@
       $xScale(d.x2),
       $yScale(d.y2),
     ].join(" ");
-  };
+  });
 </script>
 
 <g>

@@ -6,9 +6,15 @@
     selectedOutputs,
   } from "$lib/shared/stores/modelStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
-  $: outputs = [...$selectedOutputs, "crown.fire.transition.minBaseHeight"];
-  // $: console.log(outputNodes);
-  export let clickOutsideModal;
+  let outputs = $derived([...$selectedOutputs, "crown.fire.transition.minBaseHeight"]);
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} clickOutsideModal - $: console.log(outputNodes);
+   */
+
+  /** @type {Props} */
+  let { clickOutsideModal = $bindable() } = $props();
   function showDescription() {}
 </script>
 

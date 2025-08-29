@@ -17,58 +17,58 @@
 
   const { xScale, percentRange } = getContext("LayerCake");
 
-  /** @type {Boolean} [tickMarks=false] - Show a vertical mark for each tick. */
-  export let tickMarks = true;
+  /**
+   * @typedef {Object} Props
+   * @property {Boolean} [tickMarks] - Show a vertical mark for each tick.
+   * @property {Boolean} [gridlines] - Show gridlines extending into the chart area.
+   * @property {Number} [tickMarkLength] - The length of the tick mark.
+   * @property {Boolean} [baseline]
+   * @property {Boolean} [snapLabels] - Instead of centering the text labels on the first and the last items, align them to the edges of the chart.
+   * @property {Function} [format] - A function that passes the current tick value and expects a nicely formatted value in return.
+   * @property {Number|Array|Function} [ticks] - If this is a number, it passes that along to the [d3Scale.ticks](https://github.com/d3/d3-scale) function. If this is an array, hardcodes the ticks to those values. If it's a function, passes along the default tick values and expects an array of tick values in return. If nothing, it uses the default ticks supplied by the D3 function.
+   * @property {Number} [tickGutter] - The amount of whitespace between the start of the tick and the chart drawing area (the yRange min).
+   * @property {Number} [dx] - Any optional value passed to the `dx` attribute on the text label.
+   * @property {Number} [dy] - Any optional value passed to the `dy` attribute on the text label.
+   * @property {String} units - Whether this component should use percentage or pixel values. If `percentRange={true} [units] - Whether this component should use percentage or pixel values. If `percentRange={true}` it defaults to `'%'`. Options: `'%'` or `'px'`.
+   */
 
-  /** @type {Boolean} [gridlines=true] - Show gridlines extending into the chart area. */
-  export let gridlines = false;
-
-  /** @type {Number} [tickMarkLength=6] - The length of the tick mark. */
-  export let tickMarkLength = 6;
-
-  /** @type {Boolean} [baseline=false] – Show a solid line at the bottom. */
-  export let baseline = false;
-
-  /** @type {Boolean} [snapLabels=false] - Instead of centering the text labels on the first and the last items, align them to the edges of the chart. */
-  export let snapLabels = false;
-
-  /** @type {Function} [format=d => d] - A function that passes the current tick value and expects a nicely formatted value in return. */
-  export let format = (d) => d;
-
-  /** @type {Number|Array|Function} [ticks] - If this is a number, it passes that along to the [d3Scale.ticks](https://github.com/d3/d3-scale) function. If this is an array, hardcodes the ticks to those values. If it's a function, passes along the default tick values and expects an array of tick values in return. If nothing, it uses the default ticks supplied by the D3 function. */
-  export let ticks = undefined;
-
-  /** @type {Number} [tickGutter=0] - The amount of whitespace between the start of the tick and the chart drawing area (the yRange min). */
-  export let tickGutter = 0;
-
-  /** @type {Number} [dx=0] - Any optional value passed to the `dx` attribute on the text label. */
-  export let dx = 0;
-
-  /** @type {Number} [dy=0] - Any optional value passed to the `dy` attribute on the text label. */
-  export let dy = 0;
-
-  /** @type {String} units - Whether this component should use percentage or pixel values. If `percentRange={true}` it defaults to `'%'`. Options: `'%'` or `'px'`. */
-  export let units = $percentRange === true ? "%" : "px";
+  /** @type {Props} */
+  let {
+    tickMarks = true,
+    gridlines = false,
+    tickMarkLength = 6,
+    baseline = false,
+    snapLabels = false,
+    format = (d) => d,
+    ticks = undefined,
+    tickGutter = 0,
+    dx = 0,
+    dy = 0,
+    units = $percentRange === true ? "%" : "px",
+  } = $props();
 
   const formatHour = timeFormat("%H");
   const formatDay = timeFormat("%a");
-  $: tickLen = tickMarks === true ? tickMarkLength ?? 6 : 0;
+  let tickLen = $derived(tickMarks === true ? (tickMarkLength ?? 6) : 0);
 
-  $: isBandwidth = typeof $xScale.bandwidth === "function";
+  let isBandwidth = $derived(typeof $xScale.bandwidth === "function");
 
-  $: isSelectedClass = (d) => {
+  let isSelectedClass = $derived((d) => {
     return d == $dateTime ? "font-bold text-primary-500" : "";
-  };
+  });
 
-  $: tickVals = Array.isArray(ticks)
-    ? ticks
-    : isBandwidth
-    ? $xScale.domain()
-    : typeof ticks === "function"
-    ? ticks($xScale.ticks())
-    : $xScale.ticks(ticks);
+  let tickVals = $derived(
+    Array.isArray(ticks)
+      ? ticks
+      : isBandwidth
+        ? $xScale.domain()
+        : typeof ticks === "function"
+          ? ticks($xScale.ticks())
+          : $xScale.ticks(ticks),
+  );
 
-  $: halfBand = isBandwidth ? $xScale.bandwidth() / 2 : 0;
+  let halfBand = $derived(isBandwidth ? $xScale.bandwidth() / 2 : 0);
+
   function executeClick(e) {
     if ($timeMode === "current") {
       $timeMode = "user";
@@ -82,7 +82,7 @@
     {@const tickValUnits = $xScale(tick)}
 
     {#if baseline === true}
-      <div class="baseline" style="top:0; width:100%;" />
+      <div class="baseline" style="top:0; width:100%;"></div>
     {/if}
 
     {#if gridlines === true}
@@ -90,7 +90,7 @@
         class="gridline"
         style:left="{tickValUnits}{units}"
         style="top:0; bottom:0;"
-      />
+      ></div>
     {/if}
     {#if tickMarks === true}
       <div
@@ -98,7 +98,7 @@
         style:left="{tickValUnits + halfBand}{units}"
         style:height="{tickLen}px"
         style:top="{-tickLen - tickGutter}px"
-      />
+      ></div>
     {/if}
     <div
       class="tick tick-{i} "
@@ -107,10 +107,10 @@
     >
       <div
         class="flex-col grow -space-y-1 text-center align-middle {isSelectedClass(
-          tick
+          tick,
         )} hover:font-bold"
         role="button"
-        on:click={executeClick(tick)}
+        onclick={() => executeClick(tick)}
         style:transform={`translate(calc(-50% + ${dx}px), calc(-${
           tick === $dateTime ? 130 : 110
         }% + ${dy}px))`}

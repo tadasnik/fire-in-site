@@ -2,12 +2,12 @@
   import { Input, Label, Helper, Button } from "flowbite-svelte";
   import { authHandlers, authStore } from "$lib/shared/stores/authStore";
 
-  let register = false;
-  let displayName = "";
-  let email = "";
-  let password = "";
-  let confirmPassword = "";
-  let success = undefined;
+  let register = $state(false);
+  let displayName = $state("");
+  let email = $state("");
+  let password = $state("");
+  let confirmPassword = $state("");
+  let success = $state(undefined);
 
   async function handleSubmit() {
     if (
@@ -119,14 +119,14 @@
           <button
             type="submit"
             class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            on:click={handleSubmit}>Sign in</button
+            onclick={handleSubmit}>Sign in</button
           >
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
             {#if !register}
               Don’t have an account yet?
               <a
                 role="button"
-                on:click={() => {
+                onclick={() => {
                   register = true;
                 }}
                 class="font-medium text-primary-600 hover:underline dark:text-primary-500"
@@ -137,7 +137,7 @@
 
               <a
                 role="button"
-                on:click={() => {
+                onclick={() => {
                   register = false;
                 }}
                 class="font-medium text-primary-600 hover:underline dark:text-primary-500"

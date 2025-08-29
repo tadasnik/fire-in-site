@@ -23,16 +23,27 @@
     yRange,
   } = getContext("LayerCake");
 
-  export let data;
 
-  /** @type {Number} [r=5] – The circle's radius. */
-  export let r = 10;
+  
 
-  /** @type {String} [stroke='#000'] – The circle's stroke color. */
-  export let stroke = "#000";
+  
 
-  /** @type {Number} [strokeWidth=0] – The circle's stroke width. */
-  export let strokeWidth = 1;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} data
+   * @property {Number} [r]
+   * @property {String} [stroke]
+   * @property {Number} [strokeWidth]
+   */
+
+  /** @type {Props} */
+  let {
+    data,
+    r = 10,
+    stroke = "#000",
+    strokeWidth = 1
+  } = $props();
 
   const dispatch = createEventDispatcher();
   const images = import.meta.glob(["$lib/assets/bars_background/**.webp"], {

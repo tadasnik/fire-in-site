@@ -10,38 +10,52 @@ your x-scale is an ordinal scale. If so, it will place the markers in the middle
 
   const { zDomain } = getContext("LayerCake");
 
-  /** @type {Number} [width=100] - Width of the parrent div */
-  export let width = 100;
+  
 
-  /** @type {Number} [height=10] - Height of the parrent div */
-  export let height = 10;
+  
 
-  /** @type {Boolean} [tickMarks=false] - Show a vertical mark for each tick. */
-  export let tickMarks = true;
+  
 
-  /** @type {Boolean} [baseline=false] – Show a solid line at the bottom. */
-  export let baseline = true;
+  
 
-  /** @type {Boolean} [snapTicks=false] - Instead of centering the text on the first and the last items, align them to the edges of the chart. */
-  export let snapTicks = false;
+  
 
-  /** @type {Number} [xTick=0] - How far over to position the text marker. */
-  export let xTick = 0;
+  
 
-  /** @type {Number} [tickNumber=5] - How far over to position the text marker. */
-  export let tickNumber = 5;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {Number} [width] - Width of the parrent div
+   * @property {Number} [height] - Height of the parrent div
+   * @property {Boolean} [tickMarks] - Show a vertical mark for each tick.
+   * @property {Boolean} [baseline]
+   * @property {Boolean} [snapTicks] - Instead of centering the text on the first and the last items, align them to the edges of the chart.
+   * @property {Number} [xTick] - How far over to position the text marker.
+   * @property {Number} [tickNumber] - How far over to position the text marker.
+   */
 
-  $: axisScale = scaleLinear([0, $zDomain[1]], [0, width]);
-  $: isBandwidth = typeof axisScale.bandwidth === "function";
+  /** @type {Props} */
+  let {
+    width = 100,
+    height = 10,
+    tickMarks = true,
+    baseline = true,
+    snapTicks = false,
+    xTick = 0,
+    tickNumber = 5
+  } = $props();
 
-  $: xTicks = ticks($zDomain[0], $zDomain[1], tickNumber);
-  $: tickVals = Array.isArray(xTicks)
+  let axisScale = $derived(scaleLinear([0, $zDomain[1]], [0, width]));
+  let isBandwidth = $derived(typeof axisScale.bandwidth === "function");
+
+  let xTicks = $derived(ticks($zDomain[0], $zDomain[1], tickNumber));
+  let tickVals = $derived(Array.isArray(xTicks)
     ? xTicks
     : isBandwidth
     ? axisScale.domain()
     : typeof xTicks === "function"
     ? xTicks(axisScale.ticks())
-    : axisScale.ticks(xTicks);
+    : axisScale.ticks(xTicks));
 
   function textAnchor(i) {
     if (snapTicks === true) {

@@ -50,9 +50,8 @@ export async function fetchForecastMeteo(params: {
     weatherData[variable] = hourly.variables(nr)!.valuesArray()!
   }
 
-  // console.log("openMeteo weatherData", weatherData)
   if ((params.forecast_model === "ukmo_seamless") && (params.forecastDays > 2) && (params.forecastMode === "forecast")) {
-    console.log("openMeteo fetching gti")
+    // console.log("openMeteo fetching gti")
     const gti = await fetchForecastMeteo({ ...params, forecast_model: "icon_seamless", hourlyVars: ["global_tilted_irradiance"] })
     for (let [nr, value] of weatherData["global_tilted_irradiance"].entries()) {
       if (Number.isNaN(value)) {
