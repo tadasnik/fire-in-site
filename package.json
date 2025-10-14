@@ -17,7 +17,7 @@
     "@sveltejs/kit": "latest",
     "@sveltejs/vite-plugin-svelte": "latest",
     "autoprefixer": "^10.4.20",
-    "firebase": "^10.13.0",
+    "firebase": "latest",
     "flowbite": "^2.5.2",
     "flowbite-svelte": "^0.46.23",
     "postcss": "^8.4.41",
