@@ -24,7 +24,7 @@
     $fetchingForecast = true;
     let dateTime = new Date(
       $historicalYear,
-      $historicalMonth - 1,
+      $historicalMonth,
       $historicalDay,
       12,
     );
@@ -60,7 +60,7 @@
       />
     </div>
   {/if}
-  {#if $historicalYear && $historicalMonth}
+  {#if typeof $historicalMonth === "number"}
     <div>
       <Select
         id="select-day"

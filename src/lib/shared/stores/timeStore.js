@@ -66,7 +66,8 @@ export const focusDay = derived([currentDateTime], ([$currentDateTime]) => {
 export const month = derived(
   [currentDateTime],
   ([$currentDateTime]) => {
-    return $currentDateTime.getMonth() + 1;
+    console.log("deriving current month", $currentDateTime.getMonth());
+    return $currentDateTime.getMonth();
   })
 
 export const hour = derived(
@@ -93,10 +94,11 @@ export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
     let months = [];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     monthNames.forEach((month, i) => {
-      months.push({ value: i + 1, name: month });
+      months.push({ value: i, name: month });
     })
+    console.log("monthNames", monthNames);
     if ($historicalYear === get(currentYear)) {
-      return months.slice(0, get(currentDate).getMonth() + 1)
+      return months.slice(0, get(currentDate).getMonth())
     } else {
       return months
     }
@@ -106,16 +108,17 @@ export const monthOptions = derived([historicalYear], ([$historicalYear]) => {
 export const dayOptions = derived([historicalYear, historicalMonth], ([$historicalYear, $historicalMonth]) => {
   const daysInHistoryMonth = new Date(
     $historicalYear,
-    $historicalMonth - 1,
-    0,
+    $historicalMonth + 1,
+    0
   ).getDate();
-
+  console.log("historical month, daysInHistoryMonth", $historicalMonth, daysInHistoryMonth);
   const days = Array.from({ length: daysInHistoryMonth }, (_, i) => i + 1);
+  console.log("days", days);
   const daysOb = days.map((day) => {
     return { value: day, name: day };
   });
 
-  if ($historicalYear === get(currentYear) && $historicalMonth === get(currentDate).getMonth() + 1) {
+  if ($historicalYear === get(currentYear) && $historicalMonth === get(currentDate).getMonth()) {
     return daysOb.slice(0, get(currentDate).getDate())
   } else {
     return daysOb
@@ -127,7 +130,7 @@ export const historicalDate = derived([historicalYear, historicalMonth, historic
   if (isNaN($historicalYear) || isNaN($historicalMonth) || isNaN($historicalDay)) {
     return false
   } else {
-    const histDate = new Date($historicalYear, $historicalMonth - 1, $historicalDay, 12, 0)
+    const histDate = new Date($historicalYear, $historicalMonth, $historicalDay, 12, 0)
     if (histDate < new Date(1970, 0, 1, 12, 0)) {
       return false
     } else if (histDate > new Date()) {
