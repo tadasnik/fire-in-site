@@ -36,6 +36,7 @@
   //define colour scales
   const scaleTemp = scaleSequential(interpolatePuOr).domain([0, 30]);
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
+  const scaleVPD = scaleSequential(interpolateReds).domain([0, 3]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([50, 0]);
   const scaleProb = scaleSequential(interpolateRdYlGn).domain([60, 0]);
@@ -65,6 +66,16 @@
       "Rel. Hum. (%)",
       "Relative humidity",
     ],
+    vapour_pressure_deficit: [
+      "screenRelativeHumidity",
+      "wi wi-humidity",
+      scaleVPD,
+      1,
+      [0, 2],
+      "VPD (kPa)",
+      "Vapour pressure deficit",
+    ],
+
     precipitation: [
       "totalPrecipAmount",
       "wi wi-rain",
@@ -172,18 +183,24 @@
   // };
 
   // $: console.log("Selected output", $selectedOutput);
-  let fireBehaviourData = $derived($_outputForecastArray.slice(
-    $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
-    $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
-  ));
+  let fireBehaviourData = $derived(
+    $_outputForecastArray.slice(
+      $focusDayIndex[0] < 0 ? 0 : $focusDayIndex[0],
+      $focusDayIndex[1] < 0 ? $_outputForecastArray.length : $focusDayIndex[1],
+    ),
+  );
   // $: console.log("forecastOpenMeteo", $forecastOpenMeteo);
 
   let forecastData = $derived($forecastOpenMeteo);
-  let seriesNames = $derived(Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey));
-  let groupedData = $derived(groupLonger(fireBehaviourData, seriesNames, {
-    groupTo: yKey,
-    valueTo: zKey,
-  }));
+  let seriesNames = $derived(
+    Object.keys(fireBehaviourData[0]).filter((d) => d !== xKey),
+  );
+  let groupedData = $derived(
+    groupLonger(fireBehaviourData, seriesNames, {
+      groupTo: yKey,
+      valueTo: zKey,
+    }),
+  );
 
   function formatTickXLong(tick) {
     let format = timeFormat("%H");
@@ -206,7 +223,7 @@
   let yCount = $derived(Object.keys(fireBehaviourData[0]).length);
   let chartHeight = $derived((yCountWeather + yCount) * cellSize + cellSize);
   let heatmapWidth = $derived(fireBehaviourData.length * cellSize);
-  
+
   // $: console.log("Heatmap fireBehaviourData data", $_outputForecastArray);
   // $: console.log("Heatmap forecast data", forecastData);
   // $: console.log("Heatmap output data", fireBehaviourData);

@@ -4,9 +4,7 @@
     currentTimeIndex,
     focusDayIndex,
   } from "$lib/shared/stores/forecastStore";
-  
 
-  
   /**
    * @typedef {Object} Props
    * @property {number} cellSize - heatmap cell size in px
@@ -26,7 +24,7 @@
 <div
   class="flex absolute"
   style:height={cellSize + "px"}
-  style:top={5 * cellSize + "px"}
+  style:top={6 * cellSize + "px"}
 >
   <div class="flex justify-end overflow text-right items-center"></div>
 
