@@ -1,23 +1,12 @@
 <script>
-  import {
-    Select,
-    Button,
-    Popover,
-    Label,
-    Spinner,
-    P,
-    Datepicker,
-  } from "flowbite-svelte";
+  import { Select, Button, Popover, Label, Spinner, P } from "flowbite-svelte";
 
   import {
-    dateTime,
     currentDateTime,
     historicalYear,
     historicalMonth,
     historicalDay,
     historicalDate,
-    focusDay,
-    timeMode,
     yearsOptions,
     monthOptions,
     dayOptions,
@@ -26,18 +15,7 @@
     getForecastOpenMeteo,
     fetchingForecast,
   } from "$lib/shared/stores/forecastStore.js";
-  import CurrentBehaviour from "./CurrentBehaviour.svelte";
-  import AirDatepicker from "$lib/components/ui/DatePicker.svelte";
 
-  let selectedDate = $state(undefined);
-  const minDate = new Date("1970-01-01");
-
-  const maxDate = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 6);
-    return d;
-  })();
-  let selected = null;
   function fetchHistoricalForecast() {
     $fetchingForecast = true;
     let dateTime = new Date(
