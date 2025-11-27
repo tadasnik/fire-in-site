@@ -14,6 +14,7 @@
     forecastMode,
     fetchingForecast,
   } from "$lib/shared/stores/forecastStore.js";
+  import { changedHistoricalDate } from "$lib/shared/stores/timeStore.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
   import CanopyControls from "$lib/components/ui/CanopyControls.svelte";
@@ -155,20 +156,22 @@
         </div>
       {/if}
 
-      {#if $fetchingForecast === false}
-        <div
-          class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
-        >
-          <Heatmap
-            xKey="time"
-            zKey={$selectedOutput}
-            yKey="surface.primary.fuel.model.catalogKey"
-          />
-        </div>
-        {#if $selectedOutput == "crown.fire.transition.minBaseHeight"}
-          <div class="p-2 mx-auto max-w-120">
-            <CanopyControls></CanopyControls>
+      {#if $changedHistoricalDate === true || $forecastMode === "forecast"}
+        {#if $fetchingForecast === false}
+          <div
+            class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
+          >
+            <Heatmap
+              xKey="time"
+              zKey={$selectedOutput}
+              yKey="surface.primary.fuel.model.catalogKey"
+            />
           </div>
+          {#if $selectedOutput == "crown.fire.transition.minBaseHeight"}
+            <div class="p-2 mx-auto max-w-120">
+              <CanopyControls></CanopyControls>
+            </div>
+          {/if}
         {/if}
       {/if}
     {/if}
