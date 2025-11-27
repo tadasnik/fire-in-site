@@ -51,9 +51,9 @@ export const climateOpenMeteo = writable([{
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
-export const forecastModel = writable('umo_seamless')
+export const forecastModel = writable('ukmo_seamless')
 export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
-{ 'value': 'ecmwf_ifs025', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 0.25 degree global model' },
+{ 'value': 'ecmwf_ifs', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 9km global model' },
 { 'value': 'icon_seamless', 'displayName': 'ICON', 'description': 'German Weather service (DWD) ICON model with 2km (central Europe), 7km (Europe) and 11km (global) resolution for central Europe, Europe and globe' }])
 export const fetchingForecast = writable(true)
 export const forecastDays = writable(5)
@@ -113,7 +113,12 @@ export function fillParams({
       start_date = getDateString(sub(get(currentDateTime), { days: get(forecastDaysPast) }))
     }
     if (end_date === undefined) { end_date = getDateString(get(currentDateTime)) }
-    return { ...baseParams, start_date, end_date };
+    return {
+      ...baseParams,
+      start_date,
+      end_date,
+      "models": "era5_seamless"
+    }
   }
 }
 
@@ -128,7 +133,7 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
     try {
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
-        // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
+        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
         result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
       } else {
         // console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
@@ -152,6 +157,7 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
       forecastOpenMeteo.set(resultMoist);
       fetchingForecast.set(false);
       // currentDateTime.set(dateTime);
+      console.log("get forecast result ;", result)
     } catch (error) {
       console.error("Error fetching forecast:", error);
       fetchingForecast.set(false);
@@ -165,7 +171,7 @@ export async function getHistory(hourlyVars = ['vapour_pressure_deficit'], start
     if (get(currentLocation).distanceFromPrevious > 4000) {
       // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious)
       // console.log("params in getHistory", fillParams(hourlyVars, 'historical', start_date, end_date))
-      result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode: "historical", start_date, end_date }));
+      result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode: "historical", start_date, end_date, }));
     } else {
       // result = await fetchForecastMeteo(fillParams(hourlyVars, 'historical', start_date, end_date));
     }

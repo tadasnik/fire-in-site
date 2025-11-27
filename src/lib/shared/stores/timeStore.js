@@ -1,5 +1,6 @@
 import { readable, writable, derived, get } from 'svelte/store'
 import { timeFormat } from 'd3-time-format'
+import { format } from 'date-fns'
 
 Date.prototype.subtractDays = function (days) {
   var date = new Date(this.valueOf());
@@ -41,6 +42,7 @@ export const currentDateTime = writable(
 )
 
 export const dateString = derived(currentDateTime, ($currentDateTime) => {
+  console.log('current datetime', $currentDateTime);
   return timeFormat('%Y-%m-%d')($currentDateTime)
 })
 
@@ -136,7 +138,15 @@ export const historicalDate = derived([historicalYear, historicalMonth, historic
     } else if (histDate > new Date()) {
       return false
     } else {
+      console.log("historical date", histDate);
       return histDate
     }
   }
+})
+
+export const changedHistoricalDate = derived([historicalDate, currentDateTime], ([$historicalDate, $currentDateTime]) => {
+  let fCurrent = format($currentDateTime, 'dd/MM/yyyy');
+  let fHistorical = format($historicalDate, 'dd/MM/yyyy');
+  console.log("comparing historical date and current date", fHistorical, fCurrent, fHistorical === fCurrent);
+  return fHistorical === fCurrent ? true : false
 })
