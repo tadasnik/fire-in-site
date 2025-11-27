@@ -100,9 +100,9 @@
     let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
     // console.log("slope", slope, "aspect", aspect);
     setCurrentLocation(longitude, latitude, elevation, slope, aspect);
-    if ($forecastMode === "forecast") {
-      getForecastOpenMeteo();
-    }
+    // if ($forecastMode === "forecast") {
+    getForecastOpenMeteo();
+    // }
   }
 
   function getWindCardinalDirection(windDir) {
