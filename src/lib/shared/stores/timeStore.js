@@ -68,7 +68,6 @@ export const focusDay = derived([currentDateTime], ([$currentDateTime]) => {
 export const month = derived(
   [currentDateTime],
   ([$currentDateTime]) => {
-    console.log("deriving current month", $currentDateTime.getMonth());
     return $currentDateTime.getMonth();
   })
 

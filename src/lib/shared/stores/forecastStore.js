@@ -78,7 +78,7 @@ export function fillParams({
   start_date = undefined,
   end_date = undefined,
   forecast_days = undefined,
-  forecast_days_past = undefined
+  forecast_days_past = undefined,
 } = {}) {
   // console.log("start_date, end_date in fillParams", start_date, end_date)
   if (forecast_mode === undefined) { forecast_mode = get(forecastMode) }

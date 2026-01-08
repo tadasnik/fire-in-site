@@ -78,6 +78,9 @@ export const siteInputsStore = writable({
   "site.wind.direction.source.fromNorth": 0,
 })
 
+export const monthIndex = derived([month], ([$month]) => {
+  return $month + 1
+})
 export function getFuelInputs(fuel, month) {
   const inputs = {}
   const fuelIns = get(fuelInputs)
@@ -93,10 +96,10 @@ export function getFuelInputs(fuel, month) {
   return inputs
 }
 
-export const fuelsInputs = derived([selectedFuels, month], ([$selectedFuels, $month]) => {
+export const fuelsInputs = derived([selectedFuels, monthIndex], ([$selectedFuels, $monthIndex]) => {
   const fuelsInputs = {}
   $selectedFuels.forEach((fuel) => {
-    const inputs = getFuelInputs(fuel, $month)
+    const inputs = getFuelInputs(fuel, $monthIndex)
     fuelsInputs[fuel] = inputs
   })
   return fuelsInputs
@@ -366,8 +369,8 @@ export const requiredSiteInputsForecastOpen = derived(
 );
 
 export const requiredFuelInputs = derived(
-  [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, month],
-  ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $month]) => {
+  [requiredInputs, selectedFuels, secondaryFuel, fuelInputs, monthIndex],
+  ([$requiredInputs, $selectedFuels, $secondaryFuel, $fuelInputs, $monthIndex]) => {
     const requiredFuelI = {}
     $selectedFuels.forEach((fuel) => {
       requiredFuelI[fuel] = {}
@@ -387,8 +390,8 @@ export const requiredFuelInputs = derived(
           splitKey[7] === 'herb' &&
           splitKey[8] === 'fraction'
         ) {
-          // console.log("live moisture input :", input, fuelMoisture[fuel][input][$month])
-          requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$month]]
+          // console.log("live moisture input :", $monthIndex, input, fuelMoisture[fuel][input][$monthIndex])
+          requiredFuelI[fuel][input] = [fuelMoisture[fuel][input][$monthIndex]]
         } else if (
           splitKey[0] === 'surface' &&
           splitKey[1] === 'secondary' &&
@@ -401,7 +404,7 @@ export const requiredFuelInputs = derived(
         ) {
           if (splitKey[splitKey.length - 1] === 'heatOfCombustion') {
             // heatOfCompustion varies by month and needs to be converted to J/kg from kJ/kg
-            requiredFuelI[fuel][input] = [$fuelInputs[fuel][input][$month] * 1000]
+            requiredFuelI[fuel][input] = [$fuelInputs[fuel][input][$monthIndex] * 1000]
             // console.log('heatOfCombustion :', requiredFuelI[fuel][input])
           } else {
             requiredFuelI[fuel][input] = [$fuelInputs[fuel][input]]

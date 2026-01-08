@@ -12,6 +12,7 @@ export async function fetchForecastMeteo(params: {
   end_date: string | undefined,
   forecast_mode: string | undefined,
   forecast_days: number | undefined,
+  timezone: string | undefined,
 }): Promise<any> {
 
   // console.log("fetchForecastMeteo params", params)
@@ -61,6 +62,7 @@ export async function fetchForecastMeteo(params: {
     }
   }
   weatherData["timeZone"] = timezone
+  console.log("timezone", timezone)
   return weatherData;
 }
 //     "latitude": latitude,
