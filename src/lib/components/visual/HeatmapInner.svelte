@@ -27,7 +27,7 @@
   const scaleHum = scaleSequential(interpolatePuOr).domain([99, 30]);
   const scalePrec = scaleSequential(interpolateBlues).domain([0, 2]);
   const scaleWind = scaleSequential(interpolateRdYlGn).domain([10, 0]);
-  
+
   /**
    * @typedef {Object} Props
    * @property {Function} cellSize - A function givn the canvas width and height as arguments and expects a return number that will be used as the width and height for each cell. The default will choose a size that fits seven cells across and five rows top to bottom.
@@ -38,13 +38,8 @@
    */
 
   /** @type {Props} */
-  let {
-    cellSize,
-    gapSize,
-    forecastData,
-    weatherProps,
-    modelOutputProps
-  } = $props();
+  let { cellSize, gapSize, forecastData, weatherProps, modelOutputProps } =
+    $props();
 
   let isSelectedClass = $derived((x) => {
     // console.log("isSelectedClass", x);
@@ -60,6 +55,7 @@
   const datasetsProps = [Object.keys(weatherProps).length, $data.length];
   // console.log("haetmap forecast DATA", forecastData);
   // console.log("focusDayIndex", $focusDayIndex);
+  // console.log("outProps", $selectedOutput, modelOutputProps);
 </script>
 
 {#each Object.entries(weatherProps) as [prop, values], i}
@@ -102,7 +98,7 @@
         ;stroke-width:.2;stroke:grey"
     />
     <!-- {#if (!modelOutputProps[$selectedOutput].showSmallVals && $z(object) > 0.05) || modelOutputProps[$selectedOutput].showSmallVals} -->
-    {#if modelOutputProps[$selectedOutput].showSmallVals && value != 0}
+    {#if modelOutputProps[$selectedOutput].showSmallVals && value > -1}
       <text
         x={j * cellSize + cellSize / 2}
         y={(datasetsProps[0] + gapSize + i) * cellSize + cellSize / 2}

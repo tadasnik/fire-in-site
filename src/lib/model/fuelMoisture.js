@@ -56,6 +56,9 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
       let forecastIndex = 0;
       for (let x = i; x < resultMoist.length; x = x + deadFuelsCount) {
         forecastIndex = forecastIndex + 1;
+        if (resultMoist[x] < 0) {
+          resultMoist[x] = 0
+        }
         if ((nelsonFFMCs[forecastIndex] > 30) && (resultMoist[x] < nelsonFFMCs[forecastIndex])) {
           values.push(nelsonFFMCs[forecastIndex]);
         } else {
