@@ -1,6 +1,7 @@
 import { readable, writable, derived, get } from 'svelte/store'
 import { timeFormat } from 'd3-time-format'
 import { format } from 'date-fns'
+//import { forecastUtcOffset } from '$lib/shared/stores/forecastStore'
 
 Date.prototype.subtractDays = function (days) {
   var date = new Date(this.valueOf());
@@ -14,6 +15,7 @@ export const currentYear = derived([currentDate], ([$currentDate]) => {
 })
 
 
+export const forecastUtcOffset = writable(0); // seconds
 export const historicalYear = writable()
 export const historicalMonth = writable()
 export const historicalDay = writable()
@@ -53,17 +55,34 @@ export const dateTime = derived(
     return 3600000 * (Math.round($currentDateTime / 3600000))
   }
 )
+export const focusDay = derived([currentDateTime, forecastUtcOffset], ([$currentDateTime, $forecastUtcOffset]) => {
+  // Convert current time to location-local time using the location's UTC offset
+  // $currentDateTime is a JS Date (machine-local), get the absolute epoch ms
+  console.log('current datetime, forecast forecastUtcOffset', $currentDateTime, $forecastUtcOffset);
+  const epochMs = $currentDateTime.valueOf();
+  console.log('epoch ms', epochMs);
+  // Shift to location-local time
+  const localMs = epochMs + ($forecastUtcOffset * 1000);
+  const localDate = new Date(localMs);
+  // Get midnight in location-local time (using UTC methods on the shifted date)
+  const midnightLocalMs =
+    Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
+  // Shift back to UTC epoch ms (this is what the time array uses)
+  console.log('focusDay', new Date(midnightLocalMs - ($forecastUtcOffset * 1000)));
+  return midnightLocalMs - ($forecastUtcOffset * 1000);
+});
 
-export const focusDay = derived([currentDateTime], ([$currentDateTime]) => {
-  const focusDate = new Date(
-    $currentDateTime.getFullYear(),
-    $currentDateTime.getMonth(),
-    $currentDateTime.getDate(),
-  ).setHours(0, 0, 0)
-
-  return focusDate
-  // return 3600000 * (Math.round(focusDate / 3600000))
-})
+// This is an alternative approach to calculating focusDay, which directly uses the machine-local date components without shifting. It may be more straightforward and less error-prone, but it assumes that the machine-local
+// time is the same as the location-local time, which may not always be true (e.g., if the user is in a different timezone than the forecast location).
+//export const focusDay2 = derived([currentDateTime, forecastUtcOffset], ([$currentDateTime, $forecastUtcOffset]) => {
+//  console.log('current datetime, forecast forecastUtcOffset', $currentDateTime, $forecastUtcOffset);
+//  const focusDate = new Date(
+//    $currentDateTime.getFullYear(),
+//    $currentDateTime.getMonth(),
+//    $currentDateTime.getDate(),
+//  ).setHours(0, 0, 0)
+//  return focusDate
+//})
 
 export const month = derived(
   [currentDateTime],
@@ -146,6 +165,6 @@ export const historicalDate = derived([historicalYear, historicalMonth, historic
 export const changedHistoricalDate = derived([historicalDate, currentDateTime], ([$historicalDate, $currentDateTime]) => {
   let fCurrent = format($currentDateTime, 'dd/MM/yyyy');
   let fHistorical = format($historicalDate, 'dd/MM/yyyy');
-  console.log("comparing historical date and current date", fHistorical, fCurrent, fHistorical === fCurrent);
+  // console.log("comparing historical date and current date", fHistorical, fCurrent, fHistorical === fCurrent);
   return fHistorical === fCurrent ? true : false
 })

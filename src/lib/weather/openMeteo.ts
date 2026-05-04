@@ -46,7 +46,8 @@ export async function fetchForecastMeteo(params: {
     "time": range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
       (t) => Number(3600000 * (Math.round(Number(new Date((t + utcOffsetSeconds) * 1000)) / 3600000))))
   }
-
+  //Store utc offset value for later use in time conversion of weather data
+  weatherData["utcOffsetSeconds"] = utcOffsetSeconds;
   for (let [nr, variable] of params.hourly.entries()) {
     weatherData[variable] = hourly.variables(nr)!.valuesArray()!
   }

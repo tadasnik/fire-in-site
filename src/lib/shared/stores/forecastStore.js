@@ -3,7 +3,7 @@ import { add, sub } from "date-fns";
 import { currentLocation } from '$lib/shared/stores/locationStore'
 import {
   dateTime, currentDateTime, differenceHours,
-  getMonth, dateString, focusDay, getDateString
+  getMonth, dateString, focusDay, getDateString, forecastUtcOffset
 } from '$lib/shared/stores/timeStore'
 import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
 import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
@@ -133,7 +133,7 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
     try {
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
-        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
+        // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
         result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
       } else {
         // console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
@@ -144,6 +144,8 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
         result["global_tilted_irradiance"] = gti["global_tilted_irradiance"]
       }
 
+      // Set utcOffsetSeconds
+      forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
       // Second promise
       const resultMoist = await fuelMoistureCalcs(
         result,
@@ -152,12 +154,11 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
         get(currentLocation).aspect,
         get(currentLocation).elevation,
       );
-
       // Update stores
       forecastOpenMeteo.set(resultMoist);
       fetchingForecast.set(false);
       // currentDateTime.set(dateTime);
-      console.log("get forecast result ;", result)
+      // console.log("get forecast result ;", result)
     } catch (error) {
       console.error("Error fetching forecast:", error);
       fetchingForecast.set(false);
