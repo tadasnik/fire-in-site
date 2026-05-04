@@ -55,6 +55,7 @@
     "mapbox-gl": "^3.6.0",
     "onnxruntime-web": "^1.19.2",
     "openmeteo": "^1.1.4",
+    "rollup": "^4.60.2",
     "vercel": "^41.0.3",
     "vite-plugin-commonjs": "^0.10.3"
   }
