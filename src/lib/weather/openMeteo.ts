@@ -15,9 +15,9 @@ export async function fetchForecastMeteo(params: {
   timezone: string | undefined,
 }): Promise<any> {
 
-  // console.log("fetchForecastMeteo params", params)
-
-  if (!params.forecast_mode) { params.forecast_mode = "forecast" }
+  // // console.log("fetchForecastMeteo params", params)
+  //
+  // if (!params.forecast_mode) { params.forecast_mode = "forecast" }
   const url = params.forecast_mode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
   const responses = await fetchWeatherApi(url, params)
 
@@ -39,8 +39,8 @@ export async function fetchForecastMeteo(params: {
 
   const hourly = response.hourly();
 
-  // console.log("openMeteo utcOffsetSeconds", utcOffsetSeconds)
-  // console.log("openMeteo timezone", timezone)
+  console.log("openMeteo utcOffsetSeconds", utcOffsetSeconds)
+  console.log("openMeteo timezone", timezone)
   // Note: The order of weather variables in the URL query and the indices below need to match!
   const weatherData = {
     "time": range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(

@@ -129,14 +129,14 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
   // const start_date = getDateString(date.subtractDays(past_days))
   // const end_date = getDateString(date);
   if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
-    // console.log("fetching forecast openMeteo")
+    console.log("fetching forecast openMeteo")
     try {
       let result = {}
       if (get(currentLocation).distanceFromPrevious > 4000) {
-        // console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
+        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
         result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
       } else {
-        // console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
+        console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
 
         hourlyVars = ["global_tilted_irradiance"]
         const gti = await fetchForecastMeteo(fillParams(["global_tilted_irradiance"], forecast_mode));
