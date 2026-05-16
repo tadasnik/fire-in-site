@@ -1,19 +1,16 @@
 import * as ort from 'onnxruntime-web';
-// use an async context to call onnxruntime functions.
+
+// numThreads=1 disables Emscripten pthread workers, which would otherwise be
+// spawned as classic blob-URL workers containing import.meta (ES module syntax
+// not valid in classic workers). wasmPaths points to the static directory that
+// holds both the .wasm and .mjs files onnxruntime-web needs at runtime.
+ort.env.wasm.numThreads = 1;
+ort.env.wasm.wasmPaths = '/wasm/';
+
 export async function deadFFMC(inputs) {
   try {
-    // create a new session and load the specific model.
-    //
-    // the model in this example contains a single MatMul node
-    // it has 2 inputs: 'a'(float32, 3x4) and 'b'(float32, 4x3)
-    // it has 1 output: 'c'(float32, 3x3)
     const modelUrl = "/wasm/model_onehot_dead.onnx";
-    const session = await ort.InferenceSession.create(modelUrl, {
-      wasm: {
-        wasmPaths: '/wasm/ort-wasm-simd-threaded.wasm',
-      }
-    }
-    )
+    const session = await ort.InferenceSession.create(modelUrl)
     // console.log('ONNX model loaded successfully', inputs);
     const dataA = Float32Array.from(inputs)
     const tensorA = new ort.Tensor('float32', dataA, [inputs.length / 18, 18]);
