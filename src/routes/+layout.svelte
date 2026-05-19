@@ -154,9 +154,9 @@
   let activeUrl = $derived($page.url.pathname);
   // $: console.log("layout activeURl", activeUrl);
 
-  let hidden1 = $state(true);
+  let drawerOpen = $state(false);
   const toggleDrawer = () => {
-    hidden1 = false;
+    drawerOpen = true;
   };
 
   // const dateFormat = timeFormat("%a %b %e, %H %p");
@@ -224,10 +224,10 @@
 <Drawer
   transitionType="fly"
   {transitionParams}
-  bind:hidden={hidden1}
+  bind:open={drawerOpen}
   id="sidebar1"
 >
-  <CloseButton on:click={() => (hidden1 = true)} class="mb-4 dark:text-white" />
+  <CloseButton onclick={() => (drawerOpen = false)} class="mb-4 dark:text-white" />
   <Sidebar>
     <SidebarWrapper
       divClass="overflow-y-auto py-4 px-3 rounded dark:bg-gray-800"
