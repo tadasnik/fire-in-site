@@ -3,7 +3,7 @@
 
   import { Modal, P, A } from "flowbite-svelte";
   import { ArrowRightOutline } from "flowbite-svelte-icons";
-  let { openValidationModal = $bindable() } = $props();
+  let { openValidationModal = $bindable(false) } = $props();
   function handleFuelClick() {
     console.log("clickOutsideModal parrent was", openValidationModal);
     openValidationModal = !openValidationModal;
@@ -13,7 +13,7 @@
   });
 </script>
 
-<A on:click={handleFuelClick}>User feedback</A>
+<A onclick={handleFuelClick}>User feedback</A>
 <Modal
   title="Submit flame length observations"
   form

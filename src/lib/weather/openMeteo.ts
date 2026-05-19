@@ -64,6 +64,7 @@ export async function fetchForecastMeteo(params: {
   }
   weatherData["timeZone"] = timezone
   console.log("timezone", timezone)
+  console.log("openMeteo weatherData", weatherData)
   return weatherData;
 }
 //     "latitude": latitude,

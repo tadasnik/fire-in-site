@@ -1,4 +1,4 @@
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/wasm';
 
 // numThreads=1 disables Emscripten pthread workers, which would otherwise be
 // spawned as classic blob-URL workers containing import.meta (ES module syntax

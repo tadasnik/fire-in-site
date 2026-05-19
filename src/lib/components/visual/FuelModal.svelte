@@ -17,7 +17,7 @@
    */
 
   /** @type {Props} */
-  let { clickOutsideModal = $bindable() } = $props();
+  let { clickOutsideModal = $bindable(false) } = $props();
 
   function getFuelImages(fuel) {
     let images = [];

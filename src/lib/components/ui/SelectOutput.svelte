@@ -14,7 +14,7 @@
    */
 
   /** @type {Props} */
-  let { clickOutsideModal = $bindable() } = $props();
+  let { clickOutsideModal = $bindable(false) } = $props();
   function showDescription() {}
 </script>
 
@@ -33,7 +33,7 @@
         >
       {/each}
     </Select>
-    <Button on:click={() => (clickOutsideModal = true)}
+    <Button onclick={() => (clickOutsideModal = true)}
       ><QuestionCircleOutline></QuestionCircleOutline></Button
     >
   </ButtonGroup>
