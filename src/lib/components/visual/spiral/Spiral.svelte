@@ -102,13 +102,19 @@
   });
 </script>
 
-<div class="w-full h-full p-10 overflow-hidden">
+<div class="w-full h-full p-2 overflow-hidden">
   <LayerCake
     x={"x1"}
-    xRange={[0, minDim * 0.9]}
+    xRange={[
+      (parentWidth - minDim * 0.9) / 2,
+      (parentWidth + minDim * 0.9) / 2,
+    ]}
     xDomain={[-1, 1]}
     y={"y1"}
-    yRange={[0, minDim * 0.9]}
+    yRange={[
+      (parentHeight - minDim * 0.9) / 2,
+      (parentHeight + minDim * 0.9) / 2,
+    ]}
     yDomain={[-1, 1]}
     {z}
     zScale={scaleSequential(interpolateReds)}

@@ -11,9 +11,6 @@
   } from "date-fns";
   // import { tz } from "@date-fns/tz";
   import {
-    forecastMode,
-    fetchingForecast,
-    getHistory,
     climateOpenMeteo,
     fillParams,
   } from "$lib/shared/stores/forecastStore";
@@ -23,8 +20,9 @@
   import ColorbarAxisX from "$lib/components/visual/spiral/ColorbarAxisX.svelte";
 
   let daily = {};
-  let fetchingHistory = $state(true);
-  let w = $state(), h = $state();
+  let fetchingHistory = $state(false);
+  let w = $state(),
+    h = $state();
   let margin = 20;
   let weatherVar = "vapour_pressure_deficit";
   // function dailyMaxGrouped(data, propToCalc, timeZone) {
@@ -88,20 +86,24 @@
       .map((obj) => obj[property]);
   }
 
+  const isArr = (v) =>
+    Array.isArray(v) || (ArrayBuffer.isView(v) && !(v instanceof DataView));
+
   function mergeObjects(obj1, obj2) {
     const merged = {};
-
-    // Iterate through properties of both objects
     for (const key of new Set([...Object.keys(obj1), ...Object.keys(obj2)])) {
-      merged[key] = [
-        ...(obj1[key] || []), // Add array from obj1 if exists, otherwise empty array
-        ...(obj2[key] || []), // Add array from obj2 if exists, otherwise empty array
-      ];
+      const v1 = obj1[key];
+      const v2 = obj2[key];
+      if (isArr(v1) || isArr(v2)) {
+        merged[key] = [...(isArr(v1) ? v1 : []), ...(isArr(v2) ? v2 : [])];
+      } else {
+        merged[key] = v1 ?? v2;
+      }
     }
-
     return merged;
   }
   async function getClimate() {
+    fetchingHistory = true;
     const endDate = format(subDays(new Date(), 6), "yyyy-MM-dd");
     const startDate = format(
       startOfYear(subYears(startOfYear(new Date()), 10)),
@@ -109,7 +111,14 @@
     );
     // console.log("endDate = ", endDate);
     // console.log("startDate = ", startDate);
-    const vpdHist = await getHistory([weatherVar], startDate, endDate);
+    const vpdHist = await fetchForecastMeteo(
+      fillParams({
+        hourlyVars: [weatherVar],
+        forecast_mode: "historical",
+        start_date: startDate,
+        end_date: endDate,
+      }),
+    );
     const vpdForecast = await fetchForecastMeteo(
       fillParams({
         hourlyVars: [weatherVar],
@@ -134,9 +143,9 @@
   // $: console.log("fetchingForecast = ", $fetchingForecast);
 </script>
 
-<div class="flex flex-row mx-auto min-h-44 p-5 justify-center">
+<div class="flex flex-row mx-auto py-4 justify-center">
   <div>
-    <Button on:click={getClimate}>Fetch data</Button>
+    <Button onclick={getClimate}>Fetch data</Button>
   </div>
 </div>
 <div

@@ -1,5 +1,5 @@
 <script>
-  import { Carousel } from "flowbite-svelte";
+  import { Carousel, Controls, CarouselIndicators } from "flowbite-svelte";
   import { Heading, P, A, Secondary } from "flowbite-svelte";
 
   const fieldWork = import.meta.glob("$lib/assets/fieldWorkPhotos/*.webp", {
@@ -30,22 +30,17 @@
         <span class="text-lg leading-tight text-primary-900 font-bold"
           >FireInSite is a fire behaviour prediction system</span
         >
-        in the form of a web-based application that forecasts the probability of
-        ignition, surface fire rate of spread, flame length and fireline intensity
-        for a user selected location for a set of core UK fire prone vegetation types
-        (fuels).
+        in the form of a web-based application that forecasts the probability of ignition,
+        surface fire rate of spread, flame length and fireline intensity for a user
+        selected location for a set of core UK fire prone vegetation types (fuels).
       </P>
     </div>
     <div id="test" class="max-w-2xl pt-8 pb-8">
-      <Carousel
-        images={fireImages}
-        imgClass="min-h-72"
-        
-        
-        >{#snippet children({ Controls, Indicators })}
-                <Indicators />
-          <Controls />              {/snippet}
-            </Carousel
+      <Carousel images={fireImages} imgClass="min-h-72"
+        >{#snippet children()}
+          <CarouselIndicators />
+          <Controls />
+        {/snippet}</Carousel
       >
     </div>
 
@@ -56,13 +51,13 @@
         >
           FireInSite is a point-based system</span
         > that calculates fire behaviour at a user-selected location on a map (or
-        point) for a range of possible fuel types treating each as a homogeneous
-        unit. It uses weather forecasts, linked to numeric fuel descriptors (fuel
-        models) and calculates the potential probability of ignition, rate of surface
-        fire spread, flame length, fireline intensity as well as allowing the user
-        to explore variability in dead fuel moisture over a range of forecast days.
-        It also allows the user to explore past fire behaviour by using historical
-        weather records back to 1970.
+        point) for a range of possible fuel types treating each as a homogeneous unit.
+        It uses weather forecasts, linked to numeric fuel descriptors (fuel models)
+        and calculates the potential probability of ignition, rate of surface fire
+        spread, flame length, fireline intensity as well as allowing the user to explore
+        variability in dead fuel moisture over a range of forecast days. It also allows
+        the user to explore past fire behaviour by using historical weather records
+        back to 1970.
       </P>
     </div>
     <div class="md:flex">
@@ -104,15 +99,11 @@
       </P>
     </div>
     <div id="test" class="max-w-2xl pt-8 pb-8">
-      <Carousel
-        images={fieldImages}
-        imgClass="min-h-72"
-        
-        
-        >{#snippet children({ Controls, Indicators })}
-                <Indicators />
-          <Controls />              {/snippet}
-            </Carousel
+      <Carousel images={fieldImages} imgClass="min-h-72"
+        >{#snippet children()}
+          <CarouselIndicators />
+          <Controls />
+        {/snippet}</Carousel
       >
     </div>
     <div class="p-8">
