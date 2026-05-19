@@ -153,16 +153,14 @@
         <HistoricalSelectDate></HistoricalSelectDate>
       {/if}
       {#if $forecastMode === "forecast"}
-        <div class="flex w-full md:max-w-4xl overflow-x-auto">
+        <div class="w-full md:max-w-4xl overflow-x-auto">
           <DayPicker />
         </div>
       {/if}
 
       {#if $changedHistoricalDate === true || $forecastMode === "forecast"}
         {#if $fetchingForecast === false}
-          <div
-            class="flex mx-auto min-w-120 max-w-120 md:max-w-4xl overflow-x-auto md:justify-center"
-          >
+          <div class="w-full md:max-w-4xl overflow-x-auto">
             <Heatmap
               xKey="time"
               zKey={$selectedOutput}
