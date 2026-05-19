@@ -73,7 +73,7 @@
         <text
           x={x * cellSize + cellSize / 2}
           y={i * cellSize + cellSize / 2}
-          class={isSelectedClass(x)}
+          class={isSelectedClass($data[0]?.values[x]?.time)}
           text-anchor="middle"
           dominant-baseline="middle"
           style="fill:{Math.round(weatherObject) >= values[4][0] &&

@@ -158,9 +158,9 @@
       fuel model names that form the row of the fire behaviour table. This will
       show a short description and provide an example image of the fuel type.
       For further information and to compare all fuel model parameters in a
-      single table click on <Span italic>"Fuel Models"</Span> link at the top of
-      the page. This will take you to a table of the specific parameters used in
-      each fuel model, you can click on each row and it will expand to reveal additional
+      single table click on <Span italic>"Fuel Models"</Span> link at the top of the
+      page. This will take you to a table of the specific parameters used in each
+      fuel model, you can click on each row and it will expand to reveal additional
       images and a short description.
     </P>
     <Heading tag="h4">6. Fuel moisture models</Heading>

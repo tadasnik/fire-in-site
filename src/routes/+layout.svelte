@@ -293,8 +293,8 @@
 </main>
 <Footer>
   <hr class="my-6 mx-auto" />
-  <div class="flex items-center text-center text-xs justify-between px-10">
-    <p>
+  <div class="flex flex-col items-center gap-4 px-10">
+    <p class="text-center text-xs">
       FireInSite fire behaviour predictions leverage BehavePlus fire behaviour
       modelling system, fuel models representative of UK vegetation and
       open-meteo forecasts and historical weather. Authors: Tadas Nikonovas,
@@ -307,8 +307,6 @@
       funding from the European Union’s Horizon 2020 research and innovation
       programme under grant agreement No. 101003890 (FirEUrisk)
     </p>
-  </div>
-  <div class="px-10 flex items-center justify-center">
     <FooterBrand
       href="https://ukfdrs.com/"
       src={ukfdrsLogo}

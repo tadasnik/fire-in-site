@@ -126,7 +126,9 @@
     <div class="grow w-full md:w-1/2 min-w-96 max-w-120 p-2 md:pl-8">
       <div class="flex flex-row place-items-baseline justify-center">
         <div class="items-baseline align-text-bottom pr-2">
-          <span class="align-bottom">Select model output</span>
+          <span class="align-bottom text-xs lg:text-sm"
+            >Select model output</span
+          >
         </div>
 
         <SelectOutput></SelectOutput>
@@ -143,7 +145,7 @@
       </div>
     </div>
   </div>
-  <div class="flex flex-col mx-auto min-w-120 md:justify-center">
+  <div class="flex flex-col w-full items-center">
     {#if $forecastMode === "user"}
       <UserInputControls></UserInputControls>
     {:else}
@@ -151,7 +153,7 @@
         <HistoricalSelectDate></HistoricalSelectDate>
       {/if}
       {#if $forecastMode === "forecast"}
-        <div class="flex min-w-120 max-w-120 md:max-w-4xl overflow-x-auto">
+        <div class="flex w-full md:max-w-4xl overflow-x-auto">
           <DayPicker />
         </div>
       {/if}
