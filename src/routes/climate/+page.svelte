@@ -1,5 +1,5 @@
 <script>
-  import { Button, Spinner } from "flowbite-svelte";
+  import { Spinner } from "flowbite-svelte";
   import {
     subDays,
     subYears,
@@ -131,29 +131,25 @@
     const vpd = mergeObjects(vpdHist, vpdForecast);
 
     let daily = getDailyMaxMin(vpd, weatherVar, vpd.timeZone);
-    // console.log("daily = ", daily);
     climateOpenMeteo.set(daily);
     fetchingHistory = false;
   }
 
-  // const sortedValues = getSortedValuesByProperty($climateOpenMeteo, weatherVar);
-  // console.log("sortedValues = ", sortedValues);
-
-  // $: console.log("climateOpenMeteo ", $climateOpenMeteo);
-  // $: console.log("fetchingForecast = ", $fetchingForecast);
+  $effect(() => {
+    const _lat = $currentLocation.latitude;
+    const _lon = $currentLocation.longitude;
+    climateOpenMeteo.set([]);
+    getClimate();
+  });
 </script>
 
-<div class="flex flex-row mx-auto py-4 justify-center">
-  <div>
-    <Button onclick={getClimate}>Fetch data</Button>
-  </div>
-</div>
 <div
   class="h-[500px] w-[500px] md:h-[800px] md:w-[800px] flex relative items-center mx-auto overflow-x-auto"
 >
   {#if fetchingHistory}
-    <div class="flex flex-1 justify-center items-center">
-      <Spinner></Spinner>
+    <div class="flex flex-1 flex-col gap-3 justify-center items-center">
+      <Spinner size="10"></Spinner>
+      <p class="text-slate-500">Fetching data</p>
     </div>
   {:else if $climateOpenMeteo.length > 1}
     <div class="h-full w-full" bind:clientWidth={w} bind:clientHeight={h}>
@@ -164,8 +160,6 @@
         parentHeight={h - margin}
       />
     </div>
-  {:else}
-    <p>No data</p>
   {/if}
 </div>
 

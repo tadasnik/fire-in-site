@@ -50,7 +50,7 @@
 </script>
 
 <div
-  class="flex flex-row items-end justify-start md:justify-center p-2 space-x-0.5 divide-slate-500 min-w-full"
+  class="flex flex-row items-end justify-start sm:justify-center p-2 space-x-0.5 divide-slate-500 min-w-full"
 >
   {#each $daysInForecast as day}
     <div
