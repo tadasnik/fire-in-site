@@ -1,12 +1,32 @@
-/* Write your global styles here, in PostCSS syntax */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite-svelte";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary-50: #FFC499;
+  --color-primary-100: #FFB885;
+  --color-primary-200: #FFAC70;
+  --color-primary-300: #FFA05C;
+  --color-primary-400: #FF9447;
+  --color-primary-500: #FF8833;
+  --color-primary-600: #FF7C1F;
+  --color-primary-700: #FF700A;
+  --color-primary-800: #566000;
+  --color-primary-900: #CF5700;
+  --spacing-100: 26rem;
+  --spacing-120: 30rem;
+  --text-xxs: 0.7rem;
+  --text-xxs--line-height: 0.6rem;
+  --text-xxs--letter-spacing: -0.03em;
+  --text-xxs--font-weight: 500;
+}
+
 html,
 body {
-	@apply h-full overflow-auto;
+  @apply h-full overflow-auto;
 }
 
 body {
-    min-width: 380px;
-  }
+  min-width: 380px;
+}
