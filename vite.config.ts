@@ -1,6 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import wasm from 'vite-plugin-wasm';
-import topLevelAwait from 'vite-plugin-top-level-await';
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
@@ -20,14 +19,7 @@ const ssrOnnxStub = {
 };
 
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-		// wasm and top-level-await are only needed for the client bundle;
-		// the server bundle uses the onnx-stub instead.
-		{ ...wasm(), apply: (_: unknown, { isSsrBuild }: { isSsrBuild?: boolean }) => !isSsrBuild },
-		{ ...topLevelAwait(), apply: (_: unknown, { isSsrBuild }: { isSsrBuild?: boolean }) => !isSsrBuild },
-		ssrOnnxStub,
-	],
+	plugins: [sveltekit(), wasm(), ssrOnnxStub],
 	optimizeDeps: {
 		exclude: ['onnxruntime-web'],
 	},
