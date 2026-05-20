@@ -4,11 +4,7 @@ import topLevelAwait from "vite-plugin-top-level-await";
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [
-    sveltekit(),
-    { ...wasm(), apply: (_, { isSsrBuild }) => !isSsrBuild },
-    { ...topLevelAwait(), apply: (_, { isSsrBuild }) => !isSsrBuild },
-  ],
+  plugins: [sveltekit(), wasm(), topLevelAwait()],
   optimizeDeps: {
     exclude: ['onnxruntime-web'], // Exclude onnxruntime-web from pre-bundling
   },
