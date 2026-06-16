@@ -7,11 +7,12 @@
 <script>
   import { getContext } from "svelte";
 
-  import { timeParse, timeFormat } from "d3-time-format";
+  import { timeParse, utcFormat } from "d3-time-format";
   import {
     currentDateTime,
     dateTime,
     timeMode,
+    forecastUtcOffset,
   } from "$lib/shared/stores/timeStore.js";
   import { where } from "firebase/firestore";
 
@@ -47,14 +48,14 @@
     units = $percentRange === true ? "%" : "px",
   } = $props();
 
-  const formatHour = timeFormat("%H");
-  const formatDay = timeFormat("%a");
+  const formatHour = utcFormat("%H");
+  const formatDay = utcFormat("%a");
   let tickLen = $derived(tickMarks === true ? (tickMarkLength ?? 6) : 0);
 
   let isBandwidth = $derived(typeof $xScale.bandwidth === "function");
 
   let isSelectedClass = $derived((d) => {
-    return d == $dateTime ? "font-bold text-primary-500" : "";
+    return d == $dateTime + $forecastUtcOffset * 1000 ? "font-bold text-primary-500" : "";
   });
 
   let tickVals = $derived(
@@ -73,8 +74,24 @@
     if ($timeMode === "current") {
       $timeMode = "user";
     }
-    $currentDateTime = new Date(e);
+    // Tick values are "local-as-UTC"; subtract the offset to get true UTC
+    // so focusDay doesn't double-count the offset and flip the selected day.
+    const trueUtc = e - $forecastUtcOffset * 1000;
+    console.log(
+      'executeClick | tick (local-as-UTC):', new Date(e).toISOString(),
+      '| forecastUtcOffset (s):', $forecastUtcOffset,
+      '| currentDateTime (true UTC):', new Date(trueUtc).toISOString(),
+    );
+    $currentDateTime = new Date(trueUtc);
   }
+
+  $effect(() => {
+    console.log(
+      'AxisXTop | dateTime (true UTC):', new Date($dateTime).toISOString(),
+      '| dateTime + offset (local-as-UTC):', new Date($dateTime + $forecastUtcOffset * 1000).toISOString(),
+      '| forecastUtcOffset (s):', $forecastUtcOffset,
+    );
+  });
 </script>
 
 <div class="axis x-axis" class:snapLabels>
@@ -112,7 +129,7 @@
         role="button"
         onclick={() => executeClick(tick)}
         style:transform={`translate(calc(-50% + ${dx}px), calc(-${
-          tick === $dateTime ? 130 : 110
+          tick === $dateTime + $forecastUtcOffset * 1000 ? 130 : 110
         }% + ${dy}px))`}
       >
         <div class="p-0 m-0">

@@ -25,8 +25,7 @@
   import Heatmap from "$lib/components/visual/Heatmap.svelte";
   import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
   import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
-  // import GeoLocation from "$lib/components/ui/GeoLocation.svelte";
-  // import FindLocation from "$lib/components/ui/FindLocation.svelte";
+  import LocationSearch from "$lib/components/ui/LocationSearch.svelte";
 
   let width = $state();
   let showMap = false;
@@ -73,6 +72,9 @@
 </svelte:head>
 
 <div class="flex flex-col justify-center content-center w-full space-y-5">
+  <div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-2xl">
+    <LocationSearch />
+  </div>
   <div class="container mx-auto justify-center p-2 items-center">
     {#if $fetchingForecast === false}
       <WeatherInfo

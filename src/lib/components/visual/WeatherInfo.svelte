@@ -97,10 +97,14 @@
 <div class="min-h-20">
   {#if data}
     <!-- <div class="sm:w-full md:w-1/2 p-4 min-w-80 bg-gray-100"> -->
-    <div class="flex flex-wrap flex-row justify-center space-x-2 text-2xl">
-      <div>Fire Behaviour prediction for</div>
-      <div>
-        <strong>{dateFormat(new Date($currentDateTime))}</strong>
+    <div class="flex flex-wrap flex-row items-baseline justify-center space-x-2 text-2xl">
+      <div>Fire Behaviour</div>
+      {#if fireLocation?.name}
+        <div><strong>{fireLocation.name}</strong>,</div>
+      {/if}
+      <div class="text-xl text-gray-500">
+        {Math.abs(fireLocation?.latitude ?? 0).toFixed(2)}°{(fireLocation?.latitude ?? 0) >= 0 ? 'N' : 'S'},
+        {Math.abs(fireLocation?.longitude ?? 0).toFixed(2)}°{(fireLocation?.longitude ?? 0) >= 0 ? 'E' : 'W'}
       </div>
     </div>
 

@@ -137,7 +137,7 @@
     prediction systems. The FireInSite system uses custom surface fuel models to
     estimate fire behaviour in humid temperate UK and other similar regions.
 
-    <P class="pt-5 pb-8"></P>
+    <div class="pt-5 pb-8"></div>
   </div>
 </div>
 <div
@@ -146,25 +146,27 @@
   {#each fuelsClasses as fuel}
     <div>
       <Card img={fuel.image} imgClass="aspect-video">
-        <h5
-          class="mb-2 text-2xl font-bold tracking-tight text-gray-700 dark:text-white"
-        >
-          {fuel.title}
-        </h5>
-        <p
-          class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight"
-        >
-          {@html fuel.description}
-        </p>
+        <div class="px-4 py-3">
+          <h5
+            class="mb-2 text-2xl font-bold tracking-tight text-gray-700 dark:text-white"
+          >
+            {fuel.title}
+          </h5>
+          <p
+            class="font-normal text-gray-700 dark:text-gray-400 leading-tight"
+          >
+            {@html fuel.description}
+          </p>
+        </div>
       </Card>
     </div>
   {/each}
 </div>
-<div class="max-w-80 mx-auto items-center overflow-hidden md:max-w-2xl pt-10">
+<div class="pt-10 text-center">
   <Heading
     tag="h4"
     class="mb-4"
-    customSize="pt-10 text-2xl font-extrabold  md:text-3xl lg:text-4xl"
+    customSize="pt-10 text-2xl font-extrabold md:text-3xl lg:text-4xl"
   >
     <Span class="text-primary-600 font-bold">FireInSite</Span> fuel model table
   </Heading>

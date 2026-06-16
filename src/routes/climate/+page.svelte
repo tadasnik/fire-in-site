@@ -1,136 +1,56 @@
 <script>
   import { Spinner } from "flowbite-svelte";
-  import {
-    subDays,
-    subYears,
-    startOfYear,
-    fromUnixTime,
-    getDayOfYear,
-    format,
-    parse,
-  } from "date-fns";
-  // import { tz } from "@date-fns/tz";
-  import {
-    climateOpenMeteo,
-    fillParams,
-  } from "$lib/shared/stores/forecastStore";
-  import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
+  import { subDays, subYears, startOfYear, getDayOfYear, format } from "date-fns";
+  import { climateOpenMeteo } from "$lib/shared/stores/forecastStore";
+  import { fetchDailyMeteo } from "$lib/weather/openMeteo.ts";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import Spiral from "$lib/components/visual/spiral/Spiral.svelte";
   import ColorbarAxisX from "$lib/components/visual/spiral/ColorbarAxisX.svelte";
 
-  let daily = {};
   let fetchingHistory = $state(false);
-  let w = $state(),
-    h = $state();
+  let w = $state(), h = $state();
   let margin = 20;
-  let weatherVar = "vapour_pressure_deficit";
-  // function dailyMaxGrouped(data, propToCalc, timeZone) {
-  //   const formattedData = data.time.map((timestamp, index) => {
-  //     // console.log("timestamp", timestamp, timeZone);
-  //     const formattedDate = format(fromUnixTime(timestamp), "yyyy-MM-dd", {
-  //       in: timeZone,
-  //     });
-  //     // const formattedDate = format(dateInZone, "yyyy-MM-dd", { timeZone });
-  //     return { date: formattedDate, propToCalc: data[propToCalc][index] };
-  //   });
-  //
-  //   const groupedByDate = formattedData.reduce((acc, curr) => {
-  //     acc[curr.date] = acc[curr.date] || [];
-  //     acc[curr.date].push(curr[propToCalc]);
-  //     return acc;
-  //   }, {});
-  //
-  //   // Calculate the maximum temperature for each date
-  //   const maxValues = Object.keys(groupedByDate).map((date) => {
-  //     const temperatures = groupedByDate[date];
-  //     const maxVal = Math.max(...temperatures);
-  //     return { date, maxProp: maxVal };
-  //   });
-  //   console.log(maxValues);
-  //   return maxValues;
-  // }
+  const weatherVar = "vapour_pressure_deficit_max";
 
-  function getDailyMaxMin(data, propToCalc, timeZone) {
-    console.log("propToCalc = ", propToCalc);
-    const dailyTemps = {};
-    data.time.forEach((timestamp, index) => {
-      // const zonedDate = fromUnixTime(timestamp);
-      // timestamp to seconds
-      const date = format(fromUnixTime(timestamp * 0.001), "yyyy-MM-dd");
-      // const date = format(zonedDate, "yyyy-MM-dd");
-      // console.log(date);
-      const value = data[propToCalc][index];
-
-      // Initialize or update daily max temperature
-      if (!dailyTemps[date] || dailyTemps[date] < value) {
-        dailyTemps[date] = value;
-      }
-    });
-    const dailyArray = [];
-    for (const [key, value] of Object.entries(dailyTemps)) {
-      const parsedDate = parse(key, "yyyy-MM-dd", new Date());
-      dailyArray.push({
-        date: Math.floor(parsedDate.getTime()),
-        [propToCalc]: value,
-        doy: getDayOfYear(parsedDate),
-      });
-    }
-    return dailyArray;
-  }
-
-  function getSortedValuesByProperty(array, property) {
-    return array
-      .slice()
-      .sort((a, b) => a[property] - b[property])
-      .map((obj) => obj[property]);
-  }
-
-  const isArr = (v) =>
-    Array.isArray(v) || (ArrayBuffer.isView(v) && !(v instanceof DataView));
-
-  function mergeObjects(obj1, obj2) {
-    const merged = {};
-    for (const key of new Set([...Object.keys(obj1), ...Object.keys(obj2)])) {
-      const v1 = obj1[key];
-      const v2 = obj2[key];
-      if (isArr(v1) || isArr(v2)) {
-        merged[key] = [...(isArr(v1) ? v1 : []), ...(isArr(v2) ? v2 : [])];
-      } else {
-        merged[key] = v1 ?? v2;
-      }
-    }
-    return merged;
-  }
   async function getClimate() {
     fetchingHistory = true;
     const endDate = format(subDays(new Date(), 6), "yyyy-MM-dd");
-    const startDate = format(
-      startOfYear(subYears(startOfYear(new Date()), 10)),
-      "yyyy-MM-dd",
-    );
-    // console.log("endDate = ", endDate);
-    // console.log("startDate = ", startDate);
-    const vpdHist = await fetchForecastMeteo(
-      fillParams({
-        hourlyVars: [weatherVar],
+    const startDate = format(startOfYear(subYears(new Date(), 10)), "yyyy-MM-dd");
+
+    const baseParams = {
+      latitude: $currentLocation.latitude,
+      longitude: $currentLocation.longitude,
+      daily: [weatherVar],
+      timezone: "auto",
+      timeformat: "unixtime",
+    };
+
+    const [hist, fcast] = await Promise.all([
+      fetchDailyMeteo({
+        ...baseParams,
         forecast_mode: "historical",
         start_date: startDate,
         end_date: endDate,
+        models: "era5_seamless",
       }),
-    );
-    const vpdForecast = await fetchForecastMeteo(
-      fillParams({
-        hourlyVars: [weatherVar],
+      fetchDailyMeteo({
+        ...baseParams,
         forecast_mode: "forecast",
         forecast_model: "ecmwf_ifs025",
         forecast_days: 14,
-        forecast_days_past: 6,
+        past_days: 6,
       }),
-    );
-    const vpd = mergeObjects(vpdHist, vpdForecast);
+    ]);
 
-    let daily = getDailyMaxMin(vpd, weatherVar, vpd.timeZone);
+    // Merge by timestamp; forecast takes precedence for the 6-day overlap
+    const byTime = new Map();
+    for (let i = 0; i < hist.time.length; i++) byTime.set(hist.time[i], hist[weatherVar][i]);
+    for (let i = 0; i < fcast.time.length; i++) byTime.set(fcast.time[i], fcast[weatherVar][i]);
+
+    const daily = Array.from(byTime.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([t, value]) => ({ date: t, doy: getDayOfYear(new Date(t)), [weatherVar]: value }));
+
     climateOpenMeteo.set(daily);
     fetchingHistory = false;
   }

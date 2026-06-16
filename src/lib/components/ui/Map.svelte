@@ -185,6 +185,12 @@
   }
   let width = $state();
 
+  $effect(() => {
+    const _lat = $currentLocation.latitude;
+    const _lon = $currentLocation.longitude;
+    setMarkerLocation();
+  });
+
   onMount(() => {
     const initialState = { lng: lng, lat: lat, zoom: zoom };
 

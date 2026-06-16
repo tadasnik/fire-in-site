@@ -239,16 +239,16 @@ export const elevationDiff = derived([forecastLocation, currentLocation], ([$for
   return $forecastLocation.coordinates[2] - $currentLocation.elevation
 })
 
-export const currentTimeIndex = derived([dateTime], ([$dateTime]) => {
-  const index = get(forecastOpenMeteo).time.indexOf($dateTime)
-  return index > -1 ? index : 0
+export const currentTimeIndex = derived([dateTime, forecastUtcOffset, forecastOpenMeteo], ([$dateTime, $forecastUtcOffset, $forecastOpenMeteo]) => {
+  const localAsUtcMs = $dateTime + $forecastUtcOffset * 1000;
+  const index = $forecastOpenMeteo.time.indexOf(localAsUtcMs);
+  return index > -1 ? index : 0;
 })
 
-export const focusDayIndex = derived([focusDay], ([$focusDay]) => {
-  const timeIndex = get(forecastOpenMeteo).time
+export const focusDayIndex = derived([focusDay, forecastOpenMeteo], ([$focusDay, $forecastOpenMeteo]) => {
+  const timeIndex = $forecastOpenMeteo.time
   const indexMin = timeIndex.indexOf($focusDay.valueOf())
   const indexMax = timeIndex.indexOf($focusDay.valueOf() + 86400000);
-  // console.log("time index calc", indexMin, indexMax, new Date($focusDay), new Date(timeIndex[0]), new Date(timeIndex[23]), new Date(timeIndex[-1]))
   return [indexMin, indexMax]
 })
 // export const currentDayTimeIndex = derived([dateTime], ([$dateTime]) => {

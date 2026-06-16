@@ -3,6 +3,7 @@ import { writable } from 'svelte/store'
 export const currentLocation = writable({
   userLocation: false,
   distanceFromPrevious: false,
+  name: '',
   latitude: 53,
   longitude: 0,
   elevation: 0,

@@ -56,20 +56,12 @@ export const dateTime = derived(
   }
 )
 export const focusDay = derived([currentDateTime, forecastUtcOffset], ([$currentDateTime, $forecastUtcOffset]) => {
-  // Convert current time to location-local time using the location's UTC offset
-  // $currentDateTime is a JS Date (machine-local), get the absolute epoch ms
-  console.log('current datetime, forecast forecastUtcOffset', $currentDateTime, $forecastUtcOffset);
-  const epochMs = $currentDateTime.valueOf();
-  console.log('epoch ms', epochMs);
-  // Shift to location-local time
-  const localMs = epochMs + ($forecastUtcOffset * 1000);
-  const localDate = new Date(localMs);
-  // Get midnight in location-local time (using UTC methods on the shifted date)
-  const midnightLocalMs =
-    Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
-  // Shift back to UTC epoch ms (this is what the time array uses)
-  console.log('focusDay', new Date(midnightLocalMs - ($forecastUtcOffset * 1000)));
-  return midnightLocalMs - ($forecastUtcOffset * 1000);
+  // Shift epoch ms to location-local time, then take UTC-midnight of that date.
+  // The forecast time array stores timestamps as (t + utcOffsetSeconds) * 1000,
+  // i.e. local midnight expressed as a UTC value — so we must match that convention.
+  const localMs = $currentDateTime.valueOf() + $forecastUtcOffset * 1000;
+  const d = new Date(localMs);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 });
 
 // This is an alternative approach to calculating focusDay, which directly uses the machine-local date components without shifting. It may be more straightforward and less error-prone, but it assumes that the machine-local

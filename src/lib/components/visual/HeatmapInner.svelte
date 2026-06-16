@@ -17,7 +17,7 @@
     interpolateRdYlGn,
   } from "d3-scale-chromatic";
   import { selectedOutput } from "$lib/shared/stores/modelStore";
-  import { dateTime } from "$lib/shared/stores/timeStore";
+  import { dateTime, forecastUtcOffset } from "$lib/shared/stores/timeStore";
   import { focusDayIndex } from "$lib/shared/stores/forecastStore";
   import MultiSelect from "../ui/MultiSelect.svelte";
 
@@ -42,8 +42,7 @@
     $props();
 
   let isSelectedClass = $derived((x) => {
-    // console.log("isSelectedClass", x);
-    return $dateTime == x
+    return $dateTime + $forecastUtcOffset * 1000 == x
       ? "text-sm font-bold text-neutral-500"
       : "text-xs text-neutral-400";
   });

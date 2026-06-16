@@ -12,6 +12,7 @@
     currentDateTime,
     timeMode,
     focusDay,
+    forecastUtcOffset,
   } from "$lib/shared/stores/timeStore";
   import heli from "$lib/assets/icons/helicop.png";
 
@@ -28,18 +29,15 @@
     if ($timeMode === "current") {
       $timeMode = "user";
     }
-    $currentDateTime = new Date(day).addHours(12);
+    // day is local-as-UTC midnight; subtract offset to get true UTC, then set to noon.
+    $currentDateTime = new Date(day - $forecastUtcOffset * 1000).addHours(12);
   }
 
   function formatDayShort(d) {
-    const today = new Date();
-    if (today.toDateString() === new Date(d).toDateString()) return "Today";
     return dateFormatShort(d);
   }
 
   function formatDayLong(d) {
-    const today = new Date();
-    if (today.toDateString() === new Date(d).toDateString()) return "Today";
     return dateFormatLong(d);
   }
   let isSelectedDayClass = $derived((d) => {

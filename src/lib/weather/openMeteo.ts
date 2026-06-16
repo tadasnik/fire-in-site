@@ -67,6 +67,32 @@ export async function fetchForecastMeteo(params: {
   console.log("openMeteo weatherData", weatherData)
   return weatherData;
 }
+export async function fetchDailyMeteo(params: Record<string, any>): Promise<any> {
+  const url = params.forecast_mode === 'forecast'
+    ? "https://api.open-meteo.com/v1/forecast"
+    : "https://archive-api.open-meteo.com/v1/archive";
+
+  const { forecast_mode, ...apiParams } = params;
+  const responses = await fetchWeatherApi(url, apiParams);
+  const response = responses[0];
+  const utcOffsetSeconds = response.utcOffsetSeconds();
+  const daily = response.daily()!;
+
+  const range = (start: number, stop: number, step: number) =>
+    Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+
+  const result: Record<string, any> = {
+    time: range(Number(daily.time()), Number(daily.timeEnd()), daily.interval())
+      .map(t => (t + utcOffsetSeconds) * 1000),
+  };
+
+  for (const [nr, variable] of (params.daily as string[]).entries()) {
+    result[variable] = daily.variables(nr)!.valuesArray()!;
+  }
+
+  return result;
+}
+
 //     "latitude": latitude,
 //     "longitude": longitude,
 // "start_date": "2020-07-19",
