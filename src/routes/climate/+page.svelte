@@ -1,5 +1,5 @@
 <script>
-  import { Spinner } from "flowbite-svelte";
+  import { Select, Spinner } from "flowbite-svelte";
   import { subDays, subYears, startOfYear, getDayOfYear, format } from "date-fns";
   import { climateOpenMeteo } from "$lib/shared/stores/forecastStore";
   import { fetchDailyMeteo } from "$lib/weather/openMeteo.ts";
@@ -7,16 +7,31 @@
   import Spiral from "$lib/components/visual/spiral/Spiral.svelte";
   import ColorbarAxisX from "$lib/components/visual/spiral/ColorbarAxisX.svelte";
   import LocationSearch from "$lib/components/ui/LocationSearch.svelte";
+  import YearLines from "$lib/components/visual/climate/YearLines.svelte";
+
+  const variables = [
+    { value: "vapour_pressure_deficit_max", name: "VPD daily max", units: "kPa" },
+    { value: "temperature_2m_mean", name: "Temperature daily mean", units: "°C" },
+    { value: "temperature_2m_max", name: "Temperature daily max", units: "°C" },
+    { value: "temperature_2m_min", name: "Temperature daily min", units: "°C" },
+    { value: "relative_humidity_2m_max", name: "Humidity daily max", units: "%" },
+    { value: "relative_humidity_2m_min", name: "Humidity daily min", units: "%" },
+  ];
 
   let fetchingHistory = $state(false);
   let w = $state(), h = $state();
+  let yearLinesW = $state(800), yearLinesH = $state(360);
   let margin = 20;
-  const weatherVar = "vapour_pressure_deficit_max";
+  let weatherVar = $state("vapour_pressure_deficit_max");
+  let varMeta = $derived(variables.find((v) => v.value === weatherVar) ?? variables[0]);
+
+  const HIST_START_YEAR = 1990;
+  const SPIRAL_YEARS = 10;
 
   async function getClimate() {
     fetchingHistory = true;
     const endDate = format(subDays(new Date(), 6), "yyyy-MM-dd");
-    const startDate = format(startOfYear(subYears(new Date(), 10)), "yyyy-MM-dd");
+    const startDate = `${HIST_START_YEAR}-01-01`;
 
     const baseParams = {
       latitude: $currentLocation.latitude,
@@ -56,16 +71,35 @@
     fetchingHistory = false;
   }
 
+  let spiralData = $derived.by(() => {
+    if ($climateOpenMeteo.length < 2) return $climateOpenMeteo;
+    const cutoff = startOfYear(subYears(new Date(), SPIRAL_YEARS)).getTime();
+    return $climateOpenMeteo.filter((d) => d.date >= cutoff);
+  });
+
   $effect(() => {
     const _lat = $currentLocation.latitude;
     const _lon = $currentLocation.longitude;
+    const _v = weatherVar;
     climateOpenMeteo.set([]);
     getClimate();
   });
 </script>
 
-<div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-2xl">
-  <LocationSearch />
+<div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-3xl">
+  <div class="flex flex-col md:flex-row gap-2 md:items-center">
+    <div class="flex-1 min-w-0">
+      <LocationSearch />
+    </div>
+    <div class="md:w-60 shrink-0">
+      <Select
+        size="sm"
+        items={variables}
+        bind:value={weatherVar}
+        placeholder="Select variable"
+      />
+    </div>
+  </div>
 </div>
 
 <div
@@ -76,17 +110,38 @@
       <Spinner size="10"></Spinner>
       <p class="text-slate-500">Fetching data</p>
     </div>
-  {:else if $climateOpenMeteo.length > 1}
+  {:else if spiralData.length > 1}
     <div class="h-full w-full" bind:clientWidth={w} bind:clientHeight={h}>
       <Spiral
-        data={$climateOpenMeteo}
+        data={spiralData}
         z={weatherVar}
+        varLabel={varMeta.name}
+        varUnits={varMeta.units}
         parentWidth={w - margin}
         parentHeight={h - margin}
       />
     </div>
   {/if}
 </div>
+
+{#if !fetchingHistory && $climateOpenMeteo.length > 1}
+  <div class="mx-auto max-w-5xl px-4 pb-8">
+    <div
+      class="h-[360px] w-full"
+      bind:clientWidth={yearLinesW}
+      bind:clientHeight={yearLinesH}
+    >
+      <YearLines
+        data={$climateOpenMeteo}
+        z={weatherVar}
+        varLabel={varMeta.name}
+        varUnits={varMeta.units}
+        parentWidth={yearLinesW}
+        parentHeight={yearLinesH}
+      />
+    </div>
+  </div>
+{/if}
 
 <style>
 </style>

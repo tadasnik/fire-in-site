@@ -16,7 +16,7 @@
    */
 
   /** @type {Props} */
-  let { offset = -20 } = $props();
+  let { offset = -20, varLabel = "VPD", varUnits = "kPa" } = $props();
 
   const w = 150;
   const w2 = w / 2;
@@ -54,7 +54,7 @@
         <span class="key"
           >{format(fromUnixTime(foundSorted.date * 0.001), "yyyy-MM-dd")}
           <br />
-          VPD: {$z(foundSorted).toFixed(1)} (kPa)</span
+          {varLabel}: {$z(foundSorted).toFixed(1)} ({varUnits})</span
         >
       </div>
     {/if}

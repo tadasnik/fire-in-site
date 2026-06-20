@@ -29,6 +29,8 @@
   let {
     data = [],
     z = "vapour_pressure_deficit",
+    varLabel = "VPD",
+    varUnits = "kPa",
     parentWidth,
     parentHeight,
   } = $props();
@@ -127,7 +129,7 @@
     <Legend {z}>
       <!-- @migration-task: migrate this slot by hand, `legend-title` is an invalid identifier -->
       <span slot="legend-title">
-        <h2>Vapour pressure deficit</h2>
+        <h2>{varLabel}</h2>
         <h2>
           lat: {$currentLocation.latitude.toFixed(2)} lon: {$currentLocation.longitude.toFixed(
             2,
@@ -138,7 +140,7 @@
     </Legend>
     <Html>
       <YearAnotations {polarProps} />
-      <Tooltip dataset={cartesianData} />
+      <Tooltip dataset={cartesianData} {varLabel} {varUnits} />
     </Html>
   </LayerCake>
 </div>

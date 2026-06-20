@@ -151,32 +151,31 @@
     oninput={onInput}
     onkeydown={onKeyDown}
     onblur={onBlur}
-    placeholder="Location"
+    placeholder="Placename or Lat Lon"
     autocomplete="off"
     onfocus={onFocus}
     class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
   />
   {#if open}
     <ul
-      class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700"
+      class="absolute z-50 mt-1 w-full md:min-w-[42rem] rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700"
       role="listbox"
     >
       <li class="px-4 py-1 border-b border-gray-100 dark:border-gray-600">
         {#if showingHistory}
-          <div class="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+          <div class="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 pb-1">
             <ClockOutline class="w-3 h-3" />
             <span>Recent</span>
           </div>
-        {:else}
-          <div class="hidden md:flex items-center gap-2 w-full text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-            <span class="shrink-0 w-5"></span>
-            <span class="w-36 shrink-0">Place</span>
-            <span class="w-36 shrink-0">Region</span>
-            <span class="w-20 shrink-0">Lat</span>
-            <span class="w-20 shrink-0">Lon</span>
-            <span class="w-16 shrink-0">Elev</span>
-          </div>
         {/if}
+        <div class="hidden md:flex items-center gap-2 w-full text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+          <span class="shrink-0 w-5"></span>
+          <span class="w-32 md:w-36 shrink-0">Place</span>
+          <span class="w-32 md:w-36 shrink-0">Region</span>
+          <span class="w-24 shrink-0">Lat</span>
+          <span class="w-24 shrink-0">Lon</span>
+          <span class="w-16 shrink-0">Elev</span>
+        </div>
       </li>
       {#each results as result, i}
         <li role="option" aria-selected={i === activeIndex}>
@@ -198,8 +197,8 @@
                 <span class="shrink-0">{countryFlag(result.country_code)}</span>
                 <span class="font-medium w-32 md:w-36 shrink-0 truncate">{result.name}</span>
                 <span class="text-gray-500 dark:text-gray-400 w-32 md:w-36 shrink-0 truncate">{result.admin1 ?? ''}</span>
-                <span class="hidden md:block w-20 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.latitude.toFixed(3)}</span>
-                <span class="hidden md:block w-20 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.longitude.toFixed(3)}</span>
+                <span class="hidden md:block w-24 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.latitude.toFixed(3)}</span>
+                <span class="hidden md:block w-24 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.longitude.toFixed(3)}</span>
                 <span class="hidden md:block w-16 shrink-0 text-gray-500 dark:text-gray-400">{result.elevation != null ? Math.round(result.elevation) + ' m' : ''}</span>
               </div>
             {/if}
