@@ -13,6 +13,7 @@
     forecastLocation,
     forecastMode,
     fetchingForecast,
+    forecastDataMode,
   } from "$lib/shared/stores/forecastStore.js";
   import { changedHistoricalDate } from "$lib/shared/stores/timeStore.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
@@ -161,19 +162,25 @@
       {/if}
 
       {#if $changedHistoricalDate === true || $forecastMode === "forecast"}
-        {#if $fetchingForecast === false}
-          <div class="w-full md:max-w-4xl overflow-x-auto">
+        {#if $forecastDataMode === $forecastMode}
+          <div class="w-full md:max-w-4xl overflow-x-auto transition-opacity duration-300"
+               class:opacity-30={$fetchingForecast}
+               class:pointer-events-none={$fetchingForecast}>
             <Heatmap
               xKey="time"
               zKey={$selectedOutput}
               yKey="surface.primary.fuel.model.catalogKey"
             />
           </div>
-          {#if $selectedOutput == "crown.fire.transition.minBaseHeight"}
+          {#if $selectedOutput == "crown.fire.transition.minBaseHeight" && !$fetchingForecast}
             <div class="p-2 mx-auto max-w-120">
               <CanopyControls></CanopyControls>
             </div>
           {/if}
+        {:else}
+          <div class="flex justify-center p-8">
+            <Spinner />
+          </div>
         {/if}
       {/if}
     {/if}

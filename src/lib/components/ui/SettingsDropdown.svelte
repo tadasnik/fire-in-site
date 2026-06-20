@@ -23,7 +23,7 @@
     forecastModel,
     forecastModels,
   } from "$lib/shared/stores/forecastStore";
-  import { timeMode, currentDateTime } from "$lib/shared/stores/timeStore";
+  import { timeMode, currentDateTime, historicalYear, historicalMonth, historicalDay } from "$lib/shared/stores/timeStore";
   import { outputNodes } from "$lib/data/outputNodes.js";
   import CurrentBehaviour from "../visual/CurrentBehaviour.svelte";
 
@@ -50,10 +50,13 @@
     $fetchingForecast = true;
     $forecastMode = value;
     if (value === "historical") {
-      console.log("setting forecastMode to historical");
+      $fetchingForecast = false;
     } else if (value === "forecast") {
       console.log("setting currentDateTime to now, fetching forecast");
       $currentDateTime = new Date();
+      $historicalYear = undefined;
+      $historicalMonth = undefined;
+      $historicalDay = undefined;
       getForecastOpenMeteo();
     } else {
       console.log("setting forecastMode to: ", value);
@@ -73,7 +76,7 @@
       name="fuelMoistureModel"
       bind:group={$fuelMoistureModel}
       value={"fireInSite"}
-      on:change={() => handleFuelMoistureChange("fireInSite")}>fireInSite</Radio
+      onchange={() => handleFuelMoistureChange("fireInSite")}>fireInSite</Radio
     >
     <Helper class="ps-6">fireInSite dead fuel moisture model.</Helper>
   </li>
@@ -83,7 +86,7 @@
       name="fuelMoistureModel"
       bind:group={$fuelMoistureModel}
       value={"Nelson"}
-      on:change={() => handleFuelMoistureChange("Nelson")}>SimpleFFMC</Radio
+      onchange={() => handleFuelMoistureChange("Nelson")}>SimpleFFMC</Radio
     >
     <Helper class="ps-6">Use simple Nelson dead fuel moisture model.</Helper>
   </li>
@@ -92,7 +95,7 @@
       name="fuelMoistureModel"
       bind:group={$fuelMoistureModel}
       value={"Fosberg"}
-      on:change={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
+      onchange={() => handleFuelMoistureChange("Fosberg")}>Fosberg</Radio
     >
     <Helper class="ps-6"
       >Calculate dead fuel mosture using Fosberg model.</Helper
@@ -111,7 +114,7 @@
       <Radio
         bind:group={$forecastMode}
         value={mode}
-        on:change={() => handleTimeModeChange(mode)}
+        onchange={() => handleTimeModeChange(mode)}
       >
         {mode}
       </Radio>
@@ -154,7 +157,7 @@
         <Radio
           bind:group={$forecastModel}
           {value}
-          on:change={() => handleModelChange(value)}
+          onchange={() => handleModelChange(value)}
         >
           {displayName}
         </Radio>

@@ -31,18 +31,18 @@
   } from "$lib/shared/stores/timeStore.js";
 
   import { forecastMode } from "$lib/shared/stores/forecastStore.js";
+  import { forecastUtcOffset } from "$lib/shared/stores/timeStore.js";
   let width;
-  // $: console.log(
-  //   "_outputForecastCanopy in CurrentBehaviour",
-  //   $_outputForecastCanopy.get($dateTime),
-  // );
-  let data =
-    $derived($forecastMode === "user"
+  let data = $derived(
+    $forecastMode === "user"
       ? $_outputUserInputs
-      : $_outputForecastCanopy.get($dateTime));
+      : ($_outputForecastCanopy.get($dateTime + $forecastUtcOffset * 1000) ?? [])
+  );
 </script>
 
-{#if $chartType === "fireChar"}
+{#if data.length === 0}
+  <!-- no data for this time step yet -->
+{:else if $chartType === "fireChar"}
   <FireCharacteristics
     parentWidth={width}
     {data}

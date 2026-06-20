@@ -68,8 +68,7 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
       forecast["ffmc" + "_" + deadFuelsCategories[i]] = values
     }
   } catch (error) {
-    console.error("Error fetching forecast:", error);
-    fetchingForecast.set(false);
+    console.error("Error in deadFFMC ONNX inference:", error);
   }
   forecast["ffmc_nelson"] = nelsonFFMCs
   // console.log("forecast", forecast)

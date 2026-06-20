@@ -19,7 +19,8 @@ export async function fetchForecastMeteo(params: {
   //
   // if (!params.forecast_mode) { params.forecast_mode = "forecast" }
   const url = params.forecast_mode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
-  const responses = await fetchWeatherApi(url, params)
+  const { forecast_mode, ...apiParams } = params;
+  const responses = await fetchWeatherApi(url, apiParams)
 
   // Helper function to form time ranges
   const range = (start: number, stop: number, step: number) =>

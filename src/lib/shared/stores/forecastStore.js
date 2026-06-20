@@ -51,11 +51,13 @@ export const climateOpenMeteo = writable([{
 export const forecastLocation = writable({ coordinates: [-3, 53, 100], name: "" })
 export const forecastMode = writable('forecast')
 export const forecastModes = ['forecast', 'historical']
-export const forecastModel = writable('best_match')
+export const forecastModel = writable('ecmwf_ifs')
 export const forecastModels = readable([{ 'value': 'ukmo_seamless', 'displayName': 'UK Met Office', 'description': 'UK Met Office 2km (UK) and 10km (global) model' },
 { 'value': 'ecmwf_ifs', 'displayName': 'ECMWF IFS', 'description': 'ECMWF IFS 9km global model' },
 { 'value': 'icon_seamless', 'displayName': 'ICON', 'description': 'German Weather service (DWD) ICON model with 2km (central Europe), 7km (Europe) and 11km (global) resolution for central Europe, Europe and globe' }])
 export const fetchingForecast = writable(true)
+export const forecastDataMode = writable(null) // tracks which mode the current forecastOpenMeteo data belongs to
+export const forecastCache = writable(null) // last known good forecast-mode data, cleared on location change
 export const forecastDays = writable(5)
 export const forecastDaysPast = writable(1)
 export const hourlyVarsFull = [
@@ -128,41 +130,46 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
 
   // const start_date = getDateString(date.subtractDays(past_days))
   // const end_date = getDateString(date);
-  if ((get(currentLocation).latitude) && (get(currentLocation).userLocation)) {
-    console.log("fetching forecast openMeteo")
-    try {
-      let result = {}
-      if (get(currentLocation).distanceFromPrevious > 4000) {
-        console.log("fetching forecast distanceFromPrevious > 4000", get(currentLocation).distanceFromPrevious, fillParams(hourlyVars, forecast_mode))
-        result = await fetchForecastMeteo(fillParams(hourlyVars, forecast_mode));
-      } else {
-        console.log("fetching forecast distanceFromPrevious < 4000", get(currentLocation).distanceFromPrevious)
+  if (!get(currentLocation).latitude) return;
+  if (forecast_mode !== 'historical' && !get(currentLocation).userLocation) return;
 
-        hourlyVars = ["global_tilted_irradiance"]
-        const gti = await fetchForecastMeteo(fillParams(["global_tilted_irradiance"], forecast_mode));
-        result = get(forecastOpenMeteo)
-        result["global_tilted_irradiance"] = gti["global_tilted_irradiance"]
-      }
+  fetchingForecast.set(true);
+  console.log("fetching forecast openMeteo", forecast_mode)
+  try {
+    let result = {}
+    const locationChanged = get(currentLocation).distanceFromPrevious > 4000;
+    const modeChanged = get(forecastDataMode) !== forecast_mode;
 
-      // Set utcOffsetSeconds
-      forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
-      // Second promise
-      const resultMoist = await fuelMoistureCalcs(
-        result,
-        5,
-        get(currentLocation).slope,
-        get(currentLocation).aspect,
-        get(currentLocation).elevation,
-      );
-      // Update stores
-      forecastOpenMeteo.set(resultMoist);
-      fetchingForecast.set(false);
-      // currentDateTime.set(dateTime);
-      // console.log("get forecast result ;", result)
-    } catch (error) {
-      console.error("Error fetching forecast:", error);
-      fetchingForecast.set(false);
+    // Before overwriting forecastOpenMeteo with historical data, save the current forecast
+    if (forecast_mode === 'historical' && get(forecastDataMode) === 'forecast') {
+      forecastCache.set(get(forecastOpenMeteo));
     }
+
+    const cached = get(forecastCache);
+    if (forecast_mode === 'historical' || locationChanged || (modeChanged && !cached)) {
+      // Full fetch: historical mode, location changed, or switching to forecast with no cache
+      result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode }));
+    } else {
+      // Restore cached forecast (mode switch back) or GTI-only refresh (same mode, same location)
+      const base = (modeChanged && cached) ? cached : get(forecastOpenMeteo);
+      const gti = await fetchForecastMeteo(fillParams({ hourlyVars: ["global_tilted_irradiance"], forecast_mode }));
+      result = { ...base, global_tilted_irradiance: gti["global_tilted_irradiance"] };
+    }
+
+    forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
+    const resultMoist = await fuelMoistureCalcs(
+      result,
+      5,
+      get(currentLocation).slope,
+      get(currentLocation).aspect,
+      get(currentLocation).elevation,
+    );
+    forecastOpenMeteo.set(resultMoist);
+    forecastDataMode.set(forecast_mode);
+    fetchingForecast.set(false);
+  } catch (error) {
+    console.error("Error fetching forecast:", error);
+    fetchingForecast.set(false);
   }
 }
 

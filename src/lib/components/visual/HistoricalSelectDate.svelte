@@ -36,34 +36,34 @@
 
 <div class="w-full text-center pt-4 mt-6">Historical Weather</div>
 <div class="flex flex-row pt-2 pb-2 justify-center space-x-2">
-  <div>
+  <div class="min-w-20">
     <Select
       id="select-year"
       size="sm"
       items={$yearsOptions}
       bind:value={$historicalYear}
-      placeholder="Select year"
+      placeholder="Year"
     />
   </div>
   {#if $historicalYear}
-    <div>
+    <div class="w-24">
       <Select
         id="select-month"
         size="sm"
         items={$monthOptions}
         bind:value={$historicalMonth}
-        placeholder="Select month"
+        placeholder="Month"
       />
     </div>
   {/if}
   {#if typeof $historicalMonth === "number"}
-    <div>
+    <div class="w-16">
       <Select
         id="select-day"
         size="sm"
         items={$dayOptions}
         bind:value={$historicalDay}
-        placeholder="Select day"
+        placeholder="Day"
       />
     </div>
   {/if}
@@ -76,7 +76,7 @@
       $historicalDate
         ? false
         : true}
-      on:click={() => fetchHistoricalForecast()}>Retrieve</Button
+      onclick={() => fetchHistoricalForecast()}>Retrieve</Button
     >
   </div>
 </div>

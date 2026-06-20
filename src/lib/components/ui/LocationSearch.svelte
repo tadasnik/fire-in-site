@@ -1,6 +1,6 @@
 <script>
   import { currentLocation } from "$lib/shared/stores/locationStore";
-  import { getForecastOpenMeteo } from "$lib/shared/stores/forecastStore";
+  import { getForecastOpenMeteo, forecastCache, forecastModel } from "$lib/shared/stores/forecastStore";
   import { getHistory, recordSearch } from "$lib/shared/stores/searchHistory";
   import { SearchOutline, ClockOutline } from "flowbite-svelte-icons";
 
@@ -80,6 +80,7 @@
         elevation = data.elevation?.[0] ?? 0;
       } catch { /* keep 0 */ }
     }
+    forecastCache.set(null); // new location invalidates cached forecast
     currentLocation.update((loc) => ({
       ...loc,
       latitude: result.latitude,
@@ -89,6 +90,9 @@
       userLocation: true,
       distanceFromPrevious: 99999,
     }));
+    const inUKIreland = result.latitude >= 49.5 && result.latitude <= 61
+      && result.longitude >= -10.7 && result.longitude <= 2;
+    forecastModel.set(inUKIreland ? 'ukmo_seamless' : 'ecmwf_ifs');
     getForecastOpenMeteo();
   }
 
