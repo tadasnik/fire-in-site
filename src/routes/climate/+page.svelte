@@ -6,6 +6,7 @@
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import Spiral from "$lib/components/visual/spiral/Spiral.svelte";
   import ColorbarAxisX from "$lib/components/visual/spiral/ColorbarAxisX.svelte";
+  import LocationSearch from "$lib/components/ui/LocationSearch.svelte";
 
   let fetchingHistory = $state(false);
   let w = $state(), h = $state();
@@ -62,6 +63,10 @@
     getClimate();
   });
 </script>
+
+<div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-2xl">
+  <LocationSearch />
+</div>
 
 <div
   class="h-[500px] w-[500px] md:h-[800px] md:w-[800px] flex relative items-center mx-auto overflow-x-auto"

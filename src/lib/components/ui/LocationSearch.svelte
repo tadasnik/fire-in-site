@@ -1,4 +1,6 @@
 <script>
+  import { onMount } from "svelte";
+  import { get } from "svelte/store";
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import { getForecastOpenMeteo, forecastCache, forecastModel } from "$lib/shared/stores/forecastStore";
   import { getHistory, recordSearch } from "$lib/shared/stores/searchHistory";
@@ -11,6 +13,12 @@
   let activeIndex = $state(-1);
   let debounceTimer;
   let containerEl;
+
+  onMount(() => {
+    if (get(currentLocation).userLocation) return;
+    const history = getHistory();
+    if (history.length > 0) select(history[0], { record: false });
+  });
 
   function onFocus() {
     if (query.length < 2) {
@@ -64,12 +72,12 @@
     }
   }
 
-  async function select(result) {
+  async function select(result, { record = true } = {}) {
     query = "";
     results = [];
     open = false;
     showingHistory = false;
-    if (!result._coord) recordSearch(result);
+    if (record && !result._coord) recordSearch(result);
     let elevation = result.elevation ?? 0;
     if (result._coord) {
       try {
