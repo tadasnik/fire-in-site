@@ -52,7 +52,7 @@
       fetchDailyMeteo({
         ...baseParams,
         forecast_mode: "forecast",
-        forecast_model: "ecmwf_ifs025",
+        models: "ecmwf_ifs025",
         forecast_days: 14,
         past_days: 6,
       }),

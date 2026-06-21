@@ -106,7 +106,7 @@ export function fillParams({
   if (forecast_mode === "forecast") {
     return {
       ...baseParams,
-      "forecast_model": forecast_model,
+      "models": forecast_model,
       "past_days": forecast_days_past,
       "forecast_days": forecast_days,
     }

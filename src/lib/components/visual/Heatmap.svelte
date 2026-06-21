@@ -22,6 +22,8 @@
     forecastMode,
     focusDayIndex,
     forecastOpenMeteo,
+    forecastModel,
+    forecastModels,
   } from "$lib/shared/stores/forecastStore";
   import { dateString } from "$lib/shared/stores/timeStore";
 
@@ -255,7 +257,7 @@
           {forecastData}
           {weatherProps}
           forecastLabel={$forecastMode === "forecast"
-            ? "Weather forecast"
+            ? (($forecastModels.find((m) => m.value === $forecastModel)?.displayName ?? $forecastModel) + " forecast")
             : "Weather " + $dateString}
           axisLabel={outputNodes[$selectedOutput].label +
             " (" +

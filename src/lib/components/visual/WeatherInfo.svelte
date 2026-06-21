@@ -4,7 +4,7 @@
   import "$lib/styles/weather-icons-wind.css";
   import FireCharAnotations from "./FireCharAnotations.svelte";
   import { currentDateTime, dateTime } from "$lib/shared/stores/timeStore";
-  import { currentTimeIndex } from "$lib/shared/stores/forecastStore";
+  import { currentTimeIndex, forecastMode, forecastModel, forecastModels } from "$lib/shared/stores/forecastStore";
   import { Spinner } from "flowbite-svelte";
 
   let { data, forecastLocation, fireLocation } = $props();
@@ -92,6 +92,11 @@
     "Wind From": ["windDirectionFrom10m", 0, "wi wi-wind-direction"],
   };
   // $: console.log("Weather info data", data);
+  let modelLabel = $derived.by(() => {
+    if ($forecastMode === "historical") return "ERA5 reanalysis";
+    const m = $forecastModels.find((x) => x.value === $forecastModel);
+    return m ? `${m.displayName} forecast` : `${$forecastModel} forecast`;
+  });
 </script>
 
 <div class="min-h-20">
@@ -106,6 +111,9 @@
         {Math.abs(fireLocation?.latitude ?? 0).toFixed(2)}°{(fireLocation?.latitude ?? 0) >= 0 ? 'N' : 'S'},
         {Math.abs(fireLocation?.longitude ?? 0).toFixed(2)}°{(fireLocation?.longitude ?? 0) >= 0 ? 'E' : 'W'}
       </div>
+    </div>
+    <div class="text-center text-xs text-gray-500 -mt-1">
+      {modelLabel}
     </div>
 
     <div class="flex align-middle justify-center items-end space-x-2">
