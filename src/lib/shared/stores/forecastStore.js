@@ -109,6 +109,7 @@ export function fillParams({
       "models": forecast_model,
       "past_days": forecast_days_past,
       "forecast_days": forecast_days,
+      "daily": ["weather_code"],
     }
   } else if (forecast_mode === "historical") {
     if (start_date === undefined) {

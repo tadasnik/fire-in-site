@@ -53,29 +53,26 @@ export async function fetchForecastMeteo(params: {
     weatherData[variable] = hourly.variables(nr)!.valuesArray()!
   }
 
-  // Some models (e.g. ukmo_seamless) don't expose vapour_pressure_deficit directly
-  // and return all zeros. Recompute locally from temperature_2m + relative_humidity_2m
-  // using the Tetens equation: VPD = 0.6108·exp(17.27T/(T+237.3))·(1 − RH/100)  [kPa, T in °C].
+  // Some models (e.g. ukmo_seamless) return 0 for most/all vapour_pressure_deficit
+  // values even when RH < 100% (where VPD should be > 0). Compared to ECMWF the local
+  // Tetens computation matches the API to within ~0.04 kPa, so when T+RH are present
+  // we override the API value with a locally-computed one for a model-independent result.
+  // VPD = 0.6108·exp(17.27T/(T+237.3))·(1 − RH/100)  [kPa, T in °C].
   if (
     params.hourly.includes("vapour_pressure_deficit") &&
     params.hourly.includes("temperature_2m") &&
     params.hourly.includes("relative_humidity_2m")
   ) {
-    const vpd = weatherData["vapour_pressure_deficit"] as Float32Array;
-    const allMissing = vpd.every((v) => !v || Number.isNaN(v));
-    if (allMissing) {
-      const t = weatherData["temperature_2m"] as Float32Array;
-      const rh = weatherData["relative_humidity_2m"] as Float32Array;
-      const out = new Float32Array(t.length);
-      for (let i = 0; i < t.length; i++) {
-        const ti = t[i], rhi = rh[i];
-        if (Number.isNaN(ti) || Number.isNaN(rhi)) { out[i] = NaN; continue; }
-        const es = 0.6108 * Math.exp((17.27 * ti) / (ti + 237.3));
-        out[i] = es * (1 - rhi / 100);
-      }
-      weatherData["vapour_pressure_deficit"] = out;
-      console.log("VPD missing from API response — computed locally from T+RH");
+    const t = weatherData["temperature_2m"] as Float32Array;
+    const rh = weatherData["relative_humidity_2m"] as Float32Array;
+    const out = new Float32Array(t.length);
+    for (let i = 0; i < t.length; i++) {
+      const ti = t[i], rhi = rh[i];
+      if (Number.isNaN(ti) || Number.isNaN(rhi)) { out[i] = NaN; continue; }
+      const es = 0.6108 * Math.exp((17.27 * ti) / (ti + 237.3));
+      out[i] = es * (1 - rhi / 100);
     }
+    weatherData["vapour_pressure_deficit"] = out;
   }
 
   if ((params.models === "ukmo_seamless") && (params.forecast_days > 2) && (params.forecast_mode === "forecast")) {
@@ -86,6 +83,20 @@ export async function fetchForecastMeteo(params: {
       };
     }
   }
+  // Optional daily block (e.g. daily weather_code for DayPicker icons)
+  if (Array.isArray(params.daily) && params.daily.length > 0) {
+    const daily = response.daily();
+    if (daily) {
+      const dailyTime = range(Number(daily.time()), Number(daily.timeEnd()), daily.interval()).map(
+        (t) => Number(3600000 * (Math.round(Number(new Date((t + utcOffsetSeconds) * 1000)) / 3600000)))
+      );
+      weatherData["daily_time"] = dailyTime;
+      for (const [nr, variable] of (params.daily as string[]).entries()) {
+        weatherData["daily_" + variable] = daily.variables(nr)!.valuesArray()!;
+      }
+    }
+  }
+
   weatherData["timeZone"] = timezone
   console.log("timezone", timezone)
   console.log("openMeteo weatherData", weatherData)
