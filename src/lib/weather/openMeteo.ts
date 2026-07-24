@@ -1,5 +1,11 @@
 import { fetchWeatherApi } from 'openmeteo';
 
+// Forecast requests are proxied through our own server route so the paid
+// Open-Meteo customer apikey stays server-side (see src/routes/api/forecast).
+// Historical/ERA5 archive requests need no key and go direct.
+const FORECAST_URL = "/api/forecast";
+const ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive";
+
 
 export async function fetchForecastMeteo(params: {
   latitude: number,
@@ -18,7 +24,7 @@ export async function fetchForecastMeteo(params: {
   // // console.log("fetchForecastMeteo params", params)
   //
   // if (!params.forecast_mode) { params.forecast_mode = "forecast" }
-  const url = params.forecast_mode === 'forecast' ? "https://api.open-meteo.com/v1/forecast" : "https://archive-api.open-meteo.com/v1/archive"
+  const url = params.forecast_mode === 'forecast' ? FORECAST_URL : ARCHIVE_URL
   const { forecast_mode, ...apiParams } = params;
   const responses = await fetchWeatherApi(url, apiParams)
 
@@ -103,9 +109,7 @@ export async function fetchForecastMeteo(params: {
   return weatherData;
 }
 export async function fetchDailyMeteo(params: Record<string, any>): Promise<any> {
-  const url = params.forecast_mode === 'forecast'
-    ? "https://api.open-meteo.com/v1/forecast"
-    : "https://archive-api.open-meteo.com/v1/archive";
+  const url = params.forecast_mode === 'forecast' ? FORECAST_URL : ARCHIVE_URL;
 
   const { forecast_mode, ...apiParams } = params;
   const responses = await fetchWeatherApi(url, apiParams);

@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { get } from "svelte/store";
-  import { currentLocation } from "$lib/shared/stores/locationStore";
+  import { currentLocation, getLocation } from "$lib/shared/stores/locationStore";
   import { getForecastOpenMeteo, forecastCache, forecastModel } from "$lib/shared/stores/forecastStore";
   import { getHistory, recordSearch } from "$lib/shared/stores/searchHistory";
   import { SearchOutline, ClockOutline } from "flowbite-svelte-icons";
@@ -14,10 +14,17 @@
   let debounceTimer;
   let containerEl;
 
-  onMount(() => {
+  onMount(async () => {
     if (get(currentLocation).userLocation) return;
     const history = getHistory();
-    if (history.length > 0) select(history[0], { record: false });
+    if (history.length > 0) {
+      // Default to the most-frequently used location.
+      select(history[0], { record: false });
+    } else {
+      // First-time user: fall back to IP-based geolocation.
+      const [latitude, longitude] = await getLocation();
+      select({ latitude, longitude, _coord: true }, { record: false });
+    }
   });
 
   function onFocus() {

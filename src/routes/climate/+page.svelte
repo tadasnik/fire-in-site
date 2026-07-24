@@ -86,6 +86,19 @@
   });
 </script>
 
+<svelte:head>
+  <title>Fire Weather Climate — UK Locations | FireInSite</title>
+  <meta
+    name="description"
+    content="Explore long-term fire weather and climate for any UK location: multi-year temperature, humidity and fire danger patterns behind wildfire risk, from FireInSite."
+  />
+  <meta property="og:title" content="Fire Weather Climate — UK Locations | FireInSite" />
+  <meta
+    property="og:description"
+    content="Long-term fire weather and climate patterns behind UK wildfire risk."
+  />
+</svelte:head>
+
 <div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-3xl">
   <div class="flex flex-col md:flex-row gap-2 md:items-center">
     <div class="flex-1 min-w-0">

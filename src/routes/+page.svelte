@@ -1,191 +1,58 @@
 <script>
+  import { onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { Select, Button, Spinner } from "flowbite-svelte";
-  import Map from "$lib/components/ui/Map.svelte";
-  import { outputNodes } from "$lib/data/outputNodes.js";
-  import {
-    selectedOutput,
-    selectedOutputs,
-  } from "$lib/shared/stores/modelStore.js";
-
-  import {
-    forecastOpenMeteo,
-    forecastLocation,
-    forecastMode,
-    fetchingForecast,
-    forecastDataMode,
-  } from "$lib/shared/stores/forecastStore.js";
-  import { changedHistoricalDate } from "$lib/shared/stores/timeStore.js";
+  import { Spinner } from "flowbite-svelte";
   import { currentLocation } from "$lib/shared/stores/locationStore";
-  import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
-  import CanopyControls from "$lib/components/ui/CanopyControls.svelte";
-  import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
-  import HourlyForecast from "$lib/components/visual/HourlyForecast.svelte";
-  import HistoricalSelectDate from "$lib/components/visual/HistoricalSelectDate.svelte";
-  import DayPicker from "$lib/components/visual/DayPicker.svelte";
-  import Heatmap from "$lib/components/visual/Heatmap.svelte";
-  import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
-  import UserInputControls from "$lib/components/ui/UserInputControls.svelte";
-  import LocationSearch from "$lib/components/ui/LocationSearch.svelte";
 
-  let width = $state();
-  let showMap = false;
+  // The interactive app pulls in browser-only libraries (Mapbox, the fire
+  // model). Load it dynamically on the client so this route can be
+  // server-rendered for its SEO head + hero without those libraries.
+  let HomeApp = $state(null);
+  onMount(async () => {
+    HomeApp = (await import("$lib/components/HomeApp.svelte")).default;
+  });
 
-  async function geolocate() {
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0,
-    };
+  const title = "FireInSite — Wildfire Behaviour & Fire Danger Prediction";
+  const description =
+    "FireInSite predicts wildfire behaviour across UK heath, shrub and grassland fuels — fire spread rate, flame length and intensity from live weather forecasts, free in your browser.";
 
-    function success(pos) {
-      const crd = pos.coords;
-
-      console.log("Your current position is:");
-      console.log(`Latitude : ${crd.latitude}`);
-      console.log(`Longitude: ${crd.longitude}`);
-      console.log(`More or less ${crd.accuracy} meters.`);
-      $currentLocation.longitude = crd.longitude;
-      $currentLocation.latitude = crd.latitude;
-
-      // setMapLocation(crd.longitude, crd.latitude)
-    }
-
-    function error(err) {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
-    }
-
-    navigator.geolocation.getCurrentPosition(success, error, options);
-  }
-
-  // $: console.log("currentLocation  !??????", $currentLocation);
-  // $: console.log("fetchingForecast  !??????", $fetchingForecast);
-  // $: console.log("Forecast MOde  !??????", $forecastMode);
+  // Live location shown as the hero subtitle (client-side only, once known).
+  let locationLabel = $derived.by(() => {
+    const loc = $currentLocation;
+    if (!loc || (!loc.name && !loc.latitude && !loc.longitude)) return "";
+    const lat = loc.latitude ?? 0;
+    const lon = loc.longitude ?? 0;
+    const coords =
+      `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? "N" : "S"}, ` +
+      `${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
+    return loc.name ? `${loc.name}, ${coords}` : coords;
+  });
 </script>
 
 <svelte:head>
-  <title>FireInSite fire behaviour prediction system</title>
-  <meta
-    name="description"
-    content="Fire behaviour predictions for a wide range of
-    temperate shrub and grass-dominated vegetation fuels in your browser."
-  />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
 </svelte:head>
 
-<div class="flex flex-col justify-center content-center w-full space-y-5">
-  <div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-2xl">
-    <LocationSearch />
-  </div>
-  <div class="container mx-auto justify-center p-2 items-center">
-    {#if $fetchingForecast === false}
-      <WeatherInfo
-        data={$forecastOpenMeteo}
-        forecastLocation={$forecastLocation.name}
-        fireLocation={$currentLocation}
-      />
-    {:else}
-      <WeatherInfo
-        data={null}
-        forecastLocation={$forecastLocation.name}
-        fireLocation={$currentLocation}
-      />
-    {/if}
-  </div>
-  <!-- <div class="flex flex-row mx-auto max-h-3 w-full max-w-screen-xl"> -->
-  <!--   <div class="hidden md:block place-items-baseline align-text-bottom pb-0"> -->
-  <!--     <div class="flex-row"> -->
-  <!--       <div class="items-baseline align-text-bottom pr-4"> -->
-  <!--         <span class="align-bottom">HHSelect location on the Map</span> -->
-  <!--       </div> -->
-  <!--       <div> -->
-  <!--         <Button outline primary size="xs">Geolocate</Button> -->
-  <!--       </div> -->
-  <!--     </div> -->
-  <!--     <!-- <div>Current</div> -->
-  <!--     <div class="p-5"> -->
-  <!--       <Label> -->
-  <!--         HHSelect Model output -->
-  <!--         <Select -->
-  <!--           id="select-output" -->
-  <!--           class="mb-6 pl-3" -->
-  <!--           bind:value={$selectedOutput} -->
-  <!--         > -->
-  <!--           {#each $selectedOutputs as output} -->
-  <!--             <option value={output}>{outputNodes[output].label}</option> -->
-  <!--           {/each} -->
-  <!--         </Select> -->
-  <!--       </Label> -->
-  <!--     </div> -->
-  <!--   </div> -->
-  <!-- </div> -->
-  <div
-    class="container mx-auto flex flex-col md:flex-row justify-center items-center max-w-screen-xl"
-  >
-    <div class="grow w-full md:w-1/2 min-w-96 max-w-120 pl-4 md:pl-8">
-      <!-- <FindLocation></FindLocation> -->
-      <!-- <GeoLocation></GeoLocation> -->
-      <Map></Map>
-    </div>
-    <div class="grow w-full md:w-1/2 min-w-96 max-w-120 p-2 md:pl-8">
-      <div class="flex flex-row place-items-baseline justify-center">
-        <div class="items-baseline align-text-bottom pr-2">
-          <span class="align-bottom text-xs lg:text-sm"
-            >Select model output</span
-          >
-        </div>
+<section class="container mx-auto px-4 pt-4 text-center">
+  <h1 class="text-xl md:text-xl text-gray-600 dark:text-white">
+    Wildfire Behaviour Prediction
+  </h1>
+  {#if browser && locationLabel}
+    <p class="mt-1 text-xl text-semibold text-gray-800 dark:text-gray-400">
+      {locationLabel}
+    </p>
+  {/if}
+</section>
 
-        <SelectOutput></SelectOutput>
-      </div>
-
-      <div class="flex grow aspect-square pt-2" bind:clientWidth={width}>
-        {#if browser && $fetchingForecast === false}
-          <CurrentBehaviour></CurrentBehaviour>
-        {:else}
-          <div class="flex justify-center">
-            <Spinner></Spinner>
-          </div>
-        {/if}
-      </div>
-    </div>
+{#if HomeApp}
+  <HomeApp />
+{:else}
+  <div class="flex justify-center p-16">
+    <Spinner size={8} />
   </div>
-  <div class="flex flex-col w-full items-center">
-    {#if $forecastMode === "user"}
-      <UserInputControls></UserInputControls>
-    {:else}
-      {#if $forecastMode === "historical"}
-        <HistoricalSelectDate></HistoricalSelectDate>
-      {/if}
-      {#if $forecastMode === "forecast"}
-        <div class="w-full md:max-w-4xl overflow-x-auto">
-          <DayPicker />
-        </div>
-      {/if}
-
-      {#if $changedHistoricalDate === true || $forecastMode === "forecast"}
-        {#if $forecastDataMode === $forecastMode}
-          <div class="w-full md:max-w-4xl overflow-x-auto transition-opacity duration-300"
-               class:opacity-30={$fetchingForecast}
-               class:pointer-events-none={$fetchingForecast}>
-            <Heatmap
-              xKey="time"
-              zKey={$selectedOutput}
-              yKey="surface.primary.fuel.model.catalogKey"
-            />
-          </div>
-          {#if $selectedOutput == "crown.fire.transition.minBaseHeight" && !$fetchingForecast}
-            <div class="p-2 mx-auto max-w-120">
-              <CanopyControls></CanopyControls>
-            </div>
-          {/if}
-        {:else}
-          <div class="flex justify-center p-8">
-            <Spinner />
-          </div>
-        {/if}
-      {/if}
-    {/if}
-  </div>
-</div>
-
-<style>
-</style>
+{/if}

@@ -14,6 +14,8 @@
     selectedOutputs,
     selectedOutput,
     chartType,
+    grassCuringMode,
+    liveMoistureMode,
   } from "$lib/shared/stores/modelStore";
   import {
     fetchingForecast,
@@ -99,6 +101,48 @@
     >
     <Helper class="ps-6"
       >Calculate dead fuel mosture using Fosberg model.</Helper
+    >
+  </li>
+
+  <DropdownDivider></DropdownDivider>
+  <div class="px-4 py-2">
+    <span class="block text-lg text-gray-900 dark:text-white"
+      >Grass curing:</span
+    >
+  </div>
+  <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+    <Radio name="grassCuringMode" bind:group={$grassCuringMode} value={"climatology"}
+      >Climatology</Radio
+    >
+    <Helper class="ps-6">Static monthly curing table (current default).</Helper>
+  </li>
+  <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+    <Radio name="grassCuringMode" bind:group={$grassCuringMode} value={"phenology"}
+      >Phenology model</Radio
+    >
+    <Helper class="ps-6"
+      >Continuous day-length curing with a heatwave (VPD-anomaly) bump.</Helper
+    >
+  </li>
+
+  <DropdownDivider></DropdownDivider>
+  <div class="px-4 py-2">
+    <span class="block text-lg text-gray-900 dark:text-white"
+      >Live fuel moisture:</span
+    >
+  </div>
+  <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+    <Radio name="liveMoistureMode" bind:group={$liveMoistureMode} value={"climatology"}
+      >Climatology</Radio
+    >
+    <Helper class="ps-6">Static monthly live moisture table (current default).</Helper>
+  </li>
+  <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+    <Radio name="liveMoistureMode" bind:group={$liveMoistureMode} value={"lfmc"}
+      >LFMC model</Radio
+    >
+    <Helper class="ps-6"
+      >Weather-driven live fuel moisture (grass, gorse, heather, bracken).</Helper
     >
   </li>
 

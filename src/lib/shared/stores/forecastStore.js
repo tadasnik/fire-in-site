@@ -7,6 +7,50 @@ import {
 } from '$lib/shared/stores/timeStore'
 import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
 import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
+import { lfmcCalcs } from "$lib/model/lfmcModel.js";
+
+const DAY_MS = 86400000;
+
+/**
+ * Daily-max VPD for the days preceding the forecast window, used to seed the
+ * LFMC 7-day trailing mean (the main forecast fetch only carries 1 past day).
+ *
+ * This is a reduced (T + RH + VPD only) hourly fetch, not a daily one, on
+ * purpose: (1) the daily `vapour_pressure_deficit_max` product from the forecast
+ * endpoint is unusable on ukmo_seamless, whose hourly VPD the app already
+ * overrides with a local Tetens computation from T+RH; and (2) the ERA5 archive
+ * daily product lags ~5 days, so it cannot cover a window ending today. The
+ * forecast endpoint's past_days backfill has no such lag. Daily max is reduced
+ * from the locally-computed hourly VPD, matching how the forecast-window days
+ * are derived — so past and forecast portions of the window are consistent.
+ *
+ * Returns a { dayIndex: vpdmax } map (dayIndex = floor(ms / DAY_MS)), or {} on
+ * failure so the caller falls back to forecast-window data only.
+ */
+export async function fetchPastDailyVpdMax(forecast_mode, pastDays = 8) {
+  try {
+    const hourlyVars = ["temperature_2m", "relative_humidity_2m", "vapour_pressure_deficit"];
+    const params = forecast_mode === "historical"
+      ? fillParams({
+        hourlyVars, forecast_mode,
+        start_date: getDateString(sub(get(currentDateTime), { days: pastDays })),
+        end_date: getDateString(get(currentDateTime)),
+      })
+      : fillParams({ hourlyVars, forecast_mode, forecast_days_past: pastDays, forecast_days: 1 });
+    const res = await fetchForecastMeteo(params);
+    const times = res.time || [];
+    const vpd = res["vapour_pressure_deficit"] || [];
+    const byDay = {};
+    for (let i = 0; i < times.length; i++) {
+      const v = vpd[i];
+      const day = Math.floor(times[i] / DAY_MS);
+      if (v != null && !Number.isNaN(v) && (byDay[day] == null || v > byDay[day])) byDay[day] = v;
+    }
+    return byDay;
+  } catch {
+    return {};
+  }
+}
 
 export const forecastOpenMeteo = writable({
   time: [1403984000],
@@ -109,7 +153,7 @@ export function fillParams({
       "models": forecast_model,
       "past_days": forecast_days_past,
       "forecast_days": forecast_days,
-      "daily": ["weather_code"],
+      "daily": ["precipitation_sum"],
     }
   } else if (forecast_mode === "historical") {
     if (start_date === undefined) {
@@ -146,6 +190,10 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
       forecastCache.set(get(forecastOpenMeteo));
     }
 
+    // Kick off the reduced past-days VPD fetch concurrently with the main
+    // (full-variable) fetch so it adds no wall-clock latency.
+    const pastVpdPromise = fetchPastDailyVpdMax(forecast_mode);
+
     const cached = get(forecastCache);
     if (forecast_mode === 'historical' || locationChanged || (modeChanged && !cached)) {
       // Full fetch: historical mode, location changed, or switching to forecast with no cache
@@ -157,6 +205,9 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
       result = { ...base, global_tilted_irradiance: gti["global_tilted_irradiance"] };
     }
 
+    // Daily max VPD for the days preceding the forecast window (LFMC 7-day mean).
+    result._pastVpdMaxByDay = await pastVpdPromise;
+
     forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
     const resultMoist = await fuelMoistureCalcs(
       result,
@@ -165,6 +216,8 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
       get(currentLocation).aspect,
       get(currentLocation).elevation,
     );
+    // Add per-timestep live fuel moisture (used when live moisture mode = 'lfmc').
+    await lfmcCalcs(resultMoist, get(currentLocation).latitude);
     forecastOpenMeteo.set(resultMoist);
     forecastDataMode.set(forecast_mode);
     fetchingForecast.set(false);
