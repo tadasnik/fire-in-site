@@ -6,10 +6,10 @@
   import { selectedOutput } from "$lib/shared/stores/modelStore.js";
   import { preloadDeadFFMC } from "$lib/model/fireInSiteFFMC";
   import { preloadLfmc } from "$lib/model/lfmcModel";
+  import { preloadCuring } from "$lib/model/curingModel";
 
   import {
     forecastOpenMeteo,
-    forecastLocation,
     forecastMode,
     fetchingForecast,
     forecastDataMode,
@@ -18,7 +18,8 @@
   import { currentLocation } from "$lib/shared/stores/locationStore";
   import CurrentBehaviour from "$lib/components/visual/CurrentBehaviour.svelte";
   import CanopyControls from "$lib/components/ui/CanopyControls.svelte";
-  import WeatherInfo from "$lib/components/visual/WeatherInfo.svelte";
+  import LocationInfo from "$lib/components/visual/LocationInfo.svelte";
+  import WeatherLine from "$lib/components/visual/WeatherLine.svelte";
   import HourlyForecast from "$lib/components/visual/HourlyForecast.svelte";
   import HistoricalSelectDate from "$lib/components/visual/HistoricalSelectDate.svelte";
   import DayPicker from "$lib/components/visual/DayPicker.svelte";
@@ -34,6 +35,7 @@
   onMount(() => {
     preloadDeadFFMC();
     preloadLfmc();
+    preloadCuring();
   });
 </script>
 
@@ -41,20 +43,8 @@
   <div class="container mx-auto px-4 pt-3 max-w-sm md:max-w-2xl">
     <LocationSearch />
   </div>
-  <div class="container mx-auto justify-center p-2 items-center">
-    {#if $fetchingForecast === false}
-      <WeatherInfo
-        data={$forecastOpenMeteo}
-        forecastLocation={$forecastLocation.name}
-        fireLocation={$currentLocation}
-      />
-    {:else}
-      <WeatherInfo
-        data={null}
-        forecastLocation={$forecastLocation.name}
-        fireLocation={$currentLocation}
-      />
-    {/if}
+  <div class="container mx-auto justify-center px-2 py-0 items-center">
+    <LocationInfo fireLocation={$currentLocation} />
   </div>
   <div
     class="container mx-auto flex flex-col md:flex-row justify-center items-center max-w-screen-xl"
@@ -72,6 +62,14 @@
 
         <SelectOutput></SelectOutput>
       </div>
+
+      <!-- Weather at the selected hour, annotating which hour the fire
+           behaviour results below are for. -->
+      {#if browser && $fetchingForecast === false}
+        <div class="pt-2">
+          <WeatherLine data={$forecastOpenMeteo} />
+        </div>
+      {/if}
 
       <div class="flex grow aspect-square pt-2" bind:clientWidth={width}>
         {#if browser && $fetchingForecast === false}

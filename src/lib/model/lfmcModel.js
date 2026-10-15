@@ -31,13 +31,18 @@ export const COMPONENTS = [
 ];
 
 /** App fuel code -> representative live LFMC component for site.moisture.live.category.
- *  Fuels not listed keep the climatology live moisture (no clear component). */
+ *  Only fuels with a live fuel component are mapped; fuels not listed keep the
+ *  climatology live moisture. Dead-only fuels (litters SN/BL/LN, Calluna brash
+ *  BCH, crop WB) are intentionally excluded — they have no live load, so an LFMC
+ *  value would be meaningless for them. `bv` (bilberry, Vaccinium) uses
+ *  heather_canopy (Calluna) as a proxy — both are dwarf ericaceous shrubs, a
+ *  closer match than bracken (there is no Vaccinium component in the model). */
 export const FUEL_TO_COMPONENT = {
   grl: 'moor_grass', grm: 'moor_grass', grh: 'moor_grass',
   gl: 'gorse_canopy', gm: 'gorse_canopy', gh: 'gorse_canopy', gt: 'gorse_canopy',
   cll: 'heather_canopy', clm: 'heather_canopy', clh: 'heather_canopy', clt: 'heather_canopy', cld: 'heather_canopy',
   mhl: 'heather_canopy', mhh: 'heather_canopy',
-  bk: 'bracken_leaves', bch: 'bracken_leaves', bl: 'bracken_leaves', bv: 'bracken_leaves',
+  bk: 'bracken_leaves', bv: 'heather_canopy',
 };
 
 let _sessionPromise = null;

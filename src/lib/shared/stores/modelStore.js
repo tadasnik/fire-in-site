@@ -9,10 +9,7 @@ import { elevationDiff, forecastOpenMeteo, forecastDaysPast } from "$lib/shared/
 import { currentLocation } from "$lib/shared/stores/locationStore";
 import UKFuelModels from '$lib/data/UKFuelModels.json'
 import FireSim from '$lib/model/surfaceFireOptimized.js'
-import { browser } from "$app/environment";
-import { grassCuring } from '$lib/model/grassCuring';
-import { getVpdClimatology, vpdAnomalySd7, cellKey } from '$lib/model/vpdClimatology';
-import { FUEL_TO_COMPONENT, buildVpdMax7MeanByDay } from '$lib/model/lfmcModel';
+import { FUEL_TO_COMPONENT } from '$lib/model/lfmcModel';
 import { computeOutputForecast } from '$lib/model/computeForecast.js';
 
 export const inputNodesStore = writable(inputNodes)
@@ -38,28 +35,11 @@ export const advancedMode = writable(false)
 export const chartType = writable("bars")
 
 // Grass curing method: 'climatology' = static monthly table (cured.herb.fraction),
-// 'phenology' = continuous ddur base + VPD-anomaly heatwave bump (grassCuring()).
+// 'phenology' = weather-driven ONNX curing model (per-day, forecast.curingByDay).
 export const grassCuringMode = writable('climatology')
 // Live fuel moisture method: 'climatology' = monthly table (site.moisture.live.category),
 // 'lfmc' = weather-driven ONNX LFMC model (per mapped fuel component).
 export const liveMoistureMode = writable('climatology')
-// Current location's monthly daily-max VPD climatology (mean/sd), for the anomaly.
-export const vpdClimatology = writable(null)
-
-// Load (and localStorage-cache) the VPD climatology whenever the location's
-// ERA5 grid cell changes. Browser-only (uses fetch + localStorage).
-if (browser) {
-  let _lastClimCell = null
-  currentLocation.subscribe((loc) => {
-    if (!loc || loc.latitude == null || loc.longitude == null) return
-    const cell = cellKey(loc.latitude, loc.longitude)
-    if (cell === _lastClimCell) return
-    _lastClimCell = cell
-    getVpdClimatology(loc.latitude, loc.longitude)
-      .then((c) => vpdClimatology.set(c))
-      .catch(() => { })
-  })
-}
 
 export const canopyInputs = writable({
   "site.canopy.fuel.foliar.moistureContent": [120],
@@ -304,29 +284,35 @@ export const requiredFuelInputs = derived(
 )
 
 export const _inputsForecast = derived(
-  [requiredFuelInputs, requiredSiteInputsForecastOpen, grassCuringMode, vpdClimatology,
+  [requiredFuelInputs, requiredSiteInputsForecastOpen, grassCuringMode,
     liveMoistureMode, forecastOpenMeteo, fuelMoistureModel],
-  ([$requiredFuelInputs, $requiredSiteInputsForecastOpen, $grassCuringMode, $vpdClimatology,
+  ([$requiredFuelInputs, $requiredSiteInputsForecastOpen, $grassCuringMode,
     $liveMoistureMode, $forecastOpenMeteo, $fuelMoistureModel]) => {
     const inputsForecast = new Map()
     const forecastOpenMeteoFFMC = $forecastOpenMeteo
 
-    // Grass phenology curing: the heatwave bump is driven by the same shared
-    // 7-day-mean daily-max VPD series as the LFMC model (memoised on the forecast
-    // by lfmcCalcs), standardised into a one-sided anomaly against the month's
-    // 7-day-mean SD (sd7).
+    // Grass phenology curing: per-day cured fraction from the ONNX curing model
+    // (curingModel.js), precomputed on forecast.curingByDay by curingCalcs and
+    // read here by day index. A single universal grass curve.
     const CURED_KEY = 'surface.primary.fuel.model.behave.parms.cured.herb.fraction'
+    // Fuels whose herbaceous curing is driven by the curing model: the three grass
+    // fuels plus high-herb mixed heath (mhh), whose herbaceous component
+    // (Molinia/Pteridium) cures like grass. Other herb-bearing fuels (bk, wb, bv)
+    // keep the static monthly table.
+    const CURING_MODEL_FUELS = new Set(['grl', 'grm', 'grh', 'mhh'])
     const usePhenology = $grassCuringMode === 'phenology'
-    // Read-latest for the same reason as terrain above: latitude only changes
-    // alongside a forecast refetch, which is already a tracked dependency.
-    const lat = get(currentLocation)?.latitude
-    const vpd7ByDay = usePhenology
-      ? (forecastOpenMeteoFFMC.vpdMax7MeanByDay || buildVpdMax7MeanByDay(forecastOpenMeteoFFMC))
-      : null
+    const curingByDay = usePhenology ? forecastOpenMeteoFFMC.curingByDay : null
 
     // Hoisted: invariant across the timestep x fuel loop below.
     const useFireInSite = $fuelMoistureModel === "fireInSite"
     const fuelKeys = Object.keys($requiredFuelInputs)
+    // Litter / brash surface fuels take the dedicated litter dead-moisture series
+    // (they previously borrowed bracken, which was biased ~10% too dry).
+    const LITTER_FUELS = new Set(['sn', 'bl', 'ln', 'bch'])
+
+    // DEBUG: capture climatology vs LFMC live.category per fuel at the first
+    // forecast timestep, to compare when switching to the LFMC model.
+    const lfmcDebug = $liveMoistureMode === 'lfmc' ? [] : null
 
     let i = 0;
     $requiredSiteInputsForecastOpen.forEach((forecast, time) => {
@@ -334,7 +320,9 @@ export const _inputsForecast = derived(
       fuelKeys.forEach((fuel) => {
         inputsTime[fuel] = { ...$requiredFuelInputs[fuel], ...forecast }
         if (useFireInSite) {
-          if (fuel.substring(0, 2) == 'gr') {
+          if (LITTER_FUELS.has(fuel)) {
+            inputsTime[fuel]['site.moisture.dead.category'] = [forecastOpenMeteoFFMC.ffmc_litter[i]]
+          } else if (fuel.substring(0, 2) == 'gr') {
             inputsTime[fuel]['site.moisture.dead.category'] = [forecastOpenMeteoFFMC.ffmc_grass[i]]
           } else if (fuel.substring(0, 1) == 'g') {
             inputsTime[fuel]['site.moisture.dead.category'] = [forecastOpenMeteoFFMC.ffmc_gorse[i]]
@@ -347,31 +335,48 @@ export const _inputsForecast = derived(
           } else {
             inputsTime[fuel]['site.moisture.dead.category'] = [forecastOpenMeteoFFMC.ffmc_bracken[i]]
           }
-          // LFMC model: override the monthly live.category with the weather-driven
-          // prediction for this fuel's mapped component (per timestep).
-          if ($liveMoistureMode === 'lfmc') {
-            const comp = FUEL_TO_COMPONENT[fuel]
-            const lfmcArr = comp ? forecastOpenMeteoFFMC['lfmc_' + comp] : null
-            if (lfmcArr && lfmcArr[i] != null) {
-              inputsTime[fuel]['site.moisture.live.category'] = [lfmcArr[i]]
-            }
+        }
+        // Live moisture is independent of the selected dead-moisture model.
+        // Override the monthly value with this fuel's weather-driven prediction.
+        let climLive = null, lfmcRaw = null
+        if ($liveMoistureMode === 'lfmc') {
+          climLive = inputsTime[fuel]['site.moisture.live.category']?.[0] // climatology, pre-override
+          const comp = FUEL_TO_COMPONENT[fuel]
+          const lfmcArr = comp ? forecastOpenMeteoFFMC['lfmc_' + comp] : null
+          if (lfmcArr && lfmcArr[i] != null) {
+            lfmcRaw = lfmcArr[i]
+            inputsTime[fuel]['site.moisture.live.category'] = [lfmcArr[i]]
           }
-          // live herb moisture cannot be lower than dead 1h moisture!!!
-          // inputsTime[fuel]['site.moisture.live.herb'] = inputsTime[fuel]['site.moisture.live.herb'][0] < inputsTime[fuel]['site.moisture.dead.tl1h'][0] ? inputsTime[fuel]['site.moisture.dead.tl1h'] : inputsTime[fuel]['site.moisture.live.herb']
-          inputsTime[fuel]['site.moisture.live.category'] = inputsTime[fuel]['site.moisture.live.category'][0] < inputsTime[fuel]['site.moisture.dead.category'][0] ? inputsTime[fuel]['site.moisture.dead.category'] : inputsTime[fuel]['site.moisture.live.category']
+        }
+        // Fosberg can calculate moisture internally, without a dead-category input.
+        if (inputsTime[fuel]['site.moisture.live.category']?.[0] < inputsTime[fuel]['site.moisture.dead.category']?.[0]) {
+          inputsTime[fuel]['site.moisture.live.category'] = inputsTime[fuel]['site.moisture.dead.category']
+        }
+        if (lfmcDebug && i === 0) {
+          lfmcDebug.push({
+            fuel,
+            component: FUEL_TO_COMPONENT[fuel] ?? '-',
+            climatology: climLive,
+            lfmc_raw: lfmcRaw,
+            dead: inputsTime[fuel]['site.moisture.dead.category']?.[0],
+            live_final: inputsTime[fuel]['site.moisture.live.category']?.[0],
+          })
         }
         // Grass phenology curing: replace the monthly cured.herb.fraction with the
-        // continuous ddur base + VPD-anomaly heatwave bump, per forecast day.
-        if (usePhenology && fuel.substring(0, 2) === 'gr' && CURED_KEY in inputsTime[fuel]) {
-          const date = new Date(time)
-          const vpd7 = vpd7ByDay[Math.floor(time / 86400000)]
-          const anom = vpdAnomalySd7(vpd7, date, $vpdClimatology)
-          inputsTime[fuel][CURED_KEY] = [grassCuring({ latitude: lat, date, vpdAnomalySd: anom })]
+        // ONNX curing model's per-day prediction (forecast.curingByDay).
+        if (usePhenology && CURING_MODEL_FUELS.has(fuel) && CURED_KEY in inputsTime[fuel]) {
+          const cured = curingByDay?.[Math.floor(time / 86400000)]
+          if (cured != null) inputsTime[fuel][CURED_KEY] = [cured]
         }
       })
       inputsForecast.set(time, inputsTime)
       i++
     })
+    if (lfmcDebug && lfmcDebug.length) {
+      console.log('[LFMC vs climatology] site.moisture.live.category (%), first forecast timestep — ' +
+        'climatology = monthly table, lfmc_raw = model, live_final = after max(live,dead) clamp:')
+      console.table(lfmcDebug)
+    }
     // console.log('_inputsForecast end :')
     // console.log('inputsForecast end:', inputsForecast)
     return inputsForecast

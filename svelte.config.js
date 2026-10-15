@@ -11,7 +11,7 @@ const config = {
     // fra1 (Frankfurt): closest region to Open-Meteo's German origin and to
     // UK/EU users, so the forecast proxy (src/routes/api/forecast) and SSR avoid
     // the transatlantic detour of the default US region.
-    adapter: adapter({ runtime: 'nodejs20.x', regions: ['fra1'] }),
+    adapter: adapter({ runtime: 'nodejs24.x', regions: ['fra1'] }),
   },
 };
 

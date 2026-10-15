@@ -71,7 +71,7 @@
     <Button
       size="sm"
       disabled={$historicalYear &&
-      $historicalMonth &&
+      typeof $historicalMonth === "number" &&
       $historicalDay &&
       $historicalDate
         ? false

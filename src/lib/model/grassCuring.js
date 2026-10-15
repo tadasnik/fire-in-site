@@ -1,23 +1,20 @@
 /**
  * @file grassCuring.js
- * Continuous grass curing (cured herb fraction) for FireInSite.
+ * Astronomy helpers for the fuel-moisture models, plus a legacy analytic grass
+ * curing curve.
  *
- * Replaces the discrete monthly `cured.herb.fraction` lookup table with:
- *   1. a smooth seasonal BASE, a linear function of daylight duration and its
- *      day-to-day change (ddur, ddur_change) — no month steps; and
- *   2. a one-sided heatwave BUMP that raises curing under hotter-than-normal
- *      conditions, driven by the same VPD/drought signal as the LFMC model.
+ * `daylightSeconds` / `dayOfYear` are the shared day-length primitives used by
+ * the LFMC (lfmcModel.js) and curing (curingModel.js) ONNX feature builders.
  *
- * Provenance: coefficients fitted to UK moor-grass satellite greenness
- * (cured% = 1 - greenness) under spatial cross-validation. The base matches
- * the monthly climatology's skill (R^2 ~0.66) while being continuous; the bump
- * removes the static table's ~20-point under-curing bias during heatwaves.
- * See fuel-moisture repo: figures/continuous_curing.png, hybrid_grass_curing.png.
+ * NOTE: the deployed grass curing prediction is now the ONNX model in
+ * curingModel.js (a gradient-boosted regressor trained on satellite greenness,
+ * features [ddur, ddur_change, vpdmax-7mean]). The analytic `grassCuring` /
+ * `grassCuringBase` below — a smooth day-length base plus a one-sided VPD-anomaly
+ * heatwave bump — are the earlier heuristic, retained for reference/fallback and
+ * no longer wired into the forecast path.
  *
  * Scale: returns cured herb fraction in PERCENT (0..100), matching the existing
- * `cured.herb.fraction` table. The base is on the satellite-greenness scale
- * (~14% mid-summer to ~88% mid-winter); see rescaleToAppRange() to stretch it
- * to the app's historical 20..100 endpoints if preferred.
+ * `cured.herb.fraction` table.
  */
 
 /** Fitted linear base: cured% = A + B*ddur + C*ddur_change  (ddur in seconds). */
@@ -25,8 +22,10 @@ const BASE_INTERCEPT = 128.19;
 const BASE_DDUR = -1.7475e-3;
 const BASE_DDUR_CHANGE = -5.2399e-2;
 
-/** Default bump: curing-% added per +1 SD of positive VPD anomaly. */
-export const DEFAULT_BETA = 13;
+/** Default bump: curing-% added per +1 kPa of positive VPD anomaly (vpd7 above
+ *  the local daily normal). ~26 pts/kPa matches the previous 13 pts/SD at the
+ *  summer VPD SD (~0.5 kPa) while removing the low-variance-month amplification. */
+export const DEFAULT_BETA = 26;
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
@@ -73,30 +72,21 @@ export function grassCuringBase(latitude, date) {
 }
 
 /**
- * Standardised VPD anomaly for the heatwave bump: (vpd - normal) / sd.
- * `vpdNormal` and `vpdSd` are the local month-of-year VPD climatology (mean and
- * standard deviation) and belong in the data/forecast layer. Returns 0 when no
- * climatology is supplied, which reduces the model to the smooth base.
- */
-export function vpdAnomalySd(vpd, vpdNormal, vpdSd) {
-  if (vpdNormal == null || !vpdSd) return 0;
-  return (vpd - vpdNormal) / vpdSd;
-}
-
-/**
  * Combined continuous grass curing = smooth base + one-sided heatwave bump.
+ * The anomaly (vpdAnomaly) is the absolute kPa departure of 7-day-mean VPD from
+ * the local daily-normal (see vpdClimatology.vpdAnomalyAbs); only positive
+ * (hotter-than-normal) departures raise curing.
  *
  * @param {Object} p
- * @param {number}  p.latitude          degrees north
- * @param {Date|number|string} p.date   date of the forecast step
- * @param {number} [p.vpdAnomalySd=0]   standardised VPD anomaly vs the local
- *        monthly normal; only positive (hotter-than-normal) values raise curing
- * @param {number} [p.beta=DEFAULT_BETA] curing-% per +1 SD of VPD anomaly
+ * @param {number}  p.latitude        degrees north
+ * @param {Date|number|string} p.date date of the forecast step
+ * @param {number} [p.vpdAnomaly=0]   VPD anomaly in kPa vs the local daily normal
+ * @param {number} [p.beta=DEFAULT_BETA] curing-% per +1 kPa of VPD anomaly
  * @returns {number} cured herb fraction, 0..100
  */
-export function grassCuring({ latitude, date, vpdAnomalySd = 0, beta = DEFAULT_BETA }) {
+export function grassCuring({ latitude, date, vpdAnomaly = 0, beta = DEFAULT_BETA }) {
   const base = grassCuringBase(latitude, date);
-  const bump = beta * Math.max(0, vpdAnomalySd); // one-sided: heat only cures more
+  const bump = beta * Math.max(0, vpdAnomaly); // one-sided: heat only cures more
   return clamp(base + bump, 0, 100);
 }
 

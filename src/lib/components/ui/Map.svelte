@@ -4,13 +4,10 @@
   import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
-  import {
-    getForecastOpenMeteo,
-    forecastMode,
-  } from "$lib/shared/stores/forecastStore";
-  import { currentDateTime } from "$lib/shared/stores/timeStore";
+  import { getForecastOpenMeteo } from "$lib/shared/stores/forecastStore";
+  import { elevationSlopeAspect } from "$lib/weather/elevation";
+  import { beginLocationSelection } from "$lib/shared/locationSelection";
   import "$lib/styles/mapbox-gl.css";
-  import Layout from "../../../routes/+layout.svelte";
 
   let locMarker;
   let map;
@@ -60,6 +57,7 @@
   }
 
   async function geolocate() {
+    const isCurrent = beginLocationSelection();
     const options = {
       enableHighAccuracy: true,
       timeout: 5000,
@@ -67,42 +65,53 @@
     };
 
     function success(pos) {
+      if (!isCurrent()) return;
       const crd = pos.coords;
 
       // console.log("Your current position is:");
       // console.log(`Latitude : ${crd.latitude}`);
       // console.log(`Longitude: ${crd.longitude}`);
       // console.log(`More or less ${crd.accuracy} meters.`);
-      $currentLocation.longitude = crd.longitude;
-      $currentLocation.latitude = crd.latitude;
       setMapLocation(
-        $currentLocation.longitude,
-        $currentLocation.latitude,
+        crd.longitude,
+        crd.latitude,
         true,
       );
     }
 
     function error(err) {
       console.warn(`ERROR(${err.code}): ${err.message}`);
+      // Resume the last confirmed location if this attempt superseded an
+      // in-flight startup/forecast request and permission was denied.
+      if (isCurrent()) {
+        setMapLocation($currentLocation.longitude, $currentLocation.latitude, true);
+      }
     }
 
     await navigator.geolocation.getCurrentPosition(success, error, options);
   }
 
-  function setMapLocation(longitude, latitude, center = false) {
-    // console.log("setMapLocation", longitude, latitude, center);
+  async function setMapLocation(longitude, latitude, center = false) {
+    const isCurrent = beginLocationSelection();
     locMarker.setLngLat([longitude, latitude]);
     if (center) {
       map.setCenter([longitude, latitude]);
     }
-    let elevation = map.queryTerrainElevation([longitude, latitude]);
-    // console.log("elevation", elevation);
-    let [slope, aspect] = processPointSlopeAspect(map, longitude, latitude, 50);
-    // console.log("slope", slope, "aspect", aspect);
+    // Elevation + slope + aspect from the Open-Meteo DEM (same source as the
+    // location search), not from Mapbox terrain — the map is a visual location
+    // picker only.
+    let elevation = 0;
+    let slope = 0;
+    let aspect = 0;
+    try {
+      const t = await elevationSlopeAspect(latitude, longitude);
+      elevation = t.elevation;
+      slope = t.slope;
+      aspect = t.aspect;
+    } catch { /* flat fallback */ }
+    if (!isCurrent()) return;
     setCurrentLocation(longitude, latitude, elevation, slope, aspect);
-    // if ($forecastMode === "forecast") {
     getForecastOpenMeteo();
-    // }
   }
 
   function getWindCardinalDirection(windDir) {
@@ -127,49 +136,6 @@
     currentLoc.userLocation = true;
     $currentLocation = currentLoc;
     // console.log("setCurrent currentLoc", $currentLocation);
-  }
-
-  // Slope and aspect
-  function slopeAspect(points, distance) {
-    var dzdx = (points["W"].elevation - points["E"].elevation) / (distance * 2),
-      dzdy = (points["S"].elevation - points["N"].elevation) / (distance * 2);
-
-    const slope = Math.atan(Math.sqrt(dzdx ** 2 + dzdy ** 2)) * (180 / Math.PI);
-    const aspectInit = 57.29578 * Math.atan2(dzdy, dzdx);
-
-    return [slope, (450 - aspectInit) % 360];
-  }
-
-  function processPointSlopeAspect(map, longitude, latitude, distance) {
-    const points = pointsCardinalDirections(longitude, latitude, distance);
-    pointsElevation(points, map);
-    return slopeAspect(points, distance);
-  }
-
-  function pointsCardinalDirections(longitude, latitude, distance) {
-    const points = {
-      N: { bearing: 0, coordinates: [], elevation: null },
-      E: { bearing: 90, coordinates: [], elevation: null },
-      S: { bearing: 180, coordinates: [], elevation: null },
-      W: { bearing: 270, coordinates: [], elevation: null },
-    };
-    const p1 = new LatLon(latitude, longitude);
-    Object.keys(points).forEach((key) => {
-      points[key].coordinates = p1.destinationPoint(
-        distance,
-        points[key].bearing,
-      );
-    });
-    return points;
-  }
-
-  function pointsElevation(points, map) {
-    Object.keys(points).forEach((key) => {
-      points[key].elevation = map.queryTerrainElevation([
-        points[key].coordinates._lon,
-        points[key].coordinates._lat,
-      ]);
-    });
   }
 
   function setMarkerLocation() {
@@ -225,18 +191,8 @@
       map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
     });
 
-    // map.on("sourcedata", (e) => {
-    map.on("load", () => {
-      // console.log("Map load", $currentLocation);
-      if (!$currentLocation.userLocation) {
-        // console.log("Map load no user location");
-        setMapLocation(
-          $currentLocation.longitude,
-          $currentLocation.latitude,
-          true,
-        );
-      }
-    });
+    // LocationSearch initializes from history/IP. Map load must not start a
+    // competing selection while that asynchronous lookup is still pending.
 
     map.on("click", function (e) {
       let coordinates = e.lngLat;
@@ -262,7 +218,7 @@
       >
     </div>
     <div>
-      <Button outline primary-200 size="xs" on:click={geolocate}
+      <Button outline primary-200 size="xs" onclick={geolocate}
         >Geolocate</Button
       >
     </div>

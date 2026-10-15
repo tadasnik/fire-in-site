@@ -45,8 +45,9 @@
   }
   let isSelectedDayClass = $derived((d) => {
     return isEqual(startOfDay(d), startOfDay($focusDay))
-      ? "min-h-10 sm:min-h-14 md:min-h-16 font-bold text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2 rounded-t-lg"
-      : "border-slate-500 border-b-2";
+      ? // selected tab sits 0.5rem (= rounded-t-lg radius) taller than the rest
+        "min-h-12 sm:min-h-16 md:min-h-18 font-bold text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2 rounded-t-lg"
+      : "min-h-10 sm:min-h-14 md:min-h-16 border-slate-500 border-b-2";
   });
 
   // Both hourly time and daysInForecast use "local-as-UTC ms", so keying by the
@@ -116,7 +117,7 @@
   {#each $daysInForecast as day}
     {@const info = dayInfo(day)}
     <div
-      class="w-22 sm:w-26 md:w-36 lg:w-40 shrink-0 p-1 sm:p-2 md:p-3 lg:p-4 text-xs sm:text-sm md:text-base bg-gray-100 {isSelectedDayClass(
+      class="w-22 sm:w-26 md:w-36 lg:w-40 shrink-0 p-1 sm:p-3 md:p-3 lg:p-4 text-xs sm:text-sm md:text-base bg-gray-100 {isSelectedDayClass(
         day,
       )}"
       role="button"

@@ -8,8 +8,11 @@ import {
 import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
 import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
 import { lfmcCalcs } from "$lib/model/lfmcModel.js";
+import { curingCalcs } from "$lib/model/curingModel.js";
+import { currentLocationSelection } from '$lib/shared/locationSelection';
 
 const DAY_MS = 86400000;
+let latestForecastRequest = 0;
 
 /**
  * Daily-max VPD for the days preceding the forecast window, used to seed the
@@ -140,7 +143,7 @@ export function fillParams({
     "timezone": "auto",
     "forecast_mode": forecast_mode,
   };
-  if ("global_tilted_irradiance" in hourlyVars) {
+  if (hourlyVars.includes("global_tilted_irradiance")) {
     baseParams = {
       ...baseParams,
       "tilt": get(currentLocation).slope,
@@ -178,6 +181,10 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
   if (!get(currentLocation).latitude) return;
   if (forecast_mode !== 'historical' && !get(currentLocation).userLocation) return;
 
+  const request = ++latestForecastRequest;
+  const selectionIsCurrent = currentLocationSelection();
+  const isCurrent = () => request === latestForecastRequest && selectionIsCurrent();
+  const latitude = get(currentLocation).latitude;
   fetchingForecast.set(true);
   console.log("fetching forecast openMeteo", forecast_mode)
   try {
@@ -207,21 +214,26 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
 
     // Daily max VPD for the days preceding the forecast window (LFMC 7-day mean).
     result._pastVpdMaxByDay = await pastVpdPromise;
+    if (!isCurrent()) return;
 
-    forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
     const resultMoist = await fuelMoistureCalcs(
       result,
       5,
-      get(currentLocation).slope,
-      get(currentLocation).aspect,
-      get(currentLocation).elevation,
+      latitude,
     );
+    if (!isCurrent()) return;
     // Add per-timestep live fuel moisture (used when live moisture mode = 'lfmc').
-    await lfmcCalcs(resultMoist, get(currentLocation).latitude);
+    await lfmcCalcs(resultMoist, latitude);
+    if (!isCurrent()) return;
+    // Add per-day grass curing (used when grass curing mode = 'phenology').
+    await curingCalcs(resultMoist, latitude);
+    if (!isCurrent()) return;
+    forecastUtcOffset.set(result.utcOffsetSeconds ?? 0);
     forecastOpenMeteo.set(resultMoist);
     forecastDataMode.set(forecast_mode);
     fetchingForecast.set(false);
   } catch (error) {
+    if (!isCurrent()) return;
     console.error("Error fetching forecast:", error);
     fetchingForecast.set(false);
   }

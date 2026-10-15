@@ -26,7 +26,10 @@ export function preloadDeadFFMC() {
 export async function deadFFMC(inputs) {
   try {
     const session = await getSession();
-    const tensorA = new ort.Tensor('float32', Float32Array.from(inputs), [inputs.length / 18, 18]);
+    // 17 features per row: vpd(t..t-4), gti(t..t-4), ddur, ddur_change,
+    // fuel one-hot(5: bracken, gorse, heather, moor, litter). See fuelMoisture.js.
+    const N_FEATURES = 17;
+    const tensorA = new ort.Tensor('float32', Float32Array.from(inputs), [inputs.length / N_FEATURES, N_FEATURES]);
     const results = await session.run({ X: tensorA });
     return results.variable.cpuData;
   } catch (e) {

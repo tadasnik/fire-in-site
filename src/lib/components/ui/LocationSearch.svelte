@@ -4,6 +4,8 @@
   import { currentLocation, getLocation } from "$lib/shared/stores/locationStore";
   import { getForecastOpenMeteo, forecastCache, forecastModel } from "$lib/shared/stores/forecastStore";
   import { getHistory, recordSearch } from "$lib/shared/stores/searchHistory";
+  import { elevationSlopeAspect } from "$lib/weather/elevation";
+  import { beginLocationSelection } from "$lib/shared/locationSelection";
   import { SearchOutline, ClockOutline } from "flowbite-svelte-icons";
 
   let query = $state("");
@@ -16,6 +18,7 @@
 
   onMount(async () => {
     if (get(currentLocation).userLocation) return;
+    const isCurrent = beginLocationSelection();
     const history = getHistory();
     if (history.length > 0) {
       // Default to the most-frequently used location.
@@ -23,6 +26,7 @@
     } else {
       // First-time user: fall back to IP-based geolocation.
       const [latitude, longitude] = await getLocation();
+      if (!isCurrent()) return;
       select({ latitude, longitude, _coord: true }, { record: false });
     }
   });
@@ -80,27 +84,34 @@
   }
 
   async function select(result, { record = true } = {}) {
+    const isCurrent = beginLocationSelection();
     query = "";
     results = [];
     open = false;
     showingHistory = false;
     if (record && !result._coord) recordSearch(result);
+    // Terrain elevation + slope + aspect from the DEM, for every location
+    // (search, history, coord). Previously only coord picks got an elevation
+    // and slope/aspect were left flat unless set via the map. Falls back to the
+    // geocoding elevation (and flat) if the DEM lookup fails.
     let elevation = result.elevation ?? 0;
-    if (result._coord) {
-      try {
-        const res = await fetch(
-          `https://api.open-meteo.com/v1/elevation?latitude=${result.latitude}&longitude=${result.longitude}`
-        );
-        const data = await res.json();
-        elevation = data.elevation?.[0] ?? 0;
-      } catch { /* keep 0 */ }
-    }
+    let slope = 0;
+    let aspect = 0;
+    try {
+      const t = await elevationSlopeAspect(result.latitude, result.longitude);
+      elevation = t.elevation;
+      slope = Math.round(t.slope);
+      aspect = Math.round(t.aspect);
+    } catch { /* keep geocoding elevation, flat slope/aspect */ }
+    if (!isCurrent()) return;
     forecastCache.set(null); // new location invalidates cached forecast
     currentLocation.update((loc) => ({
       ...loc,
       latitude: result.latitude,
       longitude: result.longitude,
       elevation,
+      slope,
+      aspect,
       name: result._coord ? '' : (result.name ?? ''),
       userLocation: true,
       distanceFromPrevious: 99999,
