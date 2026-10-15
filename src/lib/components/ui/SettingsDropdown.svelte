@@ -114,14 +114,14 @@
     <Radio name="grassCuringMode" bind:group={$grassCuringMode} value={"climatology"}
       >Climatology</Radio
     >
-    <Helper class="ps-6">Static monthly curing table (current default).</Helper>
+    <Helper class="ps-6">Static monthly curing table.</Helper>
   </li>
   <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
     <Radio name="grassCuringMode" bind:group={$grassCuringMode} value={"phenology"}
       >Phenology model</Radio
     >
     <Helper class="ps-6"
-      >Continuous day-length curing with a heatwave (VPD-anomaly) bump.</Helper
+      >Weather-driven curing from day length and recent weather (default).</Helper
     >
   </li>
 
@@ -135,14 +135,14 @@
     <Radio name="liveMoistureMode" bind:group={$liveMoistureMode} value={"climatology"}
       >Climatology</Radio
     >
-    <Helper class="ps-6">Static monthly live moisture table (current default).</Helper>
+    <Helper class="ps-6">Static monthly live moisture table.</Helper>
   </li>
   <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
     <Radio name="liveMoistureMode" bind:group={$liveMoistureMode} value={"lfmc"}
       >LFMC model</Radio
     >
     <Helper class="ps-6"
-      >Weather-driven live fuel moisture (grass, gorse, heather, bracken).</Helper
+      >Weather-driven live fuel moisture for grass, gorse, heather and bracken (default).</Helper
     >
   </li>
 
