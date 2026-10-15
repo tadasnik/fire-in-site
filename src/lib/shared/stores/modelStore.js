@@ -36,10 +36,10 @@ export const chartType = writable("bars")
 
 // Grass curing method: 'climatology' = static monthly table (cured.herb.fraction),
 // 'phenology' = weather-driven ONNX curing model (per-day, forecast.curingByDay).
-export const grassCuringMode = writable('climatology')
+export const grassCuringMode = writable('phenology')
 // Live fuel moisture method: 'climatology' = monthly table (site.moisture.live.category),
 // 'lfmc' = weather-driven ONNX LFMC model (per mapped fuel component).
-export const liveMoistureMode = writable('climatology')
+export const liveMoistureMode = writable('lfmc')
 
 export const canopyInputs = writable({
   "site.canopy.fuel.foliar.moistureContent": [120],
