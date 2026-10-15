@@ -14,7 +14,6 @@
     timeMode,
     forecastUtcOffset,
   } from "$lib/shared/stores/timeStore.js";
-  import { where } from "firebase/firestore";
 
   const { xScale, percentRange } = getContext("LayerCake");
 

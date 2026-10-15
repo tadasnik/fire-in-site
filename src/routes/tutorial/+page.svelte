@@ -29,6 +29,19 @@
   let width = $state();
 </script>
 
+<svelte:head>
+  <title>Tutorial — Using FireInSite for UK Wildfire Prediction</title>
+  <meta
+    name="description"
+    content="Step-by-step guide to using FireInSite: predict wildfire behaviour — spread rate, flame length and intensity — for UK vegetation fuels from live weather forecasts."
+  />
+  <meta property="og:title" content="Tutorial — Using FireInSite for UK Wildfire Prediction" />
+  <meta
+    property="og:description"
+    content="Step-by-step guide to predicting UK wildfire behaviour with FireInSite."
+  />
+</svelte:head>
+
 <div class="max-w-80 mx-auto items-center overflow-hidden md:max-w-2xl pt-10">
   <div class="flex flex-col text-slate-600">
     <Heading

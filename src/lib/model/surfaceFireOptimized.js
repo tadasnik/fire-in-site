@@ -51,7 +51,7 @@ export default class FireSim {
     this.dag = this.sim.createDag('Optimized')
     this.store = new StorageNeat(this.dag)
     this.dag.setStorageClass(this.store)
-    this.dag.setUpdateClass(new UpdateRandomOrthogonalStack(this.dag))
+    this.dag.setUpdateClass(this._randomOrthogonalStack())
     // Set display units
     for (const [key, values] of Object.entries(nodeProps)) {
       if (values.selected === true) {
@@ -131,9 +131,30 @@ export default class FireSim {
     return cbh
   }
 
+  /**
+   * The update classes are stateless between calls: the constructor only stores
+   * a dag reference, and update() rebuilds all its working state locally (and
+   * re-inits the storage class) on every invocation. So a single instance per
+   * class can be reused rather than allocated on every run — runBasic() is
+   * called thousands of times per forecast recompute.
+   */
+  _orthogonalStack() {
+    if (!this._updateOrthogonal) {
+      this._updateOrthogonal = new UpdateOrthogonalStack(this.dag)
+    }
+    return this._updateOrthogonal
+  }
+
+  _randomOrthogonalStack() {
+    if (!this._updateRandomOrthogonal) {
+      this._updateRandomOrthogonal = new UpdateRandomOrthogonalStack(this.dag)
+    }
+    return this._updateRandomOrthogonal
+  }
+
   runBasic(inputs) {
     this.dag.setRunLimit(1000)
-    this.dag.setUpdateClass(new UpdateOrthogonalStack(this.dag))
+    this.dag.setUpdateClass(this._orthogonalStack())
     const inputsArray = []
     for (const [key, values] of Object.entries(inputs)) {
       if (Array.isArray(values)) {
@@ -154,7 +175,7 @@ export default class FireSim {
 
   runWithRandom(inputs) {
     this.dag.setRunLimit(1000)
-    this.dag.setUpdateClass(new UpdateRandomOrthogonalStack(this.dag))
+    this.dag.setUpdateClass(this._randomOrthogonalStack())
     // this.dag.run()
     // dag.run can be replaced by the below:
     // console.log('inputs during run: ', inputs)

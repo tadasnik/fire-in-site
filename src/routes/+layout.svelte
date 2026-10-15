@@ -1,22 +1,13 @@
-<script module>
-  export const ssr = false;
-</script>
-
 <script>
   import "../app.postcss";
-  import { onMount } from "svelte";
   import { sineIn } from "svelte/easing";
-  import { auth, db } from "$lib/firebase/firebase.client";
   import { page } from "$app/stores";
-  import { browser } from "$app/environment";
-  import { doc, getDoc, getDocs, collection, setDoc } from "firebase/firestore";
   import {
     Sidebar,
     SidebarGroup,
     SidebarItem,
     SidebarWrapper,
     SidebarDropdownWrapper,
-    Spinner,
     Drawer,
     Dropdown,
     DropdownDivider,
@@ -28,26 +19,21 @@
     CloseButton,
     Footer,
     FooterBrand,
-    A,
   } from "flowbite-svelte";
   import {
     AdjustmentsHorizontalSolid,
     ColumnOutline,
     HomeOutline,
+    InfoCircleOutline,
+    BookOpenOutline,
+    ChartLineUpOutline,
   } from "flowbite-svelte-icons";
-  import { timeFormat } from "d3-time-format";
   import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
-  import {
-    getLocation,
-    currentLocation,
-  } from "$lib/shared/stores/locationStore";
-  import { currentDateTime, timeMode } from "$lib/shared/stores/timeStore";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
   import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
-  import { authHandlers, authStore } from "$lib/shared/stores/authStore";
   /**
    * @typedef {Object} Props
    * @property {import('svelte').Snippet} [children]
@@ -57,102 +43,27 @@
   let { children } = $props();
 
   let openValidationModal = $state(false);
+
+  // Single source of truth for the content-page nav links, rendered by both
+  // the desktop navbar and the mobile drawer so they can't drift apart.
+  const navItems = [
+    { label: "Fuel Models", href: "/fuelModels", icon: ColumnOutline },
+    { label: "About", href: "/about", icon: InfoCircleOutline },
+    { label: "Tutorial", href: "/tutorial", icon: BookOpenOutline },
+    { label: "Climate", href: "/climate", icon: ChartLineUpOutline },
+  ];
+  const sidebarIconClass =
+    "w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white";
+
   let transitionParams = {
     x: -320,
     duration: 200,
     easing: sineIn,
   };
-  onMount(() => {
-    // const interval = setInterval(() => {
-    //   if ($timeMode === "current") {
-    //     $currentDateTime = new Date();
-    //   } else {
-    //   }
-    // }, 1.8e9);
-
-    // differenceHours($dateTime - Date($forecast.timeSeries[0].time));
-    const unsuscribe = auth.onAuthStateChanged(async (user) => {
-      authStore.update((curr) => {
-        return { ...curr, currentUser: user };
-      });
-      // console.log("user changed");
-      if (
-        // if browser and no user
-        browser &&
-        !$authStore.currentUser
-        // !$authStore.isLoading
-        // window.location.pathname !== "/"
-      ) {
-        // window.location.href = "/";
-
-        const [latitude, longitude] = await getLocation();
-
-        currentLocation.update((current) => ({
-          ...current,
-          userLocation: false,
-          distanceFromPrevious: 10000,
-          latitude: latitude,
-          longitude: longitude,
-        }));
-      } else if (browser && $authStore.currentUser) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocContent = await getDoc(userDocRef);
-        if (!userDocContent.exists()) {
-          const userRef = doc(db, "users", user.uid);
-          await setDoc(
-            userRef,
-            {
-              email: user.email,
-              displayName: user.displayName,
-            },
-            { merge: true },
-          );
-        } else {
-          const defLocationRef = doc(
-            db,
-            "users",
-            user.uid,
-            "Locations",
-            "default",
-          );
-          getDoc(defLocationRef)
-            .then((defLoc) => {
-              if (defLoc.exists()) {
-                // console.log("Document data:", defLoc.data());
-                currentLocation.update((current) => ({
-                  ...current,
-                  userLocation: false,
-                  distanceFromPrevious: 10000,
-                  latitude: defLoc.data().latitude,
-                  longitude: defLoc.data().longitude,
-                }));
-              } else {
-                // console.log("No default location for user!");
-              }
-            })
-
-            .catch((error) => {
-              console.error("Error getting documents: ", error);
-            });
-        }
-      } else {
-      }
-      // console.log("executing isLoading false");
-      authStore.update((curr) => {
-        // console.log("curr", curr);
-        return { ...curr, isLoading: false };
-      });
-    });
-    return () => {
-      unsuscribe;
-      // clearInterval(interval);
-    };
-  });
-
-  let spanClass = "flex-1 ml-3 whitespace-nowrap";
-
   let activeUrl = $derived($page.url.pathname);
-  // $: console.log("layout activeURl", activeUrl);
+  // Clean per-route canonical/OG URL (no query string).
+  let canonicalUrl = $derived(`${$page.url.origin}${$page.url.pathname}`);
+  let ogImage = $derived(`${$page.url.origin}/favicon/apple-touch-icon.png`);
 
   let drawerOpen = $state(false);
   const toggleDrawer = () => {
@@ -162,38 +73,37 @@
   // const dateFormat = timeFormat("%a %b %e, %H %p");
 </script>
 
+<svelte:head>
+  <link rel="canonical" href={canonicalUrl} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="FireInSite" />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={ogImage} />
+</svelte:head>
+
 <header
   class="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
+  style="padding-top: env(safe-area-inset-top);"
 >
   <DisclamerModal />
   <Navbar
     color="default"
     fluid
-    class="flex items-center justify-between w-full mx-auto py-1.5 px-4 max-w-8xl"
+    class="flex items-center justify-between w-full mx-auto py-1.5 lg:py-0.5 px-4 max-w-8xl"
   >
     {#snippet children({ hidden, toggle })}
       <NavBrand href="/">
         <img
           src={FireInSiteLogo}
-          class="me-3 h-6 sm:h-9"
+          class="me-3 h-6 sm:h-9 lg:h-7"
           alt="fireInSite Logo"
         />
       </NavBrand>
 
       <div class="flex md:order-2">
         <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
-        <!-- <NavUl> -->
-        <!--   {#if !$authStore.currentUser} -->
-        <!--     <NavLi href="/authenticate">Sign in</NavLi> -->
-        <!--   {:else} -->
-        <!--     <NavLi -->
-        <!--       on:click={() => { -->
-        <!--         authHandlers.logout(); -->
-        <!--       }} -->
-        <!--       href="/">Sign out</NavLi -->
-        <!--     > -->
-        <!--   {/if} -->
-        <!-- </NavUl> -->
       </div>
       <NavUl>
         {#if activeUrl !== "/"}
@@ -212,10 +122,9 @@
         <Dropdown>
           <SettingsDropdown />
         </Dropdown>
-        <NavLi href="/fuelModels">Fuel Models</NavLi>
-        <NavLi href="/about">About</NavLi>
-        <NavLi href="/tutorial">Tutorial</NavLi>
-        <NavLi href="/climate">Climate</NavLi>
+        {#each navItems as item}
+          <NavLi href={item.href}>{item.label}</NavLi>
+        {/each}
         <ValidationModal bind:openValidationModal />
       </NavUl>
     {/snippet}
@@ -235,32 +144,17 @@
       <SidebarGroup>
         <SidebarItem label="Home" href="/">
           {#snippet icon()}
-            <HomeOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
+            <HomeOutline class={sidebarIconClass} />
           {/snippet}
         </SidebarItem>
-        <SidebarItem label="Fuel Models" href="/fuelModels">
-          {#snippet icon()}
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          {/snippet}
-        </SidebarItem>
-        <SidebarItem label="About" href="/about">
-          {#snippet icon()}
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          {/snippet}
-        </SidebarItem>
-        <SidebarItem label="Tutorial" href="/tutorial">
-          {#snippet icon()}
-            <ColumnOutline
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          {/snippet}
-        </SidebarItem>
+        {#each navItems as item}
+          {@const Icon = item.icon}
+          <SidebarItem label={item.label} href={item.href}>
+            {#snippet icon()}
+              <Icon class={sidebarIconClass} />
+            {/snippet}
+          </SidebarItem>
+        {/each}
         <ValidationModal bind:openValidationModal />
         <SidebarDropdownWrapper label="Settings">
           {#snippet icon()}
@@ -277,19 +171,7 @@
   </Sidebar>
 </Drawer>
 <main class="">
-  {#if browser && !$authStore.isLoading && $authStore.currentUser}
-    <!-- <heading class="p-8" tag="h1" customSize="text-3xl" -->
-    <!--   >Private page user: {$authStore.currentUser.displayName} -->
-    <!-- </heading> -->
-    <!-- <AuthReset /> -->
-    {@render children?.()}
-  {:else if browser && !$authStore.isLoading}
-    {@render children?.()}
-  {:else}
-    <div class="flex items-center justify-center h-screen">
-      <Spinner size={8} />
-    </div>
-  {/if}
+  {@render children?.()}
 </main>
 <Footer>
   <hr class="my-6 mx-auto" />

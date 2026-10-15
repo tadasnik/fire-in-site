@@ -7,20 +7,31 @@ import * as ort from 'onnxruntime-web/wasm';
 ort.env.wasm.numThreads = 1;
 ort.env.wasm.wasmPaths = '/wasm/';
 
+const MODEL_URL = "/wasm/model_onehot_dead.onnx";
+
+// Create the ONNX session once and reuse it across forecast fetches, rather
+// than reloading/reparsing the model and re-initialising the WASM session on
+// every call.
+let _sessionPromise = null;
+function getSession() {
+  if (!_sessionPromise) _sessionPromise = ort.InferenceSession.create(MODEL_URL);
+  return _sessionPromise;
+}
+
+/** Warm the ONNX session at app start so the first forecast doesn't pay the load. */
+export function preloadDeadFFMC() {
+  getSession().catch(() => { });
+}
+
 export async function deadFFMC(inputs) {
   try {
-    const modelUrl = "/wasm/model_onehot_dead.onnx";
-    const session = await ort.InferenceSession.create(modelUrl)
-    // console.log('ONNX model loaded successfully', inputs);
-    const dataA = Float32Array.from(inputs)
-    const tensorA = new ort.Tensor('float32', dataA, [inputs.length / 18, 18]);
-    // console.log('tensorA:', tensorA);
-    const feeds = { X: tensorA };
-    const results = await session.run(feeds);
-    const dataC = results.variable.cpuData;
-    // console.log("data of result tensor 'c':", dataC);
-
-    return results.variable.cpuData
+    const session = await getSession();
+    // 17 features per row: vpd(t..t-4), gti(t..t-4), ddur, ddur_change,
+    // fuel one-hot(5: bracken, gorse, heather, moor, litter). See fuelMoisture.js.
+    const N_FEATURES = 17;
+    const tensorA = new ort.Tensor('float32', Float32Array.from(inputs), [inputs.length / N_FEATURES, N_FEATURES]);
+    const results = await session.run({ X: tensorA });
+    return results.variable.cpuData;
   } catch (e) {
     console.log("failed to inference ONNX model:", e);
   }

@@ -1,9 +1,13 @@
-import { getMonth } from '$lib/shared/stores/timeStore'
 import { simpleNelsonFuelMoisture } from '$lib/model/nelsonFMC/simpleNelson';
 import { deadFFMC } from './fireInSiteFFMC';
+import { daylightSeconds } from '$lib/model/grassCuring';
+
+const DAY_MS = 86400000;
 
 
-const deadFuelsCategories = { 0: "bracken", 1: "gorse", 2: "heather", 3: "grass" }
+// Order MUST match the model one-hot in export_dead_ddur.py:
+// Bracken, Gorse, Heather, Moor(=grass), Litter.
+const deadFuelsCategories = { 0: "bracken", 1: "gorse", 2: "heather", 3: "grass", 4: "litter" }
 
 function getPaddedSlice(arr, start, end, padLength) {
   // Get the base slice
@@ -23,7 +27,7 @@ function getPaddedSlice(arr, start, end, padLength) {
   } else { return result; }
 }
 
-export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevation) {
+export async function fuelMoistureCalcs(forecast, timeLag, latitude) {
   let nelsonFFMC = null
   const nelsonFFMCs = []
   const fsFFMCs = []
@@ -37,9 +41,16 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
       forecast["precipitation"][nr])
     nelsonFFMCs.push(nelsonFFMC)
     nr = nr + 1
+    // Seasonal predictors: astronomical daylength (ddur, seconds) and its
+    // day-to-day change (yesterday - today). Computed from latitude+date (no
+    // fetch); smooth, higher-skill, hemisphere-correct. Terrain (slope/aspect/
+    // elevation) is intentionally NOT an input — GTI is already tilt/azimuth-
+    // adjusted so it carries that signal. Must match export_dead_ddur.py order.
+    const ddur = daylightSeconds(latitude, new Date(time));
+    const ddurChange = daylightSeconds(latitude, new Date(time - DAY_MS)) - ddur;
     const inputs = ([...getPaddedSlice(forecast["vapour_pressure_deficit"], nr - timeLag, nr, timeLag),
     ...getPaddedSlice(forecast["global_tilted_irradiance"], nr - timeLag, nr, timeLag),
-      slope, aspect, elevation, getMonth(new Date(time))])
+      ddur, ddurChange])
     for (let i = 0; i < deadFuelsCount; i++) {
       let fuelFlagArray = Array(deadFuelsCount).fill(0.)
       fuelFlagArray[i] = 1
@@ -56,8 +67,10 @@ export async function fuelMoistureCalcs(forecast, timeLag, slope, aspect, elevat
       let forecastIndex = 0;
       for (let x = i; x < resultMoist.length; x = x + deadFuelsCount) {
         forecastIndex = forecastIndex + 1;
-        if (resultMoist[x] < 0) {
-          resultMoist[x] = 0
+        // Floor dead FMC at 1% — 0% is physically implausible and can cause
+        // extreme/degenerate behaviour downstream.
+        if (resultMoist[x] < 1) {
+          resultMoist[x] = 1
         }
         if ((nelsonFFMCs[forecastIndex] > 30) && (resultMoist[x] < nelsonFFMCs[forecastIndex])) {
           values.push(nelsonFFMCs[forecastIndex]);

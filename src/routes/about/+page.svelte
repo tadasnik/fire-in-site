@@ -23,6 +23,19 @@
   });
 </script>
 
+<svelte:head>
+  <title>About FireInSite — UK Wildfire Behaviour Prediction Tool</title>
+  <meta
+    name="description"
+    content="About FireInSite: a free web tool that predicts wildfire behaviour and fire danger for UK heath, shrub and grassland vegetation, built by the UK Fire Danger Rating System (UKFDRS) project."
+  />
+  <meta property="og:title" content="About FireInSite — UK Wildfire Behaviour Prediction Tool" />
+  <meta
+    property="og:description"
+    content="A free web tool predicting wildfire behaviour and fire danger for UK vegetation, from the UK Fire Danger Rating System project."
+  />
+</svelte:head>
+
 <div class="max-w-md mx-auto overflow-hidden md:max-w-2xl pt-10">
   <div class="flex flex-col text-slate-500">
     <div class="p-8">
