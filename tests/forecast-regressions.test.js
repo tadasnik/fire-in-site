@@ -22,6 +22,45 @@ after(async () => {
   await server?.close();
 });
 
+test('hourly weather icons follow the selected Open-Meteo WMO code', async () => {
+  const { render } = await server.ssrLoadModule('svelte/server');
+  const time = await server.ssrLoadModule('/src/lib/shared/stores/timeStore.js');
+  const { default: WeatherLine } = await server.ssrLoadModule('/src/lib/components/visual/WeatherLine.svelte');
+  const start = Date.UTC(2026, 9, 15, 8);
+  const codes = new Float32Array([45, 1, 2, 3, 61, 95, NaN]);
+  const data = {
+    time: Array.from(codes, (_, i) => start + i * 3600000),
+    weather_code: codes,
+    // An obsolete field must never override the selected hourly WMO code.
+    significantWeatherCode: 0,
+    temperature_2m: new Float32Array(codes.length).fill(15),
+    relative_humidity_2m: new Float32Array(codes.length).fill(60),
+    wind_speed_10m: new Float32Array(codes.length).fill(5),
+    wind_direction_10m: new Float32Array(codes.length).fill(180),
+  };
+  const originalForecast = get(forecast.forecastOpenMeteo);
+  const originalTime = get(time.currentDateTime);
+  const originalOffset = get(time.forecastUtcOffset);
+  try {
+    forecast.forecastOpenMeteo.set(data);
+    time.forecastUtcOffset.set(0);
+    const expected = ['wi-fog', 'wi-day-sunny-overcast', 'wi-day-cloudy', 'wi-cloudy', 'wi-rain', 'wi-thunderstorm', 'wi-na'];
+    for (let i = 0; i < codes.length; i++) {
+      time.currentDateTime.set(new Date(data.time[i]));
+      assert.equal(get(forecast.currentTimeIndex), i);
+      const { body } = render(WeatherLine, { props: { data } });
+      assert.match(body, new RegExp(`class="text-2xl wi ${expected[i]}"`));
+      assert.doesNotMatch(body, /wi-undefined|wi-day-claudy|wi-claudy/);
+    }
+    const { body } = render(WeatherLine, { props: { data: { ...data, weather_code: undefined } } });
+    assert.match(body, /class="text-2xl wi wi-na"/);
+  } finally {
+    forecast.forecastOpenMeteo.set(originalForecast);
+    time.currentDateTime.set(originalTime);
+    time.forecastUtcOffset.set(originalOffset);
+  }
+});
+
 test('historical Retrieve enables every January day and stays disabled for incomplete dates', async () => {
   const { render } = await server.ssrLoadModule('svelte/server');
   const time = await server.ssrLoadModule('/src/lib/shared/stores/timeStore.js');
