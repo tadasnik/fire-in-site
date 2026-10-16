@@ -51,7 +51,11 @@ const DRY_REPLACEMENTS = {
   99: "wi-day-storm-showers",
 };
 
-export function iconForWmoCode(code, precipitationMm = null) {
+export function iconForWmoCode(code, precipitationMm = null, isDay = null) {
+  if (isDay === 0) {
+    const nightIcon = { 0: 'wi-night-clear', 1: 'wi-night-partly-cloudy', 2: 'wi-night-alt-cloudy' }[code];
+    if (nightIcon) return nightIcon;
+  }
   if (code == null || Number.isNaN(code)) return "";
   if (precipitationMm != null && precipitationMm < DRY_THRESHOLD_MM && DRY_REPLACEMENTS[code]) {
     return DRY_REPLACEMENTS[code];

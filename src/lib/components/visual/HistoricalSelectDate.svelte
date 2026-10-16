@@ -34,49 +34,27 @@
   }
 </script>
 
-<div class="w-full text-center pt-4 mt-6">Historical Weather</div>
-<div class="flex flex-row pt-2 pb-2 justify-center space-x-2">
-  <div class="min-w-20">
-    <Select
-      id="select-year"
-      size="sm"
-      items={$yearsOptions}
-      bind:value={$historicalYear}
-      placeholder="Year"
-    />
+<div class="mt-4 flex flex-wrap items-end gap-3">
+  <div class="min-w-24 flex-1">
+    <label class="control-label" for="select-year">Year</label>
+    <select id="select-year" class="control-input" bind:value={$historicalYear}>
+      <option value={undefined} disabled>Year</option>
+      {#each $yearsOptions as option}<option value={option.value}>{option.name}</option>{/each}
+    </select>
   </div>
-  {#if $historicalYear}
-    <div class="w-24">
-      <Select
-        id="select-month"
-        size="sm"
-        items={$monthOptions}
-        bind:value={$historicalMonth}
-        placeholder="Month"
-      />
-    </div>
-  {/if}
-  {#if typeof $historicalMonth === "number"}
-    <div class="w-16">
-      <Select
-        id="select-day"
-        size="sm"
-        items={$dayOptions}
-        bind:value={$historicalDay}
-        placeholder="Day"
-      />
-    </div>
-  {/if}
-  <div>
-    <Button
-      size="sm"
-      disabled={$historicalYear &&
-      typeof $historicalMonth === "number" &&
-      $historicalDay &&
-      $historicalDate
-        ? false
-        : true}
-      onclick={() => fetchHistoricalForecast()}>Retrieve</Button
-    >
+  <div class="min-w-28 flex-1">
+    <label class="control-label" for="select-month">Month</label>
+    <select id="select-month" class="control-input" bind:value={$historicalMonth} disabled={!$historicalYear}>
+      <option value={undefined} disabled>Month</option>
+      {#each $monthOptions || [] as option}<option value={option.value}>{option.name}</option>{/each}
+    </select>
   </div>
+  <div class="min-w-20 flex-1">
+    <label class="control-label" for="select-day">Day</label>
+    <select id="select-day" class="control-input" bind:value={$historicalDay} disabled={typeof $historicalMonth !== 'number'}>
+      <option value={undefined} disabled>Day</option>
+      {#each $dayOptions as option}<option value={option.value}>{option.name}</option>{/each}
+    </select>
+  </div>
+  <button type="button" class="button-primary" disabled={!($historicalYear && typeof $historicalMonth === 'number' && $historicalDay && $historicalDate)} onclick={fetchHistoricalForecast}>Retrieve</button>
 </div>

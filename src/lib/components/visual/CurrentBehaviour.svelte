@@ -63,9 +63,9 @@
   <!-- </div> -->
 
   {#if $commonOutputs.includes($selectedOutput) && $fuelMoistureModel != "fireInSite"}
-    <div class="flex flex-col p-2 text-primary-500">
-      <div class="text-center text-2xl">All fuels</div>
-      <div class="text-center text-9xl">
+    <div class="flex w-full flex-col items-center justify-center p-4 text-primary-700 dark:text-primary-300">
+      <div class="text-center text-sm text-gray-500">All fuels</div>
+      <div class="mt-2 text-center text-6xl font-semibold tabular-nums">
         {Math.round(data[0].values[$selectedOutput])}%
       </div>
     </div>

@@ -113,6 +113,7 @@ export const hourlyVarsFull = [
   "relative_humidity_2m",
   "precipitation",
   "weather_code",
+  "is_day",
   "cloud_cover",
   "wind_speed_10m",
   "wind_direction_10m",
@@ -156,7 +157,7 @@ export function fillParams({
       "models": forecast_model,
       "past_days": forecast_days_past,
       "forecast_days": forecast_days,
-      "daily": ["precipitation_sum"],
+      "daily": ["precipitation_sum", "sunrise", "sunset", "daylight_duration"],
     }
   } else if (forecast_mode === "historical") {
     if (start_date === undefined) {
@@ -167,6 +168,7 @@ export function fillParams({
       ...baseParams,
       start_date,
       end_date,
+      "daily": ["sunrise", "sunset", "daylight_duration"],
       "models": "era5_seamless"
     }
   }

@@ -19,7 +19,7 @@ function loadHandler(file, name, bindings) {
   }
   assert.ok(handler, `${file}: ${name}`);
   return new Function(...Object.keys(bindings), `
-    let query, results, open, showingHistory;
+    let query, results, open, showingHistory, editing, inputEl;
     let latestForecastRequest = 0;
     return (${source.slice(handler.start, handler.end)});
   `)(...Object.values(bindings));
@@ -30,6 +30,16 @@ function deferred() {
   const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
   return { promise, resolve, reject };
 }
+
+test('map compass labels wrap a rounded 360-degree terrain aspect to north', () => {
+  const direction = loadHandler('lib/components/ui/Map.svelte', 'getWindCardinalDirection', {
+    cardinalDirections: { 0: 'N', 8: 'E', 16: 'S', 24: 'W' },
+  });
+  assert.equal(direction(360), 'n');
+  assert.equal(direction(-360), 'n');
+  assert.equal(direction(90), 'e');
+  assert.equal(direction(NaN), 'n');
+});
 
 function selectionHandlers() {
   const pending = new Map();
@@ -43,6 +53,7 @@ function selectionHandlers() {
       pending.set(lat, request);
       return request.promise;
     },
+    terrainPopup: { setText() {} },
     locMarker: { setLngLat() {} }, map: { setCenter() {} },
     setCurrentLocation: (longitude, latitude) => { committed.push(latitude); },
     getForecastOpenMeteo: () => forecasts.push('fetch'),
@@ -104,36 +115,51 @@ test('delayed IP location cannot supersede a manual selection', async () => {
   assert.deepEqual(selected, []);
 });
 
-test('delayed device geolocation cannot supersede a manual selection', async () => {
-  let success;
+function deviceGeolocation() {
   const selected = [];
-  const geolocate = loadHandler('lib/components/ui/Map.svelte', 'geolocate', {
+  let restored = 0;
+  const addControl = loadHandler('lib/components/ui/Map.svelte', 'addGeolocationControl', {
     beginLocationSelection,
-    navigator: { geolocation: { getCurrentPosition(callback) { success = callback; } } },
-    setMapLocation: (...coords) => selected.push(coords),
-  });
-  await geolocate();
-  beginLocationSelection();
-  success({ coords: { latitude: 51, longitude: -3 } });
-  assert.deepEqual(selected, []);
-});
-
-test('denied geolocation resumes the confirmed location only if still current', async () => {
-  let fail;
-  const selected = [];
-  const geolocate = loadHandler('lib/components/ui/Map.svelte', 'geolocate', {
-    beginLocationSelection,
-    navigator: { geolocation: { getCurrentPosition(_, error) { fail = error; } } },
     $currentLocation: { latitude: 53, longitude: -3 },
     setMapLocation: (...coords) => selected.push(coords),
-    console: { warn() {} },
+    setMarkerLocation: () => restored++,
+    map: { addControl() {}, stop() {} },
   });
-  await geolocate();
-  fail({ code: 1, message: 'Denied' });
-  assert.deepEqual(selected, [[-3, 53, true]]);
-  await geolocate();
+  class GeolocateControl {
+    handlers = {};
+    on(type, handler) { this.handlers[type] = handler; }
+    trigger() { return true; }
+  }
+  const control = addControl({ GeolocateControl });
+  return { control, selected, restored: () => restored };
+}
+
+test('delayed device geolocation cannot supersede a manual selection', () => {
+  const { control, selected, restored } = deviceGeolocation();
+  control.trigger();
   beginLocationSelection();
-  fail({ code: 1, message: 'Denied' });
+  control.handlers.geolocate({ coords: { latitude: 51, longitude: -3 } });
+  assert.deepEqual(selected, []);
+  assert.equal(restored(), 1, 'restore the map after its native camera update');
+});
+
+test('device geolocation selects the returned point and ignores repeat clicks while pending', () => {
+  const { control, selected } = deviceGeolocation();
+  assert.equal(control.trigger(), true);
+  assert.equal(control.trigger(), false);
+  control.handlers.geolocate({ coords: { latitude: 51, longitude: -3 } });
+  assert.deepEqual(selected, [[-3, 51]]);
+  assert.equal(control.trigger(), true);
+});
+
+test('denied geolocation resumes the confirmed location only if still current', () => {
+  const { control, selected } = deviceGeolocation();
+  control.trigger();
+  control.handlers.error({ code: 1, message: 'Denied' });
+  assert.deepEqual(selected, [[-3, 53]]);
+  control.trigger();
+  beginLocationSelection();
+  control.handlers.error({ code: 1, message: 'Denied' });
   assert.equal(selected.length, 1);
 });
 

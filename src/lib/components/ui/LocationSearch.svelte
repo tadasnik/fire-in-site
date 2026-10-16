@@ -9,6 +9,14 @@
   import { SearchOutline, ClockOutline } from "flowbite-svelte-icons";
 
   let query = $state("");
+  let editing = $state(false);
+  let inputEl;
+  const selectedLabel = $derived.by(() => {
+    const { userLocation, name, latitude, longitude } = $currentLocation;
+    if (!userLocation || !Number.isFinite(latitude) || !Number.isFinite(longitude)) return '';
+    const coords = `${Math.abs(latitude).toFixed(2)}°${latitude >= 0 ? 'N' : 'S'}, ${Math.abs(longitude).toFixed(2)}°${longitude >= 0 ? 'E' : 'W'}`;
+    return name ? `${name} · ${coords}` : coords;
+  });
   let results = $state([]);
   let open = $state(false);
   let showingHistory = $state(false);
@@ -32,6 +40,9 @@
   });
 
   function onFocus() {
+    editing = true;
+    query = "";
+    activeIndex = -1;
     if (query.length < 2) {
       const history = getHistory();
       if (history.length > 0) {
@@ -64,7 +75,8 @@
   }
 
   async function search() {
-    const coords = parseCoords(query);
+    const searchQuery = query;
+    const coords = parseCoords(searchQuery);
     if (coords) {
       results = [{ _coord: true, latitude: coords.lat, longitude: coords.lon }];
       open = true;
@@ -75,9 +87,11 @@
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=en&format=json`
       );
       const data = await res.json();
+      if (!editing || query !== searchQuery) return;
       results = data.results ?? [];
       open = results.length > 0;
     } catch {
+      if (!editing || query !== searchQuery) return;
       results = [];
       open = false;
     }
@@ -85,6 +99,8 @@
 
   async function select(result, { record = true } = {}) {
     const isCurrent = beginLocationSelection();
+    inputEl?.blur();
+    editing = false;
     query = "";
     results = [];
     open = false;
@@ -137,6 +153,11 @@
   }
 
   function onKeyDown(e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      inputEl.blur();
+      return;
+    }
     if (!open) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -147,15 +168,15 @@
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
       select(results[activeIndex]);
-    } else if (e.key === "Escape") {
-      open = false;
-      activeIndex = -1;
     }
   }
 
   function onBlur() {
-    // Delay so onmousedown on a result fires before blur closes the list
-    setTimeout(() => { open = false; activeIndex = -1; }, 150);
+    clearTimeout(debounceTimer);
+    editing = false;
+    query = "";
+    open = false;
+    activeIndex = -1;
   }
 </script>
 
@@ -164,15 +185,20 @@
     <SearchOutline class="h-4 w-4 text-gray-400 dark:text-gray-500" />
   </div>
   <input
+    id="location-search"
     type="text"
-    bind:value={query}
-    oninput={onInput}
+    bind:this={inputEl}
+    value={editing ? query : selectedLabel}
+    oninput={(event) => { query = event.currentTarget.value; onInput(); }}
+    onclick={() => { if (!editing) onFocus(); }}
     onkeydown={onKeyDown}
     onblur={onBlur}
     placeholder="Placename or Lat Lon"
     autocomplete="off"
     onfocus={onFocus}
-    class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+    title={!editing ? selectedLabel : undefined}
+    class="control-input pl-9"
+    class:location-selected={!editing && Boolean(selectedLabel)}
   />
   {#if open}
     <ul
@@ -203,7 +229,8 @@
               {i === activeIndex ? 'bg-orange-50 dark:bg-gray-600' : 'hover:bg-orange-50 dark:hover:bg-gray-600'}
               {i === 0 ? 'rounded-t-lg' : ''}
               {i === results.length - 1 ? 'rounded-b-lg' : ''}"
-            onmousedown={() => select(result)}
+            onmousedown={(event) => event.preventDefault()}
+            onclick={() => select(result)}
           >
             {#if result._coord}
               <div class="flex items-center gap-2 w-full">
@@ -213,8 +240,8 @@
             {:else}
               <div class="flex items-center gap-2 w-full">
                 <span class="shrink-0">{countryFlag(result.country_code)}</span>
-                <span class="font-medium w-32 md:w-36 shrink-0 truncate">{result.name}</span>
-                <span class="text-gray-500 dark:text-gray-400 w-32 md:w-36 shrink-0 truncate">{result.admin1 ?? ''}</span>
+                <span class="font-medium min-w-0 flex-1 md:flex-none md:w-36 truncate">{result.name}</span>
+                <span class="text-gray-500 dark:text-gray-400 min-w-0 flex-1 md:flex-none md:w-36 truncate">{result.admin1 ?? ''}</span>
                 <span class="hidden md:block w-24 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.latitude.toFixed(3)}</span>
                 <span class="hidden md:block w-24 shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.longitude.toFixed(3)}</span>
                 <span class="hidden md:block w-16 shrink-0 text-gray-500 dark:text-gray-400">{result.elevation != null ? Math.round(result.elevation) + ' m' : ''}</span>
@@ -226,3 +253,8 @@
     </ul>
   {/if}
 </div>
+
+<style>
+  .location-selected { font-weight: 600; color: #111827; text-overflow: ellipsis; }
+  :global(.dark) .location-selected { color: #f3f4f6; }
+</style>

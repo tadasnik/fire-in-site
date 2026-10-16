@@ -1,6 +1,5 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Button } from "flowbite-svelte";
   import mapboxgl from "mapbox-gl";
   import LatLon from "geodesy/latlon-spherical.js";
   import { currentLocation } from "$lib/shared/stores/locationStore";
@@ -8,10 +7,57 @@
   import { elevationSlopeAspect } from "$lib/weather/elevation";
   import { beginLocationSelection } from "$lib/shared/locationSelection";
   import "$lib/styles/mapbox-gl.css";
+  import 'maplibre-gl/dist/maplibre-gl.css';
+  import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 
   let locMarker;
+  let terrainPopup;
   let map;
+  let destroyed = false;
   let mapContainer = $state();
+  let mapNotice = $state('');
+  const mapboxToken = import.meta.env.VITE_MAPBOX_GL_TOKEN;
+  const streetTiles = import.meta.env.VITE_OSM_TILE_URL
+    || '/api/map/tiles/{z}/{x}/{y}';
+  let satellite = Boolean(mapboxToken?.trim());
+
+  function streetStyle() {
+    return {
+      version: 8,
+      sources: {
+        osm: {
+          type: 'raster',
+          tiles: [streetTiles],
+          tileSize: 256,
+          maxzoom: 18,
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · <a href="https://www.fossgis.de/">FOSSGIS</a>',
+        },
+      },
+      layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+    };
+  }
+
+  function handleMapError(event) {
+    if (event.error?.name === 'AbortError') return;
+    if (satellite && [401, 403].includes(event.error?.status)) {
+      satellite = false;
+      mapNotice = 'Satellite imagery unavailable. Showing street map.';
+      void initializeMap().catch(() => { mapNotice = 'Unable to initialize the street map.'; });
+    } else if (!satellite && event.sourceId === 'osm') {
+      mapNotice = 'Some map tiles could not load. Try reloading the map.';
+    }
+  }
+
+  function handleSourceData(event) {
+    if (!satellite && event.sourceId === 'osm' && event.tile?.state === 'loaded') {
+      mapNotice = '';
+    }
+  }
+
+  function reloadStreetMap() {
+    mapNotice = '';
+    map?.getSource('osm')?.setTiles([streetTiles]);
+  }
   let lng, lat, zoom;
 
   lng = -3;
@@ -52,50 +98,49 @@
     31: "N",
   };
 
-  function geolocateForecast() {
-    geolocate();
-  }
-
-  async function geolocate() {
-    const isCurrent = beginLocationSelection();
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0,
+  function addGeolocationControl(renderer) {
+    const control = new renderer.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+      trackUserLocation: false,
+      showUserLocation: false,
+      showAccuracyCircle: false,
+    });
+    const trigger = control.trigger.bind(control);
+    let isCurrent = () => false;
+    let pending = false;
+    // Start the selection guard before the native control requests permission.
+    control.trigger = () => {
+      if (pending) return false;
+      isCurrent = beginLocationSelection();
+      pending = true;
+      const started = trigger();
+      if (!started) pending = false;
+      return started;
     };
-
-    function success(pos) {
-      if (!isCurrent()) return;
-      const crd = pos.coords;
-
-      // console.log("Your current position is:");
-      // console.log(`Latitude : ${crd.latitude}`);
-      // console.log(`Longitude: ${crd.longitude}`);
-      // console.log(`More or less ${crd.accuracy} meters.`);
-      setMapLocation(
-        crd.longitude,
-        crd.latitude,
-        true,
-      );
-    }
-
-    function error(err) {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
-      // Resume the last confirmed location if this attempt superseded an
-      // in-flight startup/forecast request and permission was denied.
-      if (isCurrent()) {
-        setMapLocation($currentLocation.longitude, $currentLocation.latitude, true);
+    control.on('geolocate', ({ coords }) => {
+      pending = false;
+      if (!isCurrent()) {
+        map.stop();
+        setMarkerLocation();
+        return;
       }
-    }
-
-    await navigator.geolocation.getCurrentPosition(success, error, options);
+      setMapLocation(coords.longitude, coords.latitude);
+    });
+    control.on('error', () => {
+      pending = false;
+      // Resume a confirmed selection if this lookup interrupted its forecast.
+      if (isCurrent()) setMapLocation($currentLocation.longitude, $currentLocation.latitude);
+    });
+    map.addControl(control, 'top-right');
+    return control;
   }
 
   async function setMapLocation(longitude, latitude, center = false) {
     const isCurrent = beginLocationSelection();
-    locMarker.setLngLat([longitude, latitude]);
+    terrainPopup?.setText("Loading terrain…");
+    locMarker?.setLngLat([longitude, latitude]);
     if (center) {
-      map.setCenter([longitude, latitude]);
+      map?.setCenter([longitude, latitude]);
     }
     // Elevation + slope + aspect from the Open-Meteo DEM (same source as the
     // location search), not from Mapbox terrain — the map is a visual location
@@ -115,7 +160,8 @@
   }
 
   function getWindCardinalDirection(windDir) {
-    return cardinalDirections[Math.floor(windDir / 11.25)].toLowerCase();
+    const direction = ((Number(windDir) % 360) + 360) % 360;
+    return cardinalDirections[Math.floor(direction / 11.25)]?.toLowerCase() ?? 'n';
   }
 
   function setCurrentLocation(longitude, latitude, elevation, slope, aspect) {
@@ -138,18 +184,28 @@
     // console.log("setCurrent currentLoc", $currentLocation);
   }
 
+  function updateTerrainPopup() {
+    if (!terrainPopup) return;
+    const { elevation, slope, aspect } = $currentLocation;
+    const format = value => Number.isFinite(value) ? Math.round(value) : '—';
+    const direction = getWindCardinalDirection(aspect).toUpperCase();
+    terrainPopup.setText(
+      `Elevation ${format(elevation)} m asl\nSlope ${format(slope)}% · Aspect ${Number.isFinite(aspect) ? direction : '—'}`,
+    );
+  }
+
   function setMarkerLocation() {
     // console.log("setMarkerLocation");
-    if (map) {
+    if (map && locMarker) {
       // console.log("setMarkerLocation map available");
       map.setCenter([$currentLocation.longitude, $currentLocation.latitude]);
+      updateTerrainPopup();
       locMarker.setLngLat([
         $currentLocation.longitude,
         $currentLocation.latitude,
       ]);
     }
   }
-  let width = $state();
 
   $effect(() => {
     const _lat = $currentLocation.latitude;
@@ -157,7 +213,14 @@
     setMarkerLocation();
   });
 
-  onMount(() => {
+  async function initializeMap() {
+    // Mapbox GL requires authorization even for third-party tiles. Use the
+    // independent MapLibre renderer for the keyless street-map fallback.
+    const renderer = satellite ? mapboxgl : await import('maplibre-gl');
+    if (!satellite) renderer.setWorkerUrl(maplibreWorkerUrl);
+    if (destroyed) return;
+    map?.remove();
+    locMarker = undefined;
     const initialState = { lng: lng, lat: lat, zoom: zoom };
 
     // console.log(
@@ -168,19 +231,23 @@
     // );
     // $currentLocation, setMarkerLocation();
 
-    map = new mapboxgl.Map({
+    map = new renderer.Map({
       container: mapContainer,
-      accessToken: import.meta.env.VITE_MAPBOX_GL_TOKEN,
+      accessToken: satellite ? mapboxToken : undefined,
 
-      style: `mapbox://styles/mapbox/satellite-streets-v12`,
+      style: satellite ? 'mapbox://styles/mapbox/satellite-streets-v12' : streetStyle(),
       center: [$currentLocation.longitude, $currentLocation.latitude],
       zoom: initialState.zoom,
     });
-    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new renderer.NavigationControl());
+    addGeolocationControl(renderer);
     map._isReady = false;
     map.ready = () => map._isReady;
     map.once("load", () => (map._isReady = true));
+    map.on('error', handleMapError);
+    map.on('sourcedata', handleSourceData);
     map.on("style.load", () => {
+      if (!satellite) return;
       // add the digital elevation model tiles
       map.addSource("mapbox-dem", {
         type: "raster-dem",
@@ -199,12 +266,28 @@
       setMapLocation(coordinates.lng, coordinates.lat, false);
     });
 
-    locMarker = new mapboxgl.Marker()
+    terrainPopup = new renderer.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      focusAfterOpen: false,
+      offset: 38,
+      className: 'terrain-popup',
+      maxWidth: '220px',
+    });
+    updateTerrainPopup();
+    locMarker = new renderer.Marker()
       .setLngLat([$currentLocation.longitude, $currentLocation.latitude])
-      .addTo(map);
+      .setPopup(terrainPopup)
+      .addTo(map)
+      .togglePopup();
+  }
+
+  onMount(() => {
+    void initializeMap().catch(() => { mapNotice = 'Unable to initialize the map.'; });
   });
 
   onDestroy(async () => {
+    destroyed = true;
     if (map) {
       map.remove();
     }
@@ -212,81 +295,27 @@
 </script>
 
 <div class="flex flex-col justify-center">
-  <div class="flex flex-row place-items-baseline justify-center pb-2">
-    <div class="items-baseline align-text-bottom pr-4">
-      <span class="align-bottom text-slate-500">Select location on the Map</span
-      >
-    </div>
-    <div>
-      <Button outline primary-200 size="xs" onclick={geolocate}
-        >Geolocate</Button
-      >
-    </div>
+  <div class="map-viewport">
+    <div class="map-canvas" bind:this={mapContainer}></div>
   </div>
-
-  <div class="aspect-square overflow-hidden" bind:clientWidth={width}>
-    <div
-      class="w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1"
-    >
-      {#if $currentLocation.elevation}
-        {$currentLocation.latitude.toFixed(3)}<i class="text-xl wi wi-degrees"
-        ></i>{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed(
-          3,
-        )}<i class="text-xl wi wi-degrees"></i>{$currentLocation.longitude >= 0
-          ? "E"
-          : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed(
-          0,
-        )}%,
-        <i
-          class="text-2xl wi wi-wind
-      wi-towards-{getWindCardinalDirection($currentLocation.aspect)}"
-        ></i>
-      {/if}
-    </div>
-    <div class="w-full h-full z-0" bind:this={mapContainer}></div>
-  </div>
+  {#if mapNotice}
+    <p class="pt-2 text-center text-xs text-gray-500" role="status">
+      {mapNotice}
+      <button type="button" class="ml-2 underline" onclick={reloadStreetMap}>Reload map</button>
+    </p>
+  {/if}
 </div>
 
-<!-- </div> -->
-
-<!-- <div -->
-<!--   class="absolute w-full bg-slate-600 bg-opacity-90 text-center text-gray-50 z-10 p-1" -->
-<!-- > -->
-<!--   {$currentLocation.latitude.toFixed(3)}<i -->
-<!--     class="text-xl wi wi-degrees" -->
-<!--   />{$currentLocation.latitude >= 0 ? "N" : "S"}, {$currentLocation.longitude.toFixed( -->
-<!--     3, -->
-<!--   )}<i class="text-xl wi wi-degrees" />{$currentLocation.longitude >= 0 -->
-<!--     ? "E" -->
-<!--     : "W"}, {$currentLocation.elevation.toFixed(0)}m asl, slope: {$currentLocation.slope.toFixed( -->
-<!--     0, -->
-<!--   )}%, -->
-<!--   <i -->
-<!--     class="text-2xl wi wi-wind -->
-<!--       wi-towards-{getWindCardinalDirection($currentLocation.aspect)}" -->
-<!--   /> -->
-<!-- </div> -->
-<!-- <div class="map z-0" bind:this={mapContainer} /> -->
-
 <style>
-  .map {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  .sidebar {
-    background-color: rgb(35 55 75 / 90%);
-    color: #fff;
-    padding: 6px 12px;
-    font-family: monospace;
-    z-index: 1;
-    position: relative;
-    top: 0;
-    left: 0;
-    margin: 12px;
-    border-radius: 4px;
+  .map-viewport { position: relative; height: 330px; border-radius: 8px; overflow: hidden; }
+  .map-canvas { position: absolute; inset: 0; }
+  :global(.terrain-popup .maplibregl-popup-content),
+  :global(.terrain-popup .mapboxgl-popup-content) {
+    padding: 6px 9px;
+    color: #334155;
+    font: 12px/1.5 system-ui, sans-serif;
+    white-space: pre-line;
+    border-radius: 5px;
+    box-shadow: 0 1px 6px rgb(0 0 0 / 15%);
   }
 </style>

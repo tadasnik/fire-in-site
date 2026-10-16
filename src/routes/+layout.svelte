@@ -7,10 +7,7 @@
     SidebarGroup,
     SidebarItem,
     SidebarWrapper,
-    SidebarDropdownWrapper,
     Drawer,
-    Dropdown,
-    DropdownDivider,
     Navbar,
     NavBrand,
     NavLi,
@@ -21,7 +18,6 @@
     FooterBrand,
   } from "flowbite-svelte";
   import {
-    AdjustmentsHorizontalSolid,
     ColumnOutline,
     HomeOutline,
     InfoCircleOutline,
@@ -30,7 +26,6 @@
   } from "flowbite-svelte-icons";
   import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
-  import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
   import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
@@ -84,44 +79,32 @@
 </svelte:head>
 
 <header
-  class="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
+  class="site-header sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-100 dark:border-gray-800 dark:bg-gray-950"
   style="padding-top: env(safe-area-inset-top);"
 >
   <DisclamerModal />
   <Navbar
     color="default"
     fluid
-    class="flex items-center justify-between w-full mx-auto py-1.5 lg:py-0.5 px-4 max-w-8xl"
+    class="flex items-center justify-between w-full mx-auto py-1 px-3"
   >
     {#snippet children({ hidden, toggle })}
       <NavBrand href="/">
         <img
           src={FireInSiteLogo}
-          class="me-3 h-6 sm:h-9 lg:h-7"
+          class="me-3 h-9"
           alt="fireInSite Logo"
         />
       </NavBrand>
 
       <div class="flex md:order-2">
-        <NavHamburger onClick={toggleDrawer} class="m-0 mr-3 lg:hidden" />
+        <NavHamburger onclick={toggleDrawer} class="m-0 p-1.5 md:hidden" />
       </div>
       <NavUl>
         {#if activeUrl !== "/"}
           <NavLi href="/">The Model</NavLi>
         {/if}
 
-        <NavLi class="cursor-pointer">
-          <div class="flex-col items-center">
-            <AdjustmentsHorizontalSolid
-              class="w-4 h-4 ms-2 text-primary-900 dark:text-white inline"
-            />
-            Settings
-          </div>
-        </NavLi>
-
-        <Dropdown>
-          <SettingsDropdown />
-        </Dropdown>
         {#each navItems as item}
           <NavLi href={item.href}>{item.label}</NavLi>
         {/each}
@@ -156,21 +139,12 @@
           </SidebarItem>
         {/each}
         <ValidationModal bind:openValidationModal />
-        <SidebarDropdownWrapper label="Settings">
-          {#snippet icon()}
-            <AdjustmentsHorizontalSolid
-              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            />
-          {/snippet}
-          <DropdownDivider></DropdownDivider>
 
-          <SettingsDropdown></SettingsDropdown>
-        </SidebarDropdownWrapper>
       </SidebarGroup>
     </SidebarWrapper>
   </Sidebar>
 </Drawer>
-<main class="">
+<main class="flex-1">
   {@render children?.()}
 </main>
 <Footer>

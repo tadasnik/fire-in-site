@@ -10,7 +10,6 @@
   import { outputNodes } from "$lib/data/outputNodes.js";
   import UKFuelModels from "$lib/data/UKFuelModels.json";
   import FuelModelModal from "$lib/components/visual/FuelModal.svelte";
-  import SelectOutput from "$lib/components/ui/SelectOutput.svelte";
   import { fuelCodeFormat } from "$lib/shared/utils.js";
   const { data, xGet, y, yGet, percentRange } = getContext("LayerCake");
 
@@ -114,9 +113,8 @@
     triggeredBy={"#" + "is" + i}>{prop[6]}</Popover
   >
 {/each}
-<div class="absolute items-end min-w-96 p-1" style:left="95px">
-  <div class=""></div>
-  <SelectOutput />
+<div class="absolute whitespace-nowrap px-2 py-3 text-sm font-medium text-gray-700" style:left="95px">
+  {axisLabel}
 </div>
 <div
   class="flex columns-2 items-end min-w-64 p-1"

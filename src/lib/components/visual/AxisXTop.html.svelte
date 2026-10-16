@@ -121,11 +121,13 @@
       style:left="{tickValUnits + halfBand}{units}"
       style="top:{-tickGutter}px;"
     >
-      <div
-        class="flex-col grow -space-y-1 text-center align-middle {isSelectedClass(
+      <button
+        type="button"
+        aria-label="{formatDay(tick)} {formatHour(tick)}:00 location time"
+        aria-pressed={tick === $dateTime + $forecastUtcOffset * 1000}
+        class="flex flex-col grow -space-y-1 text-center align-middle rounded focus-visible:outline-2 focus-visible:outline-orange-600 {isSelectedClass(
           tick,
         )} hover:font-bold"
-        role="button"
         onclick={() => executeClick(tick)}
         style:transform={`translate(calc(-50% + ${dx}px), calc(-${
           tick === $dateTime + $forecastUtcOffset * 1000 ? 130 : 110
@@ -137,7 +139,7 @@
         <div class="p-0 m-0">
           {formatHour(tick)}
         </div>
-      </div>
+      </button>
     </div>
   {/each}
 </div>

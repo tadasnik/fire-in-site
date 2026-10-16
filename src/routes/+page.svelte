@@ -4,7 +4,7 @@
 
   // The interactive app pulls in browser-only libraries (Mapbox, the fire
   // model). Load it dynamically on the client so this route can be
-  // server-rendered for its SEO head + hero without those libraries.
+  // server-rendered for its SEO metadata and heading without those libraries.
   let HomeApp = $state(null);
   onMount(async () => {
     HomeApp = (await import("$lib/components/HomeApp.svelte")).default;
@@ -24,16 +24,19 @@
   <meta name="twitter:description" content={description} />
 </svelte:head>
 
-<section class="container mx-auto px-4 pt-4 text-center">
-  <h1 class="text-xl md:text-xl text-gray-600 dark:text-gray-400">
-    Wildfire Behaviour Prediction
-  </h1>
-</section>
+{#snippet forecastHeading()}
+  <h1 id="behaviour-heading" class="section-title">Wildfire behaviour forecast</h1>
+{/snippet}
 
 {#if HomeApp}
-  <HomeApp />
+  <HomeApp {forecastHeading} />
 {:else}
-  <div class="flex justify-center p-16">
-    <Spinner size={8} />
+  <div class="forecast-workspace">
+    <div class="workspace-loading">
+      {@render forecastHeading()}
+      <div class="flex justify-center p-8" role="status" aria-label="Loading forecast">
+        <Spinner size={8} />
+      </div>
+    </div>
   </div>
 {/if}

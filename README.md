@@ -10,9 +10,37 @@ FireInSite is built on over four years of intensive data collection of fuel mois
 
 The model integrates terrain information from Mapbox digital elevation tiles, weather data by Open-Meteo with BehavePlus fire behaviour model to provide both fire behaviour forecasts for five days and/or hindcasts (using historic weather).
 
+In forecast mode, a separate EFFIS panel supplements these predictions with daily
+Canadian Fire Weather Index System indices for the selected point: FWI, FFMC,
+DMC, DC, ISI and BUI. It follows the selected day and includes the available daily
+series, an index guide and the EFFIS FWI danger class. These ECMWF-driven indices
+describe regional fire weather at approximately 8 km resolution; they remain
+independent of FireInSite's selected fuel, terrain and weather model. FFMC is an
+index, not a fuel moisture percentage.
+
+The panel uses `/api/effis/point?lat=…&lon=…`, a server-side adapter for the EFFIS
+viewer chart service. No API key is required. Successful responses are cached for
+five minutes in browsers and fifteen minutes at the CDN. Missing values and
+upstream errors are handled independently of the fire behaviour forecast.
+Historical and user-defined weather modes do not display the current EFFIS
+forecast. Source: [Copernicus Emergency Management Service / EFFIS](https://forest-fire.emergency.copernicus.eu/about-effis/technical-background/fire-danger-forecast),
+with [CC BY 4.0 attribution](https://forest-fire.emergency.copernicus.eu/about-effis/data-license).
+
 The application is designed to be user-friendly and accessible to a wide range of users, including land managers, fire service personel and researchers.
 
 Built with Svelte and flowbite.
+
+The main forecast page shows model settings in a persistent sidebar on screens
+1280 px and wider. On smaller screens the same controls open in a dedicated
+Model settings drawer, separate from navigation. Day and hour controls use the
+forecast location's time; choosing another day preserves the selected hour.
+Chart view and output selection remain beside the fire behaviour results.
+
+For local development, set `VITE_MAPBOX_GL_TOKEN` in `.env` to use the deployed
+satellite-map setup. Without a token, the location picker uses MapLibre and a
+street basemap from FOSSGIS/OpenStreetMap Germany, served through a cached
+same-origin tile endpoint. This community service is for modest noncommercial
+interactive use. `VITE_OSM_TILE_URL` can select another OSM-compatible XYZ source.
 
 ## Authors
 

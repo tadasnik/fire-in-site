@@ -11,25 +11,23 @@ export const currentLocation = writable({
   aspect: 0
 })
 
-export async function getLocation() {
+export async function getLocation({ fetcher = fetch, token = import.meta.env?.VITE_GEOAPIFY_TOKEN } = {}) {
+  const fallback = [52, -1.5];
+  if (!token?.trim()) return fallback;
   try {
-    // 5. Dispatch the request for the users
-    var requestOptions = {
-      method: "GET",
-    };
-
-    const response = await fetch(
-      "https://api.geoapify.com/v1/ipinfo?apiKey=" + import.meta.env.VITE_GEOAPIFY_TOKEN,
-      requestOptions,
+    const response = await fetcher(
+      "https://api.geoapify.com/v1/ipinfo?apiKey=" + encodeURIComponent(token),
+      { signal: AbortSignal.timeout(5000) },
     )
     if (response.ok) {
-      const jsonResponse = await response.json()
-      return [parseFloat(jsonResponse.location.latitude), parseFloat(jsonResponse.location.longitude)]
+      const { location } = await response.json();
+      const latitude = parseFloat(location?.latitude);
+      const longitude = parseFloat(location?.longitude);
+      if (Number.isFinite(latitude) && Number.isFinite(longitude)
+        && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180) {
+        return [latitude, longitude];
+      }
     }
-    else {
-      const text = response.text();
-    }
-  } catch (error) {
-    return [52, -1.5]
-  }
+  } catch { /* Use the default UK location when IP geolocation is unavailable. */ }
+  return fallback;
 }

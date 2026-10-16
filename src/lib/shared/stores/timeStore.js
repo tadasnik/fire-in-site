@@ -55,11 +55,11 @@ export const dateTime = derived(
     return 3600000 * (Math.round($currentDateTime / 3600000))
   }
 )
-export const focusDay = derived([currentDateTime, forecastUtcOffset], ([$currentDateTime, $forecastUtcOffset]) => {
+export const focusDay = derived([dateTime, forecastUtcOffset], ([$dateTime, $forecastUtcOffset]) => {
   // Shift epoch ms to location-local time, then take UTC-midnight of that date.
   // The forecast time array stores timestamps as (t + utcOffsetSeconds) * 1000,
   // i.e. local midnight expressed as a UTC value — so we must match that convention.
-  const localMs = $currentDateTime.valueOf() + $forecastUtcOffset * 1000;
+  const localMs = $dateTime + $forecastUtcOffset * 1000;
   const d = new Date(localMs);
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 });

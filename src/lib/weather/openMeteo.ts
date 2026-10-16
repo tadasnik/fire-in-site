@@ -1,4 +1,5 @@
 import { fetchWeatherApi } from 'openmeteo';
+import { solarTimestamps } from './solarTimes.js';
 
 // Forecast requests are proxied through our own server route so the paid
 // Open-Meteo customer apikey stays server-side (see src/routes/api/forecast).
@@ -26,6 +27,14 @@ export async function fetchForecastMeteo(params: {
   // if (!params.forecast_mode) { params.forecast_mode = "forecast" }
   const url = params.forecast_mode === 'forecast' ? FORECAST_URL : ARCHIVE_URL
   const { forecast_mode, ...apiParams } = params;
+  // One sample beyond the visible range closes the continuous weather curves.
+  const needsBoundary = params.hourly.includes('wind_speed_10m') || params.hourly.includes('global_tilted_irradiance');
+  let closingTime = Infinity;
+  if (needsBoundary && forecast_mode === 'forecast') apiParams.forecast_days = (params.forecast_days ?? 5) + 1;
+  if (needsBoundary && forecast_mode === 'historical' && params.end_date) {
+    closingTime = Date.parse(params.end_date + 'T00:00:00Z') + 86400000;
+    apiParams.end_date = new Date(closingTime).toISOString().slice(0, 10);
+  }
   const responses = await fetchWeatherApi(url, apiParams)
 
   // Helper function to form time ranges
@@ -53,10 +62,16 @@ export async function fetchForecastMeteo(params: {
     "time": range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
       (t) => Number(3600000 * (Math.round(Number(new Date((t + utcOffsetSeconds) * 1000)) / 3600000))))
   }
+  if (needsBoundary) {
+    const length = forecast_mode === 'forecast'
+      ? ((params.forecast_days ?? 5) + (params.past_days ?? 0)) * 24 + 1
+      : weatherData.time.filter(time => time <= closingTime).length;
+    weatherData.time = weatherData.time.slice(0, length);
+  }
   //Store utc offset value for later use in time conversion of weather data
   weatherData["utcOffsetSeconds"] = utcOffsetSeconds;
   for (let [nr, variable] of params.hourly.entries()) {
-    weatherData[variable] = hourly.variables(nr)!.valuesArray()!
+    weatherData[variable] = hourly.variables(nr)!.valuesArray()!.slice(0, weatherData.time.length)
   }
 
   // Some models (e.g. ukmo_seamless) return 0 for most/all vapour_pressure_deficit
@@ -81,7 +96,7 @@ export async function fetchForecastMeteo(params: {
     weatherData["vapour_pressure_deficit"] = out;
   }
 
-  if ((params.models === "ukmo_seamless") && (params.forecast_days > 2) && (params.forecast_mode === "forecast")) {
+  if (params.hourly.includes("global_tilted_irradiance") && (params.models === "ukmo_seamless") && (params.forecast_days > 2) && (params.forecast_mode === "forecast")) {
     const gti = await fetchForecastMeteo({ ...params, models: "icon_seamless", hourly: ["global_tilted_irradiance"] })
     for (let [nr, value] of weatherData["global_tilted_irradiance"].entries()) {
       if (Number.isNaN(value)) {
@@ -98,7 +113,10 @@ export async function fetchForecastMeteo(params: {
       );
       weatherData["daily_time"] = dailyTime;
       for (const [nr, variable] of (params.daily as string[]).entries()) {
-        weatherData["daily_" + variable] = daily.variables(nr)!.valuesArray()!;
+        const values = daily.variables(nr)!;
+        weatherData["daily_" + variable] = variable === 'sunrise' || variable === 'sunset'
+          ? solarTimestamps(values, utcOffsetSeconds)
+          : values.valuesArray()!;
       }
     }
   }

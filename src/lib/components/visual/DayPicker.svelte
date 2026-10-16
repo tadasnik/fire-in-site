@@ -1,11 +1,8 @@
 <script>
-  import { timeFormat } from "d3-time-format";
-  import { isEqual, startOfDay } from "date-fns";
+  import { utcFormat } from "d3-time-format";
+  import { localHour, instantForLocalHour } from "$lib/shared/forecastTime.js";
   import { dateTime } from "$lib/shared/stores/timeStore";
   import {
-    currentTimeIndex,
-    forecastMode,
-    focusDayIndex,
     daysInForecast,
     forecastOpenMeteo,
   } from "$lib/shared/stores/forecastStore";
@@ -17,23 +14,14 @@
   } from "$lib/shared/stores/timeStore";
   import { iconForWmoCode } from "$lib/data/wmoWeatherIcons.js";
   import "$lib/styles/weather-icons.css";
-  import heli from "$lib/assets/icons/helicop.png";
 
-  const dateFormatShort = timeFormat("%a %e");
-  const dateFormatLong = timeFormat("%a %e %b");
-
-  // $: console.log("focusDay", $focusDay);
-  Date.prototype.addHours = function (h) {
-    this.setTime(this.getTime() + h * 60 * 60 * 1000);
-    return this;
-  };
+  const dateFormatShort = utcFormat("%a %e");
+  const dateFormatLong = utcFormat("%a %e %b");
 
   function handleDayClick(day) {
-    if ($timeMode === "current") {
-      $timeMode = "user";
-    }
-    // day is local-as-UTC midnight; subtract offset to get true UTC, then set to noon.
-    $currentDateTime = new Date(day - $forecastUtcOffset * 1000).addHours(12);
+    $timeMode = "user";
+    const hour = localHour($dateTime, $forecastUtcOffset);
+    $currentDateTime = instantForLocalHour(day, hour, $forecastUtcOffset);
   }
 
   function formatDayShort(d) {
@@ -43,13 +31,6 @@
   function formatDayLong(d) {
     return dateFormatLong(d);
   }
-  let isSelectedDayClass = $derived((d) => {
-    return isEqual(startOfDay(d), startOfDay($focusDay))
-      ? // selected tab sits 0.5rem (= rounded-t-lg radius) taller than the rest
-        "min-h-12 sm:min-h-16 md:min-h-18 font-bold text-primary-900 bg-white border-slate-500 border-t-2 border-l-2 border-r-2 rounded-t-lg"
-      : "min-h-10 sm:min-h-14 md:min-h-16 border-slate-500 border-b-2";
-  });
-
   // Both hourly time and daysInForecast use "local-as-UTC ms", so keying by the
   // UTC date string of that ms gives the location-local day, independent of the
   // browser's own timezone.
@@ -111,29 +92,17 @@
   }
 </script>
 
-<div
-  class="flex flex-row items-end justify-start sm:justify-center p-2 space-x-0.5 divide-slate-500 min-w-full"
->
+<div class="forecast-days" role="group" aria-label="Forecast day">
   {#each $daysInForecast as day}
     {@const info = dayInfo(day)}
-    <div
-      class="w-22 sm:w-26 md:w-36 lg:w-40 shrink-0 p-1 sm:p-3 md:p-3 lg:p-4 text-xs sm:text-sm md:text-base bg-gray-100 {isSelectedDayClass(
-        day,
-      )}"
-      role="button"
-      onclick={() => handleDayClick(day)}
-    >
-      <div class="flex items-center justify-between gap-1">
-        <span class="sm:hidden">{formatDayShort(day)}</span>
-        <span class="hidden sm:inline">{formatDayLong(day)}</span>
-        {#if info?.code != null && !Number.isNaN(info.code)}
-          <i
-            class="wi {iconForWmoCode(info.code, info.precip)} text-base sm:text-lg md:text-xl text-slate-600"
-            title="WMO code {info.code}{info.precip != null ? ` — ${info.precip.toFixed(1)} mm` : ''}"
-            aria-label="WMO weather code {info.code}"
-          ></i>
-        {/if}
-      </div>
-    </div>
+    <button type="button" class="forecast-day" aria-pressed={dayKey(day) === dayKey($focusDay)}
+      aria-label={formatDayLong(day)} onclick={() => handleDayClick(day)}>
+      <span class="font-medium">{formatDayShort(day)}</span>
+      {#if info?.code != null && !Number.isNaN(info.code)}
+        <i class="wi {iconForWmoCode(info.code, info.precip)} text-lg"
+          title="WMO code {info.code}{info.precip != null ? ` — ${info.precip.toFixed(1)} mm` : ''}"
+          aria-label="WMO weather code {info.code}"></i>
+      {:else}<span class="text-xs text-gray-400">—</span>{/if}
+    </button>
   {/each}
 </div>

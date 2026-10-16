@@ -56,6 +56,7 @@
     "geodesy": "^2.4.0",
     "layercake": "^10.0.2",
     "mapbox-gl": "^3.23.1",
+    "maplibre-gl": "^6.14.0",
     "onnxruntime-web": "^1.26.0",
     "openmeteo": "^1.2.3",
     "rollup": "^4.60.3",

@@ -58,7 +58,7 @@
   <div class="flex align-middle justify-center items-end space-x-2 text-xs">
     <div>{weatherLabel}</div>
     <div>
-      <i class="text-2xl wi {iconForWmoCode(data.weather_code?.[$currentTimeIndex]) || 'wi-na'}"></i>
+      <i class="text-2xl wi {iconForWmoCode(data.weather_code?.[$currentTimeIndex], null, data.is_day?.[$currentTimeIndex]) || 'wi-na'}"></i>
     </div>
     <div class="space-x-0">
       <span>{data.temperature_2m[$currentTimeIndex].toFixed(0)}</span
@@ -75,7 +75,7 @@
         )}"
       ></i>
       <span class="pl-0">{data.wind_speed_10m[$currentTimeIndex].toFixed(0)}</span
-      ><span class="font-bold pl-1"> m/s</span>
+      ><span class="font-bold pl-1"> km/h</span>
     </div>
   </div>
 {/if}
