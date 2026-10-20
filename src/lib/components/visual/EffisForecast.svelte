@@ -2,26 +2,15 @@
   import { currentLocation } from '$lib/shared/stores/locationStore';
   import { forecastMode } from '$lib/shared/stores/forecastStore';
   import { focusDay } from '$lib/shared/stores/timeStore';
-  import { createEffisStore } from '$lib/shared/stores/effisStore.js';
   import { canadianIndices, dayKey } from '$lib/weather/effis.js';
 
-  const effis = createEffisStore();
+  let { effis } = $props();
   const dateFormat = new Intl.DateTimeFormat('en-GB', {
     weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC',
   });
-  let refresh = $state(0);
   const selectedDate = $derived(dayKey($focusDay));
   const selected = $derived($effis.data?.days.find((day) => day.date === selectedDate));
   const hasValues = $derived(selected && canadianIndices.some(({ key }) => selected[key] !== null));
-
-  $effect(() => {
-    const { latitude, longitude, userLocation } = $currentLocation;
-    const mode = $forecastMode;
-    refresh;
-    if (mode === 'forecast' && userLocation) void effis.load(latitude, longitude);
-    else effis.reset();
-    return () => effis.reset();
-  });
 
   function formatDate(date) {
     return dateFormat.format(new Date(`${date}T00:00:00Z`));
@@ -47,7 +36,7 @@
         type="button"
         class="button-secondary"
         disabled={$effis.status === 'loading' || !$currentLocation.userLocation}
-        onclick={() => refresh += 1}
+        onclick={() => effis.load($currentLocation.latitude, $currentLocation.longitude)}
       >{$effis.status === 'error' ? 'Retry' : 'Refresh'}</button>
     </div>
 

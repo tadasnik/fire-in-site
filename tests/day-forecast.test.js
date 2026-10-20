@@ -1,9 +1,25 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { dayWeather, viewWeather, weatherPoints, daylightSegments, dayFuels, rowDomain, linePath, areaPath, WEATHER_ROWS, hourText } from '../src/lib/shared/dayForecast.js';
+import { dayWeather, viewWeather, weatherPoints, daylightSegments, dayFuels, rowDomain, linePath, areaPath, WEATHER_ROWS, hourText, forecastColumnTime } from '../src/lib/shared/dayForecast.js';
 import { solarTimestamps } from '../src/lib/weather/solarTimes.js';
 const day = Date.UTC(2026, 9, 16);
 const hour = 3600000;
+
+test('all forecast-time values share the centre of their hourly or three-hour column', () => {
+  assert.equal(forecastColumnTime(day, hour), day + 0.5 * hour);
+  assert.equal(forecastColumnTime(day + 3 * hour, 3 * hour), day + 4.5 * hour);
+});
+
+test('rain chance uses preceding hourly timestamps and their maximum, never a sum or future rain', () => {
+  const data = { time: Array.from({ length: 6 }, (_, i) => day + (i - 2) * hour), precipitation_probability: [10, 20, 30, 0, 60, NaN] };
+  assert.equal(viewWeather(data, day)[0].precipitation_probability, 30);
+  assert.equal(viewWeather(data, day)[1].precipitation_probability, 0);
+  assert.equal(viewWeather(data, day, { step: 3 })[0].precipitation_probability, 30);
+  assert.equal(viewWeather(data, day + 2 * hour, { step: 3 })[0].precipitation_probability, 60);
+  assert.equal(viewWeather(data, day + 3 * hour, { step: 3 })[0].precipitation_probability, null);
+  assert.equal(viewWeather({ time: [day] }, day)[0].precipitation_probability, null);
+  assert.deepEqual(rowDomain([], WEATHER_ROWS.find(row => row.key === 'precipitation_probability')), [0, 100]);
+});
 
 test('daily weather preserves zero and missing data with location-local date boundaries', () => {
   const data = dayWeather({ time: [day - hour, day, day + 23 * hour, day + 24 * hour], temperature_2m: [9, 0, NaN, 99] }, day);
@@ -15,8 +31,8 @@ test('daily weather preserves zero and missing data with location-local date bou
 });
 
 test('continuous weather samples include both edges, cells use explicit start/end times', () => {
-  const times = Array.from({ length: 121 }, (_, i) => day + i * hour);
-  const data = { time: times, temperature_2m: times.map((_, i) => i), precipitation: times.map((_, i) => i), wind_gusts_10m: times.map((_, i) => i === 2 ? 50 : i) };
+  const times = Array.from({ length: 123 }, (_, i) => day + (i - 2) * hour);
+  const data = { time: times, temperature_2m: times.map((_, i) => i - 2), precipitation: times.map((_, i) => i + 1), wind_gusts_10m: times.map((_, i) => i === 1 ? 50 : i) };
   const cells = viewWeather(data, day, { days: 5, step: 3 });
   const points = weatherPoints(data, day, { days: 5, step: 3 });
   assert.equal(cells.length, 40);
@@ -24,6 +40,8 @@ test('continuous weather samples include both edges, cells use explicit start/en
   assert.equal(cells[0].time, day);
   assert.equal(cells[0].periodStart, day);
   assert.equal(cells[0].periodEnd, day + 3 * hour);
+  assert.equal(cells[0].precedingStart, day - 3 * hour);
+  assert.equal(cells[0].precedingEnd, day);
   assert.equal(cells[0].precipitation, 1 + 2 + 3);
   assert.equal(cells[0].wind_gusts_10m, 50);
   assert.equal(points[0].temperature_2m, 0);
@@ -34,10 +52,11 @@ test('continuous weather samples include both edges, cells use explicit start/en
   assert.equal(weatherPoints(data, day).length, 25);
 });
 
-test('hourly rain intervals use the amount ending at the interval right edge', () => {
+test('forecast-time rain columns use the amount ending at the labelled hour', () => {
   const data = { time: [day, day + hour], precipitation: [99, 2] };
-  assert.equal(viewWeather(data, day)[0].precipitation, 2);
-  assert.equal(viewWeather(data, day)[1].precipitation, null);
+  assert.equal(viewWeather(data, day)[0].precipitation, 99);
+  assert.equal(viewWeather(data, day)[1].precipitation, 2);
+  assert.equal(viewWeather(data, day)[2].precipitation, null);
 });
 
 test('fuel cells cover [start,end), retain brief peaks and never include the closing sample', () => {
@@ -61,10 +80,27 @@ test('missing data breaks curves and makes incomplete totals/maxima unavailable'
 });
 
 test('weather scales include zero, subzero temperatures and gust maxima', () => {
-  assert.deepEqual(rowDomain([{ wind_speed_10m: 2, wind_gusts_10m: 16 }], WEATHER_ROWS[3]), [0, 16]);
+  assert.deepEqual(rowDomain([{ wind_speed_10m: 2, wind_gusts_10m: 16 }], WEATHER_ROWS.find(row => row.key === 'wind_speed_10m')), [0, 16]);
   assert.deepEqual(rowDomain([{ temperature_2m: -10 }], WEATHER_ROWS[0]), [-12, 0]);
   assert.deepEqual(rowDomain([{ temperature_2m: 18 }], WEATHER_ROWS[0]), [0, 20]);
-  assert.deepEqual(rowDomain([], WEATHER_ROWS[2]), [0, 1]);
+  assert.deepEqual(rowDomain([], WEATHER_ROWS.find(row => row.key === 'precipitation')), [0, 1]);
+});
+
+test('VPD remains an instantaneous kPa sample in hourly and three-hour views, preserving zero and gaps', () => {
+  const data = {
+    time: Array.from({ length: 25 }, (_, i) => day + i * hour),
+    vapour_pressure_deficit: Float32Array.from({ length: 25 }, (_, i) => i === 0 ? 0 : i === 3 ? NaN : i / 100),
+  };
+  const daily = viewWeather(data, day);
+  const overview = viewWeather(data, day, { days: 1, step: 3 });
+  assert.equal(daily[0].vapour_pressure_deficit, 0);
+  assert.equal(daily[1].vapour_pressure_deficit, data.vapour_pressure_deficit[1]);
+  assert.equal(overview[1].vapour_pressure_deficit, null);
+  assert.equal(overview[2].vapour_pressure_deficit, data.vapour_pressure_deficit[6]);
+  assert.equal(weatherPoints(data, day).at(-1).vapour_pressure_deficit, data.vapour_pressure_deficit[24]);
+  assert.equal(viewWeather({ time: [day] }, day)[0].vapour_pressure_deficit, null);
+  const vpd = WEATHER_ROWS.find(row => row.key === 'vapour_pressure_deficit');
+  assert.deepEqual(rowDomain(daily, vpd), [0, 1]);
 });
 
 test('temperature fill closes against zero and keeps missing segments separate', () => {

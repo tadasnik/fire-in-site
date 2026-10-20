@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { parse } from 'svelte/compiler';
 import { get, writable } from 'svelte/store';
 import { beginLocationSelection, currentLocationSelection } from '../src/lib/shared/locationSelection.js';
+import { fetchWeatherWithProbability } from '../src/lib/weather/precipitationProbability.js';
 
 // Exercise the actual handlers without needing Mapbox, a DOM, or network calls.
 // Svelte's parser selects their source; only external dependencies are replaced.
@@ -178,7 +179,7 @@ for (const stage of ['fetch', 'dead', 'live', 'curing']) {
       return value;
     };
     const fetchForecast = loadHandler('lib/shared/stores/forecastStore.js', 'getForecastOpenMeteo', {
-      get, forecastMode: mode,
+      get, forecastMode: mode, fetchWeatherWithProbability,
       currentLocation: writable({ latitude: 53, userLocation: true, distanceFromPrevious: 99999 }),
       currentLocationSelection, fetchingForecast: loading, forecastDataMode: mode,
       forecastCache: writable(null), forecastOpenMeteo: data, forecastUtcOffset: offset,
@@ -211,7 +212,7 @@ for (const fails of [false, true]) {
     const mode = writable('forecast');
     let requests = 0;
     const refresh = loadHandler('lib/shared/stores/forecastStore.js', 'getForecastOpenMeteo', {
-      get, forecastMode: mode,
+      get, forecastMode: mode, fetchWeatherWithProbability,
       currentLocation: writable({ latitude: 53, userLocation: true, distanceFromPrevious: 99999 }),
       currentLocationSelection, fetchingForecast: loading, forecastDataMode: mode,
       forecastCache: writable(null), forecastOpenMeteo: data, forecastUtcOffset: offset,

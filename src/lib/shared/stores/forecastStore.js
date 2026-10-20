@@ -6,6 +6,7 @@ import {
   getMonth, dateString, focusDay, getDateString, forecastUtcOffset
 } from '$lib/shared/stores/timeStore'
 import { fetchForecastMeteo } from "$lib/weather/openMeteo.ts";
+import { fetchWeatherWithProbability } from '$lib/weather/precipitationProbability.js';
 import { fuelMoistureCalcs } from "$lib/model/fuelMoisture.js";
 import { lfmcCalcs } from "$lib/model/lfmcModel.js";
 import { curingCalcs } from "$lib/model/curingModel.js";
@@ -206,7 +207,7 @@ export async function getForecastOpenMeteo({ hourlyVars, start_date, end_date, f
     const cached = get(forecastCache);
     if (forecast_mode === 'historical' || locationChanged || (modeChanged && !cached)) {
       // Full fetch: historical mode, location changed, or switching to forecast with no cache
-      result = await fetchForecastMeteo(fillParams({ hourlyVars, forecast_mode }));
+      result = await fetchWeatherWithProbability(fillParams({ hourlyVars, forecast_mode }), fetchForecastMeteo);
     } else {
       // Restore cached forecast (mode switch back) or GTI-only refresh (same mode, same location)
       const base = (modeChanged && cached) ? cached : get(forecastOpenMeteo);

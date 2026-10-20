@@ -1,16 +1,23 @@
 import { HOUR_MS } from './forecastTime.js';
 
 export const WEATHER_ROWS = [
-  { key: 'temperature_2m', label: 'Temperature', unit: '°C', top: 54, height: 60, color: '#c2410c' },
-  { key: 'relative_humidity_2m', label: 'Humidity', unit: '%', top: 114, height: 48, color: '#0f766e', domain: [0, 100] },
-  { key: 'precipitation', label: 'Precipitation', unit: 'mm / hour', top: 162, height: 48, color: '#2563eb', bars: true },
-  { key: 'wind_speed_10m', label: 'Wind / gusts', unit: 'km/h', top: 210, height: 64, color: '#475569' },
-  { key: 'cloud_cover', label: 'Cloud cover', unit: '%', top: 274, height: 28, color: '#64748b' },
+  { key: 'temperature_2m', label: 'Temperature', icon: 'wi-thermometer', unit: '°C', top: 32, height: 60, color: '#c2410c' },
+  { key: 'relative_humidity_2m', label: 'Humidity', icon: 'wi-humidity', unit: '%', top: 92, height: 26, color: '#0f766e', domain: [0, 100] },
+  { key: 'vapour_pressure_deficit', label: 'VPD', description: 'Vapour pressure deficit', unit: 'kPa', top: 118, height: 26, color: '#7c3aed', digits: 2 },
+  { key: 'precipitation', label: 'Precipitation', icon: 'wi-raindrop', unit: 'mm/h', top: 144, height: 26, color: '#2563eb', accumulation: true, interval: true },
+  { key: 'precipitation_probability', label: 'Chance', description: 'Chance of precipitation >0.1 mm · Best Match ensembles; 3-hour view shows the maximum hourly chance, not the chance over the entire interval', unit: '%', top: 170, height: 26, color: '#0284c7', domain: [0, 100], interval: true },
+  { key: 'wind_speed_10m', label: 'Wind / gusts', icon: 'wi-strong-wind', unit: 'km/h', top: 196, height: 38, color: '#475569' },
+  { key: 'cloud_cover', label: 'Cloud cover', icon: 'wi-cloudy', unit: '%', top: 234, height: 26, color: '#64748b', domain: [0, 100] },
 ];
-export const WEATHER_HEIGHT = 302;
+export const WEATHER_AXIS_HEIGHT = 22;
+export const WEATHER_HEIGHT = 260;
 export const finiteValue = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
 export const hourText = time => `${String(new Date(time).getUTCHours()).padStart(2, '0')}:00`;
 export const formatValue = (value, digits = 0) => finiteValue(value) === null ? '—' : value.toFixed(digits);
+
+// This is a forecast-time table with a temperature sparkline: all values for
+// an hour share its column centre, regardless of their accumulation period.
+export const forecastColumnTime = (time, step) => Number(time) + step / 2;
 
 // The data source encodes location wall-clock time as UTC milliseconds.
 // Keep a full day of columns; absent hours stay missing rather than becoming zero.
@@ -50,10 +57,13 @@ export function viewWeather(data, start, { days = 1, step = 1 } = {}) {
       ...weatherAt(data, time, indices),
       periodStart: time,
       periodEnd: time + step * HOUR_MS,
-      // Open-Meteo rain/gusts describe the preceding hour, so a 00–03
-      // interval uses the amounts/maxima timestamped 01, 02 and 03.
-      precipitation: aggregate(data, indices, 'precipitation', time + HOUR_MS, step, values => values.reduce((a, b) => a + b, 0)),
-      wind_gusts_10m: aggregate(data, indices, 'wind_gusts_10m', time + HOUR_MS, step, values => Math.max(...values)),
+      precedingStart: time - step * HOUR_MS,
+      precedingEnd: time,
+      // At 09:00, the preceding 3h use API timestamps 07, 08 and 09.
+      // Keep accumulation semantics separate from the column's hit target.
+      precipitation: aggregate(data, indices, 'precipitation', time - (step - 1) * HOUR_MS, step, values => values.reduce((a, b) => a + b, 0)),
+      precipitation_probability: aggregate(data, indices, 'precipitation_probability', time - (step - 1) * HOUR_MS, step, values => Math.max(...values)),
+      wind_gusts_10m: aggregate(data, indices, 'wind_gusts_10m', time - (step - 1) * HOUR_MS, step, values => Math.max(...values)),
     };
   });
 }

@@ -64,9 +64,10 @@ export async function fuelMoistureCalcs(forecast, timeLag, latitude) {
     );
     for (let i = 0; i < deadFuelsCount; i++) {
       let values = []
-      let forecastIndex = 0;
       for (let x = i; x < resultMoist.length; x = x + deadFuelsCount) {
-        forecastIndex = forecastIndex + 1;
+        // ONNX rows are interleaved by fuel within each timestamp. Use the
+        // same hour's Nelson moisture, never the next hour's rain response.
+        const forecastIndex = Math.floor(x / deadFuelsCount);
         // Floor dead FMC at 1% — 0% is physically implausible and can cause
         // extreme/degenerate behaviour downstream.
         if (resultMoist[x] < 1) {

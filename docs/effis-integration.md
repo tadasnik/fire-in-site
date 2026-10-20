@@ -2,8 +2,8 @@
 
 Investigated against the application and live services on 16 October 2026.
 This document records the service investigation and proposed integration. The
-point forecast panel is now implemented on the `effis-fwi` branch; spatial layers
-and numeric raster ingestion remain proposals.
+point forecast panel and daily FWI map are implemented on the `effis-fwi` branch;
+numeric raster ingestion remains a proposal.
 
 ## Recommendation
 
@@ -220,6 +220,40 @@ Very Extreme. All-null records remain missing and have no danger class.
 Before shipping, verify coordinate order, daily date alignment across BST/GMT,
 missing values, superseded requests, map/point agreement and upstream failures.
 Check content types and payloads: WMS service errors can arrive with HTTP 200.
+
+### Implemented daily map view
+
+The forecast view switch now offers **Day / 5 days / FWI map**. The map replaces
+the weather/fuel charts and selected-hour comparison, rather than rendering a
+second forecast timeline. Returning to Day or 5 days restores those charts.
+The existing day tabs select the FWI raster's `TIME`; the hour selector is hidden
+in this mode. Map date controls remain usable while hourly weather loads or fails.
+Historical/user-defined modes do not show this current-forecast map option.
+
+`EffisMap.svelte` lazy-loads the existing MapLibre renderer only when selected,
+uses the keyless street tile proxy as its background, and overlays the live GWIS
+`ecmwf.fwi` classified raster. It pans/zooms independently of the location picker,
+marks the selected forecast location, and reuses its point FWI in a separate
+badge. Panning does not change the selected location or start model calculations.
+The six-class legend reuses `fwiDanger` colours, checked against the live official
+legend. Tiles use nearest resampling and max source zoom 8 (overzoomed locally).
+Users can adjust opacity and recenter the map.
+
+`/api/effis/tiles/[date]/[z]/[x]/[y]` validates XYZ bounds and the same bounded
+current-date window as the point adapter, computes Web Mercator bounds, and
+requests a fixed WMS product/host with a 15-second timeout. Valid 256px PNGs get
+short browser/CDN caching; XML/HTML WMS exceptions and upstream failures return
+uncacheable errors. It does not accept arbitrary upstream URLs, layers or sizes.
+Date changes remove the previous layer/source before adding a date-keyed source,
+so the previous day's raster is not shown as if it belonged to the new date.
+Late errors from retired sources are ignored. Tile and point failures remain
+independent; no-data/transparent areas are never labelled Low.
+
+The map credits CEMS / EFFIS, ECMWF and the street-map providers. Point and raster
+products may update at different times; the UI states this limitation. Loading a
+PNG does not prove that every area/date has data: uncoloured areas may be missing
+or outside product coverage. This is regional daily fire-weather context, not
+the application's hourly fuel-specific fire behaviour prediction.
 
 ## Primary references
 

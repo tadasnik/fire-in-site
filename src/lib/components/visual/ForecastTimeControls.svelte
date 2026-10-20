@@ -1,9 +1,10 @@
 <script>
   import { currentDateTime, dateTime, focusDay, forecastUtcOffset, timeMode } from '$lib/shared/stores/timeStore';
-  import { forecastMode, forecastOpenMeteo, forecastDataMode, fetchingForecast } from '$lib/shared/stores/forecastStore';
+  import { forecastMode, forecastOpenMeteo, forecastDataMode, fetchingForecast, daysInForecast } from '$lib/shared/stores/forecastStore';
   import { availableHours, localHour, instantForLocalHour, HOUR_MS } from '$lib/shared/forecastTime.js';
   import DayPicker from './DayPicker.svelte';
   import HistoricalSelectDate from './HistoricalSelectDate.svelte';
+  let { effis = null, dailyOnly = false, dailySummaries = new Map() } = $props();
 
   const dateFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
   const ready = $derived($forecastDataMode === $forecastMode && !$fetchingForecast && $forecastOpenMeteo.time.length > 1);
@@ -12,6 +13,8 @@
   const nowAvailable = $derived($forecastOpenMeteo.time.includes(Math.floor(Date.now() / HOUR_MS) * HOUR_MS + $forecastUtcOffset * 1000));
   const offset = $derived($forecastUtcOffset / 3600);
   const zoneLabel = $derived(`Location time · UTC${offset >= 0 ? '+' : '−'}${Math.abs(offset)}`);
+  const mapDays = $derived(ready ? $daysInForecast : Array.from({ length: 5 }, (_, i) =>
+    (Math.floor((Date.now() + $forecastUtcOffset * 1000) / 86400000) + i) * 86400000));
 
   function selectHour(value) {
     timeMode.set('user');
@@ -27,9 +30,9 @@
 <section class="workspace-section time-controls" aria-labelledby="time-controls-heading">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div>
-      <h2 id="time-controls-heading" class="section-title">{$forecastMode === 'historical' ? 'Historical weather' : 'Forecast time'}</h2>
+      <h2 id="time-controls-heading" class="section-title">{$forecastMode === 'historical' ? 'Historical weather' : dailyOnly ? 'Forecast day' : 'Forecast time'}</h2>
     </div>
-    {#if ready}
+    {#if ready && !dailyOnly}
       <div class="time-selection">
         <label class="control-label mb-0" for="forecast-hour">Hour</label>
         <select id="forecast-hour" class="control-input hour-select" value={hour} disabled={!hours.length} onchange={(e) => selectHour(e.currentTarget.value)}>
@@ -40,8 +43,11 @@
     {/if}
   </div>
   {#if $forecastMode === 'historical'}<HistoricalSelectDate />{/if}
-  {#if ready}
-    {#if $forecastMode === 'forecast'}<DayPicker />{/if}
+  {#if dailyOnly && $forecastMode === 'forecast'}
+    <DayPicker {effis} days={mapDays} dailySummaries={ready ? dailySummaries : new Map()} />
+    <p class="mt-2 control-help">{dateFormat.format($focusDay)} · daily EFFIS forecast</p>
+  {:else if ready}
+    {#if $forecastMode === 'forecast'}<DayPicker {effis} {dailySummaries} />{/if}
     <p class="mt-2 text-xs text-gray-600 dark:text-gray-300">
       <span class="font-medium text-gray-900 dark:text-gray-100">{dateFormat.format($focusDay)} · {String(hour).padStart(2, '0')}:00</span>
       <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">{zoneLabel}</span>

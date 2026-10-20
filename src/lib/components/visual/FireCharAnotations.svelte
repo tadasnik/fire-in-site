@@ -8,11 +8,8 @@
   import { getContext, tick } from "svelte";
   import { max } from "d3-array";
   import { writable } from "svelte/store";
-  import heli from "$lib/assets/icons/helicop.png";
-  import beater from "$lib/assets/icons/beater.png";
-  import leaf_blower from "$lib/assets/icons/leaf_blower.png";
-  import multi from "$lib/assets/icons/multi.png";
-  import unimog from "$lib/assets/icons/unimog.png";
+  import { suppressionIcons } from '$lib/shared/suppression.js';
+  const { helicopter: heli, beater, blower: leaf_blower, vehicles: multi, unimog } = suppressionIcons;
   import UKFuelModels from "$lib/data/UKFuelModels.json";
 
   const { data, x, y, xScale, yScale, xRange, yRange, xDomain } =

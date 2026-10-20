@@ -28,7 +28,7 @@ export async function fetchForecastMeteo(params: {
   const url = params.forecast_mode === 'forecast' ? FORECAST_URL : ARCHIVE_URL
   const { forecast_mode, ...apiParams } = params;
   // One sample beyond the visible range closes the continuous weather curves.
-  const needsBoundary = params.hourly.includes('wind_speed_10m') || params.hourly.includes('global_tilted_irradiance');
+  const needsBoundary = params.hourly.includes('wind_speed_10m') || params.hourly.includes('global_tilted_irradiance') || params.hourly.includes('precipitation_probability');
   let closingTime = Infinity;
   if (needsBoundary && forecast_mode === 'forecast') apiParams.forecast_days = (params.forecast_days ?? 5) + 1;
   if (needsBoundary && forecast_mode === 'historical' && params.end_date) {
