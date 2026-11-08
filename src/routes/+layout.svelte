@@ -27,6 +27,7 @@
     InfoCircleOutline,
     BookOpenOutline,
     ChartLineUpOutline,
+    ScaleBalancedOutline,
   } from "flowbite-svelte-icons";
   import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
@@ -57,6 +58,7 @@
     { label: "About", href: "/about", icon: InfoCircleOutline },
     { label: "Tutorial", href: "/tutorial", icon: BookOpenOutline },
     { label: "Climate", href: "/climate", icon: ChartLineUpOutline },
+    { label: "Terms", href: TERMS_HREF, icon: ScaleBalancedOutline },
   ];
   const sidebarIconClass =
     "w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white";
