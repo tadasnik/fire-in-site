@@ -23,6 +23,20 @@ Built with Svelte and flowbite.
 
 ## License
 
+> **TODO(legal): unresolved — do not publish the use statement until this is settled.**
+> This README declares the MIT Licence, which permits commercial use,
+> modification, sublicensing and sale, and is irrevocable for anyone who
+> already holds a copy. The use statement being prepared for the site
+> (`/terms`, see `src/lib/shared/legal.js`) states that the data, equations and
+> fuel models are *not* available for commercial use. The two contradict each
+> other, and this repository is public.
+>
+> The statement's subject is the data, fuel models and content, which is not the
+> same thing as the application source. The likely resolution is to scope them
+> separately — source under a named licence, data and fuel models under the
+> restrictive statement — but the owner of the IP has to decide. There is also
+> no `LICENSE` file, so the MIT claim is README-only and its scope is undefined.
+
 This project is licensed under the MIT License.
 
 ## Acknowledgments

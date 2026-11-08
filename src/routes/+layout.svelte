@@ -32,6 +32,12 @@
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
+  import {
+    COPYRIGHT_LINE,
+    MARKED_NAME,
+    SHORT_NOTICE,
+    TERMS_HREF,
+  } from "$lib/shared/legal.js";
   import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
   /**
@@ -188,6 +194,12 @@
       Understanding fuels, fire behaviour and impacts’ (NE/T003553/1) and
       funding from the European Union’s Horizon 2020 research and innovation
       programme under grant agreement No. 101003890 (FirEUrisk)
+    </p>
+    <p class="text-center text-xs">
+      {COPYRIGHT_LINE} · {MARKED_NAME} · {SHORT_NOTICE}
+      <a href={TERMS_HREF} class="underline hover:no-underline"
+        >Open access, collaboration and use</a
+      >
     </p>
     <FooterBrand
       href="https://ukfdrs.com/"

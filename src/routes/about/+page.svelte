@@ -1,6 +1,7 @@
 <script>
   import { Carousel, Controls, CarouselIndicators } from "flowbite-svelte";
   import { Heading, P, A, Secondary } from "flowbite-svelte";
+  import { MARKED_NAME, TERMS_HREF } from "$lib/shared/legal.js";
 
   const fieldWork = import.meta.glob("$lib/assets/fieldWorkPhotos/*.webp", {
     eager: true,
@@ -160,6 +161,20 @@
           To find out how to use FireInsite
         </span>
         please visit <A href="/tutorial">tutorial</A> page.
+      </P>
+    </div>
+
+    <div class="p-8">
+      <P class="mt-2">
+        <span class="text-lg leading-tight text-primary-900 font-bold">
+          FireInSite is an open access tool
+        </span>
+        and we welcome collaboration. The data, equations and fuel models within
+        it are not currently available for commercial use without our prior
+        written permission, and the {MARKED_NAME} name and logo should not be
+        used in a way that suggests endorsement or affiliation. Please see
+        <A href={TERMS_HREF}>open access, collaboration and use</A> for the full
+        statement, or to discuss a particular use with us.
       </P>
     </div>
   </div>
