@@ -21,31 +21,24 @@ Built with Svelte and flowbite.
 * **Kerryn Little**
 
 
-## License
+## Licence and use
 
-> **TODO(legal): unresolved — do not publish the use statement until this is settled.**
-> This README declares the MIT Licence, which permits commercial use,
-> modification, sublicensing and sale, and is irrevocable for anyone who
-> already holds a copy. The use statement being prepared for the site
-> (`/terms`, see `src/lib/shared/legal.js`) states that the data, equations and
-> fuel models are *not* available for commercial use. The two contradict each
-> other, and this repository is public.
->
-> The statement has since been narrowed: it restricts FireInSite as a *system*
-> (the application, its source code, and the integration and calibration of the
-> models within it), not the underlying data and fuel models, which are already
-> published under their own terms. That removes the contradiction over the data
-> but not over the source code, which is what MIT here would cover.
->
-> Proposed plan, pending the ownership decision: make this repository private
-> (which stops new copies accruing under the MIT line but does not revoke the
-> grant for copies already made), and publish a curated, dated snapshot under a
-> UKFDRS organisation with a deliberate licence in an actual `LICENSE` file.
-> As of 2026-11-10 this repository has 0 forks, 0 stars and 1 watcher, and the
-> MIT line was added on 2024-12-16 in a commit titled "update readme" — never
-> backed by a `LICENSE` file or a package.json field.
+FireInSite as a system — this application, its source code, and the integration
+and calibration of the models within it — is not available for commercial use
+without prior written permission. No open source licence is granted. See
+[Open access, collaboration and use](https://fireinsite.org/terms) for the full
+statement, including what counts as commercial use and how to discuss a
+particular use with us.
 
-This project is licensed under the MIT License.
+The science behind FireInSite is published separately and carries its own terms:
+the fuel moisture measurements, the UK fuel models derived from them, and the
+BehavePlus fire behaviour equations. This statement adds no restriction to those.
+
+The FireInSite name and brand identity are the subject of a UK trade mark
+application.
+
+© 2026 FireInSite project team. All rights reserved, subject to the permissions
+described in that statement.
 
 ## Acknowledgments
 

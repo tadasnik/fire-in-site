@@ -7,3 +7,6 @@ node_modules/
 *.DS_Store
 dist/
 memory/
+
+# Local-only legal working notes — never published
+docs/legal/
