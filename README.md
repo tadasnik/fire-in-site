@@ -23,6 +23,28 @@ Built with Svelte and flowbite.
 
 ## License
 
+> **TODO(legal): unresolved — do not publish the use statement until this is settled.**
+> This README declares the MIT Licence, which permits commercial use,
+> modification, sublicensing and sale, and is irrevocable for anyone who
+> already holds a copy. The use statement being prepared for the site
+> (`/terms`, see `src/lib/shared/legal.js`) states that the data, equations and
+> fuel models are *not* available for commercial use. The two contradict each
+> other, and this repository is public.
+>
+> The statement has since been narrowed: it restricts FireInSite as a *system*
+> (the application, its source code, and the integration and calibration of the
+> models within it), not the underlying data and fuel models, which are already
+> published under their own terms. That removes the contradiction over the data
+> but not over the source code, which is what MIT here would cover.
+>
+> Proposed plan, pending the ownership decision: make this repository private
+> (which stops new copies accruing under the MIT line but does not revoke the
+> grant for copies already made), and publish a curated, dated snapshot under a
+> UKFDRS organisation with a deliberate licence in an actual `LICENSE` file.
+> As of 2026-11-10 this repository has 0 forks, 0 stars and 1 watcher, and the
+> MIT line was added on 2024-12-16 in a commit titled "update readme" — never
+> backed by a `LICENSE` file or a package.json field.
+
 This project is licensed under the MIT License.
 
 ## Acknowledgments

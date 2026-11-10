@@ -27,11 +27,18 @@
     InfoCircleOutline,
     BookOpenOutline,
     ChartLineUpOutline,
+    ScaleBalancedOutline,
   } from "flowbite-svelte-icons";
   import FireInSiteLogo from "$lib/assets/FireInSitelogo.png";
   import ukfdrsLogo from "$lib/assets/ukfdrs-logo.png";
   import SettingsDropdown from "$lib/components/ui/SettingsDropdown.svelte";
   import DisclamerModal from "$lib/components/ui/DisclamerModal.svelte";
+  import {
+    COPYRIGHT_LINE,
+    MARKED_NAME,
+    SHORT_NOTICE,
+    TERMS_HREF,
+  } from "$lib/shared/legal.js";
   import ValidationModal from "$lib/components/ui/ValidationModal.svelte";
 
   /**
@@ -51,6 +58,7 @@
     { label: "About", href: "/about", icon: InfoCircleOutline },
     { label: "Tutorial", href: "/tutorial", icon: BookOpenOutline },
     { label: "Climate", href: "/climate", icon: ChartLineUpOutline },
+    { label: "Terms", href: TERMS_HREF, icon: ScaleBalancedOutline },
   ];
   const sidebarIconClass =
     "w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white";
@@ -188,6 +196,12 @@
       Understanding fuels, fire behaviour and impacts’ (NE/T003553/1) and
       funding from the European Union’s Horizon 2020 research and innovation
       programme under grant agreement No. 101003890 (FirEUrisk)
+    </p>
+    <p class="text-center text-xs">
+      {COPYRIGHT_LINE} · {MARKED_NAME} · {SHORT_NOTICE}
+      <a href={TERMS_HREF} class="underline hover:no-underline"
+        >Open access, collaboration and use</a
+      >
     </p>
     <FooterBrand
       href="https://ukfdrs.com/"

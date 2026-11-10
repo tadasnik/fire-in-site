@@ -1,8 +1,11 @@
 <script>
   import { onMount } from "svelte";
+  import { SHORT_NOTICE, TERMS_HREF } from "$lib/shared/legal.js";
 
   let showModal = $state(false);
-  const storageKey = "fireInSiteDisclaimerAcknowledged";
+  // Bumped when the disclaimer text changes materially, so visitors who
+  // acknowledged an earlier version are shown the current one.
+  const storageKey = "fireInSiteDisclaimerAcknowledged.2";
 
   onMount(() => {
     const acknowledged = localStorage.getItem(storageKey);
@@ -38,11 +41,26 @@
         >. Users are strongly encouraged to apply their own judgment and consult
         additional sources when making decisions based on this application.
       </p>
-      <p class="mb-4 text-sm text-gray-700">
+      <p class="mb-3 text-sm text-gray-700">
         <strong
           >The authors and developers of FireInSite cannot accept responsibility
           or liability for any loss, damage, or consequences resulting from the
           use of this application or the information it provides.</strong
+        >
+        Nothing in this disclaimer excludes or limits liability for death or
+        personal injury caused by negligence, or for anything else that cannot
+        lawfully be excluded or limited.
+      </p>
+      <!--
+        TODO(legal): the carve-out sentence above is required — under the Unfair
+        Contract Terms Act 1977 liability for death or personal injury from
+        negligence cannot be excluded, and the previous blanket exclusion risked
+        being unenforceable in full. Confirm the wording before publishing.
+      -->
+      <p class="mb-4 text-sm text-gray-700">
+        {SHORT_NOTICE}
+        <a href={TERMS_HREF} class="underline hover:no-underline"
+          >Open access, collaboration and use</a
         >
       </p>
       <div class="flex justify-end">
