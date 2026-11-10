@@ -13,7 +13,7 @@
   <title>Open access, collaboration and use — FireInSite</title>
   <meta
     name="description"
-    content="How FireInSite may be used: open access for non-commercial use, an invitation to collaborate, and the FireInSite name and brand identity."
+    content="How FireInSite may be used: the underlying science is published and open, the FireInSite system is not available for commercial use without permission, and we welcome collaboration."
   />
   <meta
     property="og:title"
@@ -21,7 +21,7 @@
   />
   <meta
     property="og:description"
-    content="How FireInSite may be used: open access for non-commercial use, an invitation to collaborate, and the FireInSite name and brand identity."
+    content="The science behind FireInSite is published and open. The system itself is not available for commercial use without our prior written permission."
   />
 </svelte:head>
 
@@ -33,27 +33,55 @@
       </Heading>
 
       <P class="mt-2">
-        FireInSite has been developed as an open access tool. At this point in
-        time, the data, equations, fuel models and other content held within
-        FireInSite are
-        <span class="font-bold">not available for commercial use</span>. They
+        <span class="font-bold text-primary-900"
+          >The science behind FireInSite is open.</span
+        >
+        The fuel moisture measurements, vegetation flammability data and the UK
+        fuel models derived from them are published, and the fire behaviour
+        equations come from the published BehavePlus system. Use that underlying
+        science from those sources, on the terms under which it was released.
+        This statement adds no restriction to data or publications already made
+        available.
+      </P>
+      <!--
+        TODO(legal): the published data and fuel models went out under their own
+        licence terms, which have not been checked. If any were released under a
+        permissive licence such as CC BY, commercial use of them is already
+        permitted and nothing here can withdraw that.
+      -->
+
+      <P class="mt-6">
+        <span class="font-bold text-primary-900"
+          >This statement covers FireInSite as a system</span
+        >
+        — the application, its source code, and the integration and calibration
+        of the models within it. That is our own work, and at this point in time
+        it is <span class="font-bold">not available for commercial use</span>. It
         may not be reproduced, adapted, incorporated into other products or
         services, or otherwise used for commercial purposes without our prior
         written permission.
       </P>
 
       <P class="mt-6">
+        By commercial use we mean use intended for or directed toward commercial
+        advantage or private monetary compensation — for example, consultancy
+        delivered to a client, or a product or service offered for a fee. Use by
+        fire and rescue services, public bodies, researchers and educators for
+        their own purposes is not commercial use.
+      </P>
+      <!--
+        TODO(legal): this definition is modelled on the UK Non-Commercial
+        Government Licence and needs confirming. The carve-in for fire and
+        rescue services and public bodies matters most — they are core users and
+        should not have to ask whether they are permitted.
+      -->
+
+      <P class="mt-6">
         We welcome open collaboration. Our aim is to keep FireInSite open, and
         we would be glad to work with individuals and organisations who share
         that approach and who wish to expand, improve and continue its
-        development.{#if CONTACT_SENTENCE}
-          {" "}{CONTACT_SENTENCE}
-        {/if}
+        development. {CONTACT_SENTENCE}
       </P>
-      <!--
-        TODO(legal): the collaboration paragraph needs a contact address.
-        Set CONTACT_EMAIL in $lib/shared/legal.js and the sentence appears.
-      -->
 
       <P class="mt-6">
         {MARK_SYMBOL === "™"

@@ -169,10 +169,13 @@
         <span class="text-lg leading-tight text-primary-900 font-bold">
           FireInSite is an open access tool
         </span>
-        and we welcome collaboration. The data, equations and fuel models within
-        it are not currently available for commercial use without our prior
-        written permission, and the {MARKED_NAME} name and logo should not be
-        used in a way that suggests endorsement or affiliation. Please see
+        and we welcome collaboration. The science behind it is published: the
+        fuel moisture data and the UK fuel models derived from it are available
+        from their own sources, on their own terms. The FireInSite system
+        itself — the application and the models as integrated and calibrated
+        within it — is not currently available for commercial use without our
+        prior written permission, and the {MARKED_NAME} name and logo should not
+        be used in a way that suggests endorsement or affiliation. Please see
         <A href={TERMS_HREF}>open access, collaboration and use</A> for the full
         statement, or to discuss a particular use with us.
       </P>

@@ -6,11 +6,18 @@
  * TEMPORARY WORDING — the UK trademark application is pending. On
  * registration the following all change together, and only here:
  *   - MARK_SYMBOL        "™" -> "®"
- *   - markStatus         "the subject of a trade mark application" -> registered wording
+ *   - MARK_STATUS        "the subject of a trade mark application" -> registered
  *   - add the UKIPO registration number if the review wants it shown
  * Using ® before the UKIPO grants registration is an offence under section 95
  * of the Trade Marks Act 1994, so leave this as ™ until registration is
  * confirmed in writing.
+ *
+ * SCOPE — the statement restricts FireInSite as a system (the application, its
+ * source code, and the integration and calibration of the models within it).
+ * It deliberately does NOT restrict the underlying fuel moisture data, fuel
+ * models or fire behaviour equations, which are already published under their
+ * own terms. Keep that distinction when editing: claiming the published
+ * science would be both inaccurate and unenforceable.
  */
 
 /** TODO(legal): flip to "®" only once UKIPO registration is granted. */
@@ -29,12 +36,6 @@ export const COPYRIGHT_HOLDER = "FireInSite project team";
 
 export const COPYRIGHT_YEAR = "2026";
 
-/**
- * TODO(legal): the site has no contact address at all today. Use a role
- * address that outlives individual staff, not a personal one.
- */
-export const CONTACT_EMAIL = "";
-
 /** Shown on /terms so readers can see how current the statement is. */
 export const STATEMENT_REVIEWED = "November 2026";
 
@@ -51,12 +52,13 @@ export const COPYRIGHT_LINE = `© ${COPYRIGHT_YEAR} ${COPYRIGHT_HOLDER}`;
  * the full statement lives on /terms.
  */
 export const SHORT_NOTICE =
-  "Not for commercial use without permission.";
+  "FireInSite is not for commercial use without permission.";
 
 /**
- * The contact sentence, rendered only once a real address exists so the site
- * never ships a "[contact email]" placeholder to visitors.
+ * The collaboration invitation. No address is published by choice.
+ * TODO(legal): the site offers no general contact route — the only form is the
+ * flame length observation survey. Decide how a permission request should
+ * actually reach you before this goes live.
  */
-export const CONTACT_SENTENCE = CONTACT_EMAIL
-  ? `If you would like to collaborate, or to discuss a particular use, please contact us at ${CONTACT_EMAIL}.`
-  : "";
+export const CONTACT_SENTENCE =
+  "If you would like to collaborate, or to discuss a particular use, please contact us.";
